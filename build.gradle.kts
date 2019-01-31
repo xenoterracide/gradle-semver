@@ -7,23 +7,31 @@
  */
 
 plugins {
-    // Apply the java-library plugin to add support for Java Library
+    idea
     `java-library`
+    `java-gradle-plugin`
+    id("com.gradle.plugin-publish").version("0.10.0")
 }
 
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api("org.apache.commons:commons-math3:3.6.1")
+    implementation("org.apache.commons:commons-lang3:3.+")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.+")
+}
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation("com.google.guava:guava:26.0-jre")
-
-    // Use JUnit test framework
-    testImplementation("junit:junit:4.12")
+pluginBundle {
+    // These settings are set for the whole plugin bundle
+    vcsUrl = "https://bitbucket.org/xenoterracide/gradle-plugin-bundle"
+    website = vcsUrl
+    plugins {
+        create("sem-ver") {
+            id = "com.xenoterracide.gradle.$name"
+            displayName = "Xeno's SemVer with Git"
+            description = "Use pure java to parse semantic git tags, and add a project.version"
+            tags = listOf("git")
+        }
+    }
 }
