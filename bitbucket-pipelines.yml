@@ -4,7 +4,6 @@ options:
 pipelines:
   default:
     - step:
-        size: 2x
         caches:
           - gradle
         script:
@@ -13,7 +12,6 @@ pipelines:
     update:
       - step:
           name: test locks and gradle
-          size: 2x
           caches:
             - gradle
           script:

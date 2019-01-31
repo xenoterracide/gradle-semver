@@ -17,6 +17,10 @@ repositories {
     mavenCentral()
 }
 
+dependencyLocking {
+    lockAllConfigurations()
+}
+
 dependencies {
     implementation("org.apache.commons:commons-lang3:3.+")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.+")
