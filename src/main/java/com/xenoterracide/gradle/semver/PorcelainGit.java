@@ -33,33 +33,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.StreamSupport;
 
-public final class PorcelainGit {
+final class PorcelainGit {
     private static final String VERSION_PREFIX = "v";
     private static final String TAG_PREFIX = "refs/tags/";
     private static final String VERSION_GLOB = VERSION_PREFIX + "[0-9]*.[0-9]*.[0-9]*";
 
     private final Git git;
 
-    public PorcelainGit( Git git ) {
+    PorcelainGit( Git git ) {
         this.git = Objects.requireNonNull( git );
     }
 
-    public String describe() throws InvalidPatternException, GitAPIException,
-            IOException {
-        String version = git.describe().setMatch( VERSION_GLOB ).call();
-        if ( version == null ) {
-            Ref mostRecentTag = findMostRecentTag();
-            if ( mostRecentTag != null ) {
-                String vtag = StringUtils.removeStart( mostRecentTag.getName(), TAG_PREFIX );
-                ObjectId head = getRepo().resolve( "HEAD" );
-                long commitCount = countCommits( mostRecentTag.getPeeledObjectId(), head.toObjectId() );
-                version = String.join( "-", vtag, String.valueOf( commitCount ),
-                        'g' + head.name().substring( 0, 7 ), "SNAPSHOT"
-                );
-
-            }
-        }
-        return version;
+    private static <T> T getLast( List<T> list ) {
+        return list != null && !list.isEmpty() ? list.get( list.size() - 1 ) : null;
     }
 
     Ref findMostRecentTag() throws IOException {
@@ -75,8 +61,22 @@ public final class PorcelainGit {
         return StreamSupport.stream( git.log().addRange( a, b ).call().spliterator(), true ).count();
     }
 
-    public static <T> T getLast( List<T> list ) {
-        return list != null && !list.isEmpty() ? list.get( list.size() - 1 ) : null;
+    String describe() throws InvalidPatternException, GitAPIException,
+            IOException {
+        String version = git.describe().setMatch( VERSION_GLOB ).call();
+        if ( version == null ) {
+            Ref mostRecentTag = findMostRecentTag();
+            if ( mostRecentTag != null ) {
+                String vtag = StringUtils.removeStart( mostRecentTag.getName(), TAG_PREFIX );
+                ObjectId head = getRepo().resolve( "HEAD" );
+                long commitCount = countCommits( mostRecentTag.getPeeledObjectId(), head.toObjectId() );
+                version = String.join( "-", vtag, String.valueOf( commitCount ),
+                        'g' + head.name().substring( 0, 7 ), "SNAPSHOT"
+                );
+
+            }
+        }
+        return version;
     }
 
     private RefDatabase getDb() {

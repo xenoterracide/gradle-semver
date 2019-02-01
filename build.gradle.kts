@@ -29,7 +29,7 @@ dependencies {
 
 pluginBundle {
     // These settings are set for the whole plugin bundle
-    vcsUrl = "https://bitbucket.org/xenoterracide/gradle-plugin-bundle"
+    vcsUrl = "https://bitbucket.org/xenoterracide/gradle-plugin-mirror"
     website = vcsUrl
     plugins {
         create("sem-ver") {
