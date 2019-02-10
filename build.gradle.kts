@@ -11,7 +11,7 @@ plugins {
     `java-library`
     `java-gradle-plugin`
     id("com.gradle.plugin-publish").version("0.10.0")
-    id("com.xenoterracide.gradle.sem-ver").version("0.7.11")
+    id("com.xenoterracide.gradle.sem-ver").version("0.8.1")
 }
 group="com.xenoterracide"
 repositories {
