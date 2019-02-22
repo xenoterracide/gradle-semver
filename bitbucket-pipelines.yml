@@ -1,4 +1,4 @@
-image: gradle:jdk11
+image: gradle:jdk8
 options:
   max-time: 5
 pipelines:
