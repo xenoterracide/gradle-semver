@@ -27,6 +27,11 @@ dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.+")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 pluginBundle {
     // These settings are set for the whole plugin bundle
     vcsUrl = "https://bitbucket.org/xenoterracide/gradle-plugin-mirror"
