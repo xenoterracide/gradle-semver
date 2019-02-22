@@ -11,8 +11,8 @@ plugins {
     `java-library`
     `java-gradle-plugin`
     id("com.gradle.plugin-publish").version("0.10.0")
-    id("com.xenoterracide.gradle.sem-ver").version("0.8.1")
 }
+version = "0.8.4"
 group="com.xenoterracide"
 repositories {
     mavenCentral()
