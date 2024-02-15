@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.InvalidPatternException;
-import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.BaseRepositoryBuilder;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -23,9 +23,8 @@ public class SemVerPlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    try {
-      Repository repo = new FileRepositoryBuilder().readEnvironment().findGitDir(project.getProjectDir()).build();
-
+    BaseRepositoryBuilder<?, ?> builder = new FileRepositoryBuilder().findGitDir(project.getProjectDir());
+    try (var repo = builder.build()) {
       Optional
         .ofNullable(new PorcelainGit(new Git(repo)).describe())
         .map(v -> v.substring(1))

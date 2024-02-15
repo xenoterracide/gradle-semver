@@ -20,12 +20,15 @@ dependencies {
 
 java {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(8))
+    languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
 
 tasks.withType<Jar> {
   archiveBaseName.set(project.path.substring(1).replace(":", "-"))
+}
+tasks.compileJava {
+  options.release = 11
 }
 
 tasks.withType<JavaCompile>().configureEach {

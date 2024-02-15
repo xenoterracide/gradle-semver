@@ -5,7 +5,7 @@ buildscript { dependencyLocking { lockAllConfigurations() } }
 plugins {
   `java-library`
   `java-gradle-plugin`
-  id("our.spotless")
+  id("our.javalibrary")
 }
 
 version = "0.8.4"
