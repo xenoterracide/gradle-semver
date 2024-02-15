@@ -1,0 +1,28 @@
+name: Update Node
+on:
+  schedule:
+    #         ┌───────────── minute (0 - 59)
+    #         │ ┌───────────── hour (0 - 23)
+    #         │ │ ┌───────────── day of the month (1 - 31)
+    #         │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #         │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #         * * * * *
+    - cron: "0 4 * * *" # 4am every Wednesday
+jobs:
+  update-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+      - run: npm update
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          title: "chore: Update Node Dependencies"
+          branch: topic/update-node
+          token: ${{ secrets.PAT }}
+      - run: gh pr merge --auto --squash ${{ env.PULL_REQUEST_NUMBER }}
+        if: ${{ env.PULL_REQUEST_NUMBER != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}

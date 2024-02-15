@@ -1,0 +1,34 @@
+name: Update Java
+on:
+  schedule:
+    #         ┌───────────── minute (0 - 59)
+    #         │ ┌───────────── hour (0 - 23)
+    #         │ │ ┌───────────── day of the month (1 - 31)
+    #         │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #         │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #         * * * * *
+    - cron: "0 3 * * *" # 3am every Wednesday
+jobs:
+  update-java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: current
+          arguments: wrapper --write-locks
+      - run: ./gradlew --version
+      - run: find . -name '*gradle.lockfile' -delete
+      - run: ./gradlew wrapper --write-locks
+      - run: ./gradlew build buildHealth --write-locks
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          title: "chore: Update Java Dependencies"
+          branch: topic/update-java
+          token: ${{ secrets.GH_MERGE_PAT }}
+      - run: gh pr merge --auto --squash ${{ env.PULL_REQUEST_NUMBER }}
+        if: ${{ env.PULL_REQUEST_NUMBER != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_MERGE_PAT }}
