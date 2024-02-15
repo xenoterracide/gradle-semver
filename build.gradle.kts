@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2024 Caleb Cushing.
+buildscript { dependencyLocking { lockAllConfigurations() } }
+
 plugins {
   `java-library`
   `java-gradle-plugin`
@@ -17,6 +19,6 @@ dependencyLocking {
 }
 
 dependencies {
-  implementation("org.apache.commons:commons-lang3:3.+")
-  implementation("org.eclipse.jgit:org.eclipse.jgit:6.+")
+  implementation(libs.commons.lang)
+  implementation(libs.jgit)
 }

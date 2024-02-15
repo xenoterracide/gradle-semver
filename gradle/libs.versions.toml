@@ -10,7 +10,7 @@ autoservice = "com.google.auto.service:auto-service:1.+"
 checker-annotations = { module = "org.checkerframework:checker-qual", version.ref = "checker" }
 checker-core = { module = "org.checkerframework:checker", version.ref = "checker" }
 commons-io = "commons-io:commons-io:2.+"
-commons-lang = { module = "org.apache.commons:commons-lang3" }
+commons-lang = "org.apache.commons:commons-lang3:3.+"
 compile-testing = "com.google.testing.compile:compile-testing:0.+"
 equalsverifier = "nl.jqno.equalsverifier:equalsverifier:3.+"
 errorprone-annotations = { module = "com.google.errorprone:error_prone_annotations", version.ref = "ep" }
@@ -27,6 +27,7 @@ jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-d
 jackson-module-parameter-names = { module = "com.fasterxml.jackson.module:jackson-module-parameter-names" }
 java-parser = "com.github.javaparser:javaparser-core:3.+"
 jakarta-annotation = { module = "jakarta.annotation:jakarta.annotation-api" }
+jgit = "org.eclipse.jgit:org.eclipse.jgit:6.+"
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-bom = "org.junit:junit-bom:5.+"
 junit-parameters = { module = "org.junit.jupiter:junit-jupiter-params" }
