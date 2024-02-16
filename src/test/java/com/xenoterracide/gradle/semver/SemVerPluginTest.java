@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.testkit.runner.GradleRunner;
@@ -48,6 +49,6 @@ class SemVerPluginTest {
       .withPluginClasspath()
       .withArguments("getSemVer")
       .build();
-    assertThat(out.getOutput()).matches("^\\s+version:");
+    assertThat(out.getOutput()).matches(Pattern.compile("^\\s+version:", Pattern.MULTILINE));
   }
 }
