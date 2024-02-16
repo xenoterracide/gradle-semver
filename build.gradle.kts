@@ -3,7 +3,6 @@
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
-  `java-library`
   `java-gradle-plugin`
   id("our.javalibrary")
 }
