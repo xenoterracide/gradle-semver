@@ -44,6 +44,7 @@ class SemVerPluginTest {
   void t() {
     var build = GradleRunner
       .create()
+      .withDebug(true)
       .withProjectDir(testProjectDir)
       .withArguments("getSemVer")
       .withPluginClasspath()
