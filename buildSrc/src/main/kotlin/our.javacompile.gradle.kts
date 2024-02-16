@@ -18,15 +18,19 @@ dependencies {
 
 java {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
+    languageVersion.set(JavaLanguageVersion.of(21))
   }
+}
+
+tasks.compileJava {
+  options.release = 11
+}
+tasks.compileTestJava {
+  options.release = 17
 }
 
 tasks.withType<Jar> {
   archiveBaseName.set(project.path.substring(1).replace(":", "-"))
-}
-tasks.compileJava {
-  options.release = 11
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -49,6 +53,7 @@ tasks.withType<JavaCompile>().configureEach {
     disableWarningsInGeneratedCode.set(true)
     excludedPaths.set(".*/build/generated/sources/annotationProcessor/.*")
     option("NullAway:AnnotatedPackages", "com.xenoterracide")
+
     val errors = mutableListOf(
       "AmbiguousMethodReference",
       "ArgumentSelectionDefectChecker",
@@ -232,6 +237,7 @@ tasks.withType<JavaCompile>().configureEach {
         ),
       )
       option("NullAway:HandleTestAssertionLibraries", true)
+      option("NullAway:CustomInitializerAnnotations", "org.junit.jupiter.api.io.TempDir")
     }
 
     error(*errors.toTypedArray())

@@ -20,4 +20,5 @@ dependencyLocking {
 dependencies {
   implementation(libs.commons.lang)
   implementation(libs.jgit)
+  testImplementation(gradleTestKit())
 }
