@@ -43,23 +43,9 @@ class SemVerPluginTest {
     git.tag().setAnnotated(true).setMessage(msg3).setName("v0.1.3").setObjectId(three).call();
   }
 
-  @Test
-  void apply() {
-    project.getPluginManager().apply(SemVerPlugin.class);
-    assertThat(project.getVersion()).isEqualTo("0.1.3");
-  }
-
-  @Test
-  void snapshot() throws Exception {
-    git.commit().setMessage("four").setAllowEmpty(true).call();
-
-    project.getPluginManager().apply(SemVerPlugin.class);
-    assertThat(project.getVersion().toString()).startsWith("0.1.3-1-g").endsWith("-SNAPSHOT");
-  }
-
   @BeforeEach
   @SuppressWarnings("NullAway.Init")
-  public void setup() throws IOException, GitAPIException {
+  public void setupRunner() throws IOException, GitAPIException {
     Files.writeString(testProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = 'hello-world'");
     Files.writeString(
       testProjectDir.toPath().resolve("build.gradle"),
@@ -76,6 +62,20 @@ class SemVerPluginTest {
     try (var git = Git.init().setDirectory(testProjectDir).call()) {
       git.commit().setMessage("initial commit").call();
     }
+  }
+
+  @Test
+  void apply() {
+    project.getPluginManager().apply(SemVerPlugin.class);
+    assertThat(project.getVersion()).isEqualTo("0.1.3");
+  }
+
+  @Test
+  void snapshot() throws Exception {
+    git.commit().setMessage("four").setAllowEmpty(true).call();
+
+    project.getPluginManager().apply(SemVerPlugin.class);
+    assertThat(project.getVersion().toString()).startsWith("0.1.3-1-g").endsWith("-SNAPSHOT");
   }
 
   @Test
