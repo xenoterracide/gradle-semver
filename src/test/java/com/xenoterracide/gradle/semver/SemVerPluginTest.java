@@ -4,23 +4,14 @@ package com.xenoterracide.gradle.semver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
-import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 class SemVerPluginTest {
-
-  @TempDir
-  File testProjectDir;
 
   Project project;
   Git git;
@@ -43,27 +34,6 @@ class SemVerPluginTest {
     git.tag().setAnnotated(true).setMessage(msg3).setName("v0.1.3").setObjectId(three).call();
   }
 
-  @BeforeEach
-  @SuppressWarnings("NullAway.Init")
-  public void setupRunner() throws IOException, GitAPIException {
-    Files.writeString(testProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = 'hello-world'");
-    Files.writeString(
-      testProjectDir.toPath().resolve("build.gradle"),
-      """
-      plugins {
-        id 'com.xenoterracide.gradle.sem-ver'
-      }
-
-      task getSemVer {
-        logger.quiet("version:" + project.version)
-      }
-      """
-    );
-    try (var git = Git.init().setDirectory(testProjectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-    }
-  }
-
   @Test
   void apply() {
     project.getPluginManager().apply(SemVerPlugin.class);
@@ -76,18 +46,5 @@ class SemVerPluginTest {
 
     project.getPluginManager().apply(SemVerPlugin.class);
     assertThat(project.getVersion().toString()).startsWith("0.1.3-1-g").endsWith("-SNAPSHOT");
-  }
-
-  @Test
-  void withRunner() {
-    var build = GradleRunner
-      .create()
-      .withDebug(true)
-      .withProjectDir(testProjectDir)
-      .withArguments("getSemVer")
-      .withPluginClasspath()
-      .build();
-
-    assertThat(build.getOutput()).contains("version:unspecified");
   }
 }

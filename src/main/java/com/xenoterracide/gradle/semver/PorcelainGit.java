@@ -21,7 +21,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.RefDatabase;
 import org.eclipse.jgit.lib.Repository;
 
-final class PorcelainGit {
+class PorcelainGit {
 
   private static final String VERSION_PREFIX = "v";
   private static final String TAG_PREFIX = "refs/tags/";
