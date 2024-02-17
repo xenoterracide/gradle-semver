@@ -31,7 +31,7 @@ class SemVerPluginIntegrationTest {
       }
 
       task getSemVer {
-        logger.quiet("version:" + project.version)
+        logger.quiet("version:" + version)
       }
       """
     );
@@ -41,12 +41,24 @@ class SemVerPluginIntegrationTest {
   }
 
   @Test
-  void withRunner() {
+  void debug() {
     var build = GradleRunner
       .create()
       .withDebug(true)
       .withProjectDir(testProjectDir)
-      .withArguments("getSemVer")
+      .withArguments("getSemVer", "--stacktrace")
+      .withPluginClasspath()
+      .build();
+
+    assertThat(build.getOutput()).contains("version:unspecified");
+  }
+
+  @Test
+  void configurationCache() {
+    var build = GradleRunner
+      .create()
+      .withProjectDir(testProjectDir)
+      .withArguments("getSemVer", "--configuration-cache", "--stacktrace")
       .withPluginClasspath()
       .build();
 

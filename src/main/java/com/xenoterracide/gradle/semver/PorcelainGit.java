@@ -52,19 +52,23 @@ class PorcelainGit {
     return StreamSupport.stream(git.log().addRange(a, b).call().spliterator(), true).count();
   }
 
-  String describe() throws InvalidPatternException, GitAPIException, IOException {
-    @Var
-    String version = git.describe().setMatch(VERSION_GLOB).call();
-    if (version == null) {
-      Ref mostRecentTag = findMostRecentTag();
-      if (mostRecentTag != null) {
-        String vtag = StringUtils.removeStart(mostRecentTag.getName(), TAG_PREFIX);
-        ObjectId head = getRepo().resolve("HEAD");
-        long commitCount = countCommits(mostRecentTag.getPeeledObjectId(), head.toObjectId());
-        version = String.join("-", vtag, String.valueOf(commitCount), 'g' + head.name().substring(0, 7), "SNAPSHOT");
+  String describe() {
+    try {
+      @Var
+      String version = git.describe().setMatch(VERSION_GLOB).call();
+      if (version == null) {
+        Ref mostRecentTag = findMostRecentTag();
+        if (mostRecentTag != null) {
+          String vtag = StringUtils.removeStart(mostRecentTag.getName(), TAG_PREFIX);
+          ObjectId head = getRepo().resolve("HEAD");
+          long commitCount = countCommits(mostRecentTag.getPeeledObjectId(), head.toObjectId());
+          version = String.join("-", vtag, String.valueOf(commitCount), 'g' + head.name().substring(0, 7), "SNAPSHOT");
+        }
       }
+      return version;
+    } catch (IOException | GitAPIException | InvalidPatternException e) {
+      throw new RuntimeException(e);
     }
-    return version;
   }
 
   private RefDatabase getDb() {
