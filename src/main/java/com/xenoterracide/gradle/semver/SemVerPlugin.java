@@ -17,6 +17,10 @@ public class SemVerPlugin implements Plugin<Project> {
     preventJGitFromCallingExecutables();
   }
 
+  // preventJGitFromCallingExecutables is copied from
+  // https://github.com/diffplug/spotless/blob/224f8f96df3ad42cac81064a0461e6d4ee91dcaf/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/GitRatchetGradle.java#L35
+  // SPDX-License-Identifier: Apache-2.0
+  // Copyright 2020-2023 DiffPlug
   static void preventJGitFromCallingExecutables() {
     SystemReader reader = SystemReader.getInstance();
     SystemReader.setInstance(
