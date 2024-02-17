@@ -2,6 +2,7 @@
 // Copyright © 2018-2024 Caleb Cushing.
 package com.xenoterracide.gradle.semver;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.eclipse.jgit.api.Git;
@@ -63,7 +64,7 @@ public class SemVerPlugin implements Plugin<Project> {
       if (version != null) {
         project.setVersion(version);
       }
-    } catch (Exception e) {
+    } catch (IOException e) {
       log.error("", e);
     }
   }
