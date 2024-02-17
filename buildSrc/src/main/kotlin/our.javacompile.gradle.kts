@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2023-2024 Caleb Cushing.
+
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.accessors.dm.LibrariesForLibs
 
@@ -237,9 +238,10 @@ tasks.withType<JavaCompile>().configureEach {
         ),
       )
       option("NullAway:HandleTestAssertionLibraries", true)
-      option("NullAway:CustomInitializerAnnotations", "org.junit.jupiter.api.io.TempDir")
+      option("NullAway:ExcludedFieldAnnotations", "org.junit.jupiter.api.io.TempDir")
     }
 
     error(*errors.toTypedArray())
+    disable("InjectOnConstructorOfAbstractClass")
   }
 }

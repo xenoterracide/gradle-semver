@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright © 2024 Caleb Cushing.
+
 package com.xenoterracide.gradle.semver;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +21,6 @@ class SemVerPluginIntegrationTest {
   File testProjectDir;
 
   @BeforeEach
-  @SuppressWarnings("NullAway.Init")
   public void setupRunner() throws IOException, GitAPIException {
     Files.writeString(testProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = 'hello-world'");
     Files.writeString(

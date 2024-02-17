@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright © 2018-2024 Caleb Cushing.
+
 package com.xenoterracide.gradle.semver;
 
 import static org.assertj.core.api.Assertions.assertThat;
