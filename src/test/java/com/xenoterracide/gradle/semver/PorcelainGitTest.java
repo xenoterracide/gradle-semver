@@ -56,6 +56,19 @@ class PorcelainGitTest {
   }
 
   @Test
+  void gitMismatchTag() throws Exception {
+    try (var git = Git.init().setDirectory(projectDir).call()) {
+      git.commit().setMessage("initial commit").call();
+      git.tag().setName("latest").call();
+      git.commit().setMessage("second commit").call();
+
+      var version = new PorcelainGit(git).describe();
+
+      assertThat(version).isNull();
+    }
+  }
+
+  @Test
   void gitNoCommit() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       assertThatExceptionOfType(RuntimeException.class)

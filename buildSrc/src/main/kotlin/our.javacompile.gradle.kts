@@ -242,6 +242,5 @@ tasks.withType<JavaCompile>().configureEach {
     }
 
     error(*errors.toTypedArray())
-    disable("InjectOnConstructorOfAbstractClass")
   }
 }
