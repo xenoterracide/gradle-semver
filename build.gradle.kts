@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2024 Caleb Cushing.
+
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
-  `java-library`
   `java-gradle-plugin`
-  id("our.spotless")
+  id("our.javalibrary")
 }
 
-version = "0.8.4"
+version = "0.9.0"
 group = "com.xenoterracide"
 repositories {
   mavenCentral()
@@ -21,4 +21,5 @@ dependencyLocking {
 dependencies {
   implementation(libs.commons.lang)
   implementation(libs.jgit)
+  testImplementation(gradleTestKit())
 }

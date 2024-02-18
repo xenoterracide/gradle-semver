@@ -1,38 +1,39 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright © 2018-2024 Caleb Cushing.
+
 package com.xenoterracide.gradle.semver;
 
-import java.io.IOException;
-import java.util.Optional;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.InvalidPatternException;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/**
- * inspired by @see <a href="https://github.com/cinnober/semver-git/">Cinnober's SemVer Git</a>
- */
 public class SemVerPlugin implements Plugin<Project> {
+  static {
+    preventJGitFromCallingExecutables();
+  }
 
-  private final Logger log = LoggerFactory.getLogger(SemVerPlugin.class);
+  // preventJGitFromCallingExecutables is copied from
+  // https://github.com/diffplug/spotless/blob/224f8f96df3ad42cac81064a0461e6d4ee91dcaf/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/GitRatchetGradle.java#L35
+  // SPDX-License-Identifier: Apache-2.0
+  // Copyright 2020-2023 DiffPlug
+  static void preventJGitFromCallingExecutables() {
+    SystemReader reader = SystemReader.getInstance();
+    SystemReader.setInstance(
+      new DelegatingSystemReader(reader) {
+        @Override
+        public String getenv(String variable) {
+          if ("PATH".equals(variable)) {
+            return "";
+          } else {
+            return super.getenv(variable);
+          }
+        }
+      }
+    );
+  }
 
   @Override
   public void apply(Project project) {
-    try {
-      Repository repo = new FileRepositoryBuilder().readEnvironment().findGitDir(project.getProjectDir()).build();
-
-      Optional
-        .ofNullable(new PorcelainGit(new Git(repo)).describe())
-        .map(v -> v.substring(1))
-        .map(v -> v.contains("g") ? v + "-SNAPSHOT" : v)
-        .ifPresent(project::setVersion);
-    } catch (IOException | InvalidPatternException | GitAPIException e) {
-      log.error("", e);
-    }
+    project.getExtensions().add("gitVersion", new GitVersionProvider(project.getProjectDir()));
   }
 }

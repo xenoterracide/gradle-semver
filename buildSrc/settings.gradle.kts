@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2023-2024 Caleb Cushing.
+
 rootProject.name = "buildSrc"
 
 dependencyResolutionManagement {

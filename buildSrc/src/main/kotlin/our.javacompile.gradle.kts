@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2023-2024 Caleb Cushing.
+
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.accessors.dm.LibrariesForLibs
 
@@ -13,15 +14,20 @@ val libs = the<LibrariesForLibs>()
 
 dependencies {
   errorprone(libs.bundles.ep)
-  compileOnly(platform(libs.spring.bom))
-  compileOnly(libs.bundles.compile.annotations)
-  testCompileOnly(libs.bundles.compile.annotations)
+  compileOnly(libs.errorprone.annotations)
 }
 
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(21))
   }
+}
+
+tasks.compileJava {
+  options.release = 11
+}
+tasks.compileTestJava {
+  options.release = 17
 }
 
 tasks.withType<Jar> {
@@ -48,6 +54,7 @@ tasks.withType<JavaCompile>().configureEach {
     disableWarningsInGeneratedCode.set(true)
     excludedPaths.set(".*/build/generated/sources/annotationProcessor/.*")
     option("NullAway:AnnotatedPackages", "com.xenoterracide")
+
     val errors = mutableListOf(
       "AmbiguousMethodReference",
       "ArgumentSelectionDefectChecker",
@@ -231,6 +238,7 @@ tasks.withType<JavaCompile>().configureEach {
         ),
       )
       option("NullAway:HandleTestAssertionLibraries", true)
+      option("NullAway:ExcludedFieldAnnotations", "org.junit.jupiter.api.io.TempDir")
     }
 
     error(*errors.toTypedArray())
