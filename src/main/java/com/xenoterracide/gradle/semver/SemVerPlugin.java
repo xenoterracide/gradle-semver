@@ -22,11 +22,7 @@ public class SemVerPlugin implements Plugin<Project> {
       new DelegatingSystemReader(reader) {
         @Override
         public String getenv(String variable) {
-          if ("PATH".equals(variable)) {
-            return "";
-          } else {
-            return super.getenv(variable);
-          }
+          return "PATH".equals(variable) ? "" : super.getenv(variable);
         }
       }
     );
