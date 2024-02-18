@@ -23,7 +23,7 @@ public class SemVerPlugin implements Plugin<Project> {
       new DelegatingSystemReader(reader) {
         @Override
         public String getenv(String variable) {
-          return Constants.OS_USER_NAME_KEY.equals(variable) ? "1" : super.getenv(variable);
+          return Constants.GIT_CONFIG_NOSYSTEM_KEY.equals(variable) ? "1" : super.getenv(variable);
         }
       }
     );
