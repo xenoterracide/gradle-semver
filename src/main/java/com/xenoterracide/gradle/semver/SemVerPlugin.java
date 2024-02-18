@@ -38,7 +38,7 @@ public class SemVerPlugin implements Plugin<Project> {
       .getGradle()
       .getSharedServices()
       .registerIfAbsent(
-        "gitVersion",
+        "xgit",
         AbstractGitService.class,
         spec -> {
           spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
