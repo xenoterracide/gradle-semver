@@ -27,16 +27,17 @@ class SemVerPluginIntegrationTest {
       testProjectDir.toPath().resolve("build.gradle"),
       """
       plugins {
-        id 'com.xenoterracide.gradle.sem-ver'
+        id("com.xenoterracide.gradle.sem-ver")
       }
 
       task getSemVer {
-        logger.quiet("version:" + xgit.gitVersion())
+        logger.quiet("version:" + gitVersion.get())
       }
       """
     );
     try (var git = Git.init().setDirectory(testProjectDir).call()) {
       git.commit().setMessage("initial commit").call();
+      git.tag().setName("v0.1.0").call();
     }
   }
 
@@ -50,7 +51,7 @@ class SemVerPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("version:unspecified");
+    assertThat(build.getOutput()).contains("version:0.1.0");
   }
 
   @Test
@@ -62,6 +63,6 @@ class SemVerPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("version:unspecified");
+    assertThat(build.getOutput()).contains("version:0.1.0");
   }
 }

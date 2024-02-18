@@ -34,15 +34,6 @@ public class SemVerPlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    project
-      .getGradle()
-      .getSharedServices()
-      .registerIfAbsent(
-        "xgit",
-        AbstractGitService.class,
-        spec -> {
-          spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
-        }
-      );
+    project.getExtensions().add("gitVersion", new GitVersionProvider(project.getProjectDir()));
   }
 }
