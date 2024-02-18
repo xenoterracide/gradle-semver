@@ -17,7 +17,6 @@ spotless {
 
   java {
     licenseHeader(javaLicense + copyright)
-    removeUnusedImports()
     cleanthat()
   }
 
