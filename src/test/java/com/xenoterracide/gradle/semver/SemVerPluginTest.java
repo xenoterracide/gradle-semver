@@ -38,14 +38,16 @@ class SemVerPluginTest {
   @Test
   void apply() {
     project.getPluginManager().apply(SemVerPlugin.class);
-    assertThat(project.getVersion()).isEqualTo("0.1.3");
+    var gitVersion = project.getExtensions().getByType(GitVersionProvider.class);
+    assertThat(gitVersion.get()).isEqualTo("0.1.3");
   }
 
   @Test
   void snapshot() throws Exception {
     git.commit().setMessage("four").setAllowEmpty(true).call();
-
     project.getPluginManager().apply(SemVerPlugin.class);
-    assertThat(project.getVersion().toString()).startsWith("0.1.3-1-g").endsWith("-SNAPSHOT");
+    var gitVersion = project.getExtensions().getByType(GitVersionProvider.class);
+
+    assertThat(gitVersion.get()).startsWith("0.1.3-1-g").endsWith("-SNAPSHOT");
   }
 }
