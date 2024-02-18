@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2023-2024 Caleb Cushing.
+
 import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
