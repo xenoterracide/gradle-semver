@@ -11,7 +11,6 @@ import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.annotations.Nullable;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.util.SystemReader;
 
 class GitVersionProvider implements Provider<String> {
 
@@ -23,10 +22,7 @@ class GitVersionProvider implements Provider<String> {
 
   @Override
   public @Nullable String get() {
-    var builder = new FileRepositoryBuilder()
-      .readEnvironment(SystemReader.getInstance())
-      .setMustExist(true)
-      .findGitDir(this.projectDirectory);
+    var builder = new FileRepositoryBuilder().findGitDir(this.projectDirectory);
 
     try (var repo = builder.build()) {
       var git = new PorcelainGit(new Git(repo));
