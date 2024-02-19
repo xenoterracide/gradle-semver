@@ -6,6 +6,7 @@ buildscript { dependencyLocking { lockAllConfigurations() } }
 plugins {
   `java-gradle-plugin`
   id("our.javalibrary")
+  alias(libs.plugins.dependency.analysis)
 }
 
 version = "0.9.0"
@@ -19,7 +20,20 @@ dependencyLocking {
 }
 
 dependencies {
-  implementation(libs.commons.lang)
   implementation(libs.jgit)
+  testImplementation(libs.junit.api)
   testImplementation(gradleTestKit())
+}
+
+dependencyAnalysis {
+  issues {
+    all {
+      onAny {
+        severity("fail")
+      }
+      onUnusedDependencies {
+        exclude(libs.junit.parameters)
+      }
+    }
+  }
 }
