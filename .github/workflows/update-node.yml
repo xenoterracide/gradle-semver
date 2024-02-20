@@ -8,6 +8,9 @@ on:
     #         │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
     #         * * * * *
     - cron: "0 4 * * *" # 4am every Wednesday
+  push:
+    branches:
+      - fix/auto-update
 jobs:
   update-node:
     runs-on: ubuntu-latest

@@ -10,7 +10,7 @@ on:
     - cron: "0 3 * * *" # 3am every Wednesday
   push:
     branches:
-      - fix/update-java
+      - fix/auto-update
 jobs:
   update-java:
     runs-on: ubuntu-latest
