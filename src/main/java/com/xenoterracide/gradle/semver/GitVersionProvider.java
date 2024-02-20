@@ -13,11 +13,11 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.SystemReader;
 
-public class GitVersionProvider implements Provider<String> {
+class GitVersionProvider implements Provider<String> {
 
   private final File projectDirectory;
 
-  protected GitVersionProvider(@NonNull File projectDirectory) {
+  GitVersionProvider(@NonNull File projectDirectory) {
     this.projectDirectory = projectDirectory;
   }
 
