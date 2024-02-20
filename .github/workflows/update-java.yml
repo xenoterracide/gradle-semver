@@ -9,6 +9,8 @@ on:
     #         * * * * *
     - cron: "0 3 * * *" # 3am every Wednesday
   push:
+    branches:
+      - fix/update-java
 jobs:
   update-java:
     runs-on: ubuntu-latest
