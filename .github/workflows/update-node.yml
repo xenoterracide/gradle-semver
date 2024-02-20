@@ -8,6 +8,9 @@ on:
     #         │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
     #         * * * * *
     - cron: "0 4 * * *" # 4am every Wednesday
+  push:
+    branches:
+      - fix/auto-update
 jobs:
   update-node:
     runs-on: ubuntu-latest
@@ -17,7 +20,7 @@ jobs:
           fetch-depth: 2
       - uses: actions/setup-node@v4
       - run: npm update
-      - uses: peter-evans/create-pull-request@v5
+      - uses: peter-evans/create-pull-request@v6
         with:
           title: "chore: Update Node Dependencies"
           branch: topic/update-node

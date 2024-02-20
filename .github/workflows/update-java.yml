@@ -8,6 +8,9 @@ on:
     #         │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
     #         * * * * *
     - cron: "0 3 * * *" # 3am every Wednesday
+  push:
+    branches:
+      - fix/auto-update
 jobs:
   update-java:
     runs-on: ubuntu-latest
@@ -24,7 +27,7 @@ jobs:
       - run: ./gradlew wrapper --write-locks
       - run: ./gradlew wrapper # somehow the final bat was not generated before
       - run: ./gradlew build buildHealth --write-locks
-      - uses: peter-evans/create-pull-request@v5
+      - uses: peter-evans/create-pull-request@v6
         with:
           title: "chore: Update Java Dependencies"
           branch: topic/update-java
