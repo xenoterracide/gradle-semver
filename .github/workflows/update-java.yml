@@ -25,7 +25,7 @@ jobs:
       - run: ./gradlew wrapper --write-locks
       - run: ./gradlew wrapper # somehow the final bat was not generated before
       - run: ./gradlew build buildHealth --write-locks
-      - uses: peter-evans/create-pull-request@v5
+      - uses: peter-evans/create-pull-request@v6
         with:
           title: "chore: Update Java Dependencies"
           branch: topic/update-java
