@@ -27,11 +27,11 @@ class SemVerPluginIntegrationTest {
       testProjectDir.toPath().resolve("build.gradle"),
       """
       plugins {
-        id("com.xenoterracide.gradle.sem-ver")
+        id("com.xenoterracide.gradle.semver")
       }
 
       task getSemVer {
-        logger.quiet("version:" + gitVersion.get())
+        logger.quiet("version:" + semver.version)
       }
       """
     );

@@ -11,6 +11,7 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.semver4j.Semver;
 
 class SemVerPluginTest {
 
@@ -38,16 +39,16 @@ class SemVerPluginTest {
   @Test
   void apply() {
     project.getPluginManager().apply(SemVerPlugin.class);
-    var gitVersion = project.getExtensions().getByType(GitVersionProvider.class);
-    assertThat(gitVersion.get()).isEqualTo("0.1.3");
+    var semver = project.getExtensions().getByType(Semver.class);
+    assertThat(semver.getVersion()).isEqualTo("0.1.3");
   }
 
   @Test
   void snapshot() throws Exception {
     git.commit().setMessage("four").setAllowEmpty(true).call();
     project.getPluginManager().apply(SemVerPlugin.class);
-    var gitVersion = project.getExtensions().getByType(GitVersionProvider.class);
+    var semver = project.getExtensions().getByType(Semver.class);
 
-    assertThat(gitVersion.get()).startsWith("0.1.3-1-g").endsWith("-SNAPSHOT");
+    assertThat(semver.getVersion()).startsWith("0.1.3-SNAPSHOT-1-g");
   }
 }

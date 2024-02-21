@@ -9,8 +9,10 @@
     <Class name="~.*Test.*" />
   </Match>
   <Match>
-    <Bug pattern="BC_UNCONFIRMED_CAST_OF_RETURN_VALUE" />
-    <Class name="com.xenoterracide.gradle.semver.GitVersionProvider" />
-    <Method name="get" />
+    <Class name="com.xenoterracide.gradle.semver.AbstractGitService" />
+    <Or>
+      <Bug pattern="BC_UNCONFIRMED_CAST_OF_RETURN_VALUE" />
+      <Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR" />
+    </Or>
   </Match>
 </FindBugsFilter>

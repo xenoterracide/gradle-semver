@@ -3,11 +3,15 @@
 
 package com.xenoterracide.gradle.semver;
 
+import io.vavr.control.Try;
 import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 public class SemVerPlugin implements Plugin<Project> {
+
+  static final String EXTENSION = "semver";
+
   static {
     preventJGitFromCallingExecutables();
   }
@@ -30,6 +34,22 @@ public class SemVerPlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    project.getExtensions().add("gitVersion", new GitVersionProvider(project.getProjectDir()));
+    var serviceProvider = project
+      .getGradle()
+      .getSharedServices()
+      .registerIfAbsent(
+        "gitService",
+        AbstractGitService.class,
+        spec -> {
+          spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
+        }
+      );
+
+    project
+      .getExtensions()
+      .add(
+        EXTENSION,
+        serviceProvider.map(s -> Try.of(s::getPorcelainGit).getOrElseThrow(ExceptionTools::rethrow)).get().getSemver()
+      );
   }
 }
