@@ -10,7 +10,7 @@ import org.gradle.api.Project;
 
 public class SemVerPlugin implements Plugin<Project> {
 
-  static final String EXTENSION = "xgit";
+  static final String EXTENSION = "semver";
 
   static {
     preventJGitFromCallingExecutables();
@@ -49,7 +49,7 @@ public class SemVerPlugin implements Plugin<Project> {
       .getExtensions()
       .add(
         EXTENSION,
-        serviceProvider.map(s -> Try.of(s::getPorcelainGit).getOrElseThrow(ExceptionTools::rethrow)).get()
+        serviceProvider.map(s -> Try.of(s::getPorcelainGit).getOrElseThrow(ExceptionTools::rethrow)).get().getSemver()
       );
   }
 }
