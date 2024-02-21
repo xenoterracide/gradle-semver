@@ -20,14 +20,21 @@ class PorcelainGitTest {
   File projectDir;
 
   @Test
-  void gitVersion() throws Exception {
+  void getLastTag() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
+
+      var pg = new PorcelainGit(git);
+
+      assertThat(pg.getLastTag()).isNull();
+
       git.tag().setName("v0.1.0").call();
 
-      var version = new PorcelainGit(git).getVersion();
+      assertThat(pg.getLastTag()).matches("v0.1.0");
 
-      assertThat(version).matches("v[0-9]+\\.[0-9]+\\.[0-9].*");
+      git.tag().setName("v0.1.1").call();
+
+      assertThat(pg.getLastTag()).matches("v0.1.1");
     }
   }
 

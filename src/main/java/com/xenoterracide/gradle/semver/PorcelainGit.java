@@ -39,7 +39,11 @@ class PorcelainGit implements VersionDetails {
 
   @Override
   public @Nullable String getLastTag() {
-    return null;
+    return Try
+      .of(() -> git.describe().setMatch(VERSION_GLOB))
+      .mapTry(DescribeCommand::call)
+      .onFailure(ExceptionTools::rethrow)
+      .getOrNull();
   }
 
   @Override
@@ -57,6 +61,7 @@ class PorcelainGit implements VersionDetails {
     return Try
       .of(() -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
+      .filter(Objects::nonNull)
       .map(v -> v.substring(1))
       .map(v -> v.contains("g") ? v + "-SNAPSHOT" : v)
       .onFailure(ExceptionTools::rethrow)
