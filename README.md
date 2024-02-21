@@ -1,5 +1,7 @@
 # README
 
+A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
+
 _Plugin ID_: `"com.xenoterracide.gradle.semver"`
 _Version_: `0.9.+`
 
@@ -12,15 +14,25 @@ plugin {
   id("com.xenoterracide.gradle.semver") version "0.+"
 }
 
-version = semver.version
+version = semver
 ```
 
 The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.
 
 - If no commits, or version tags have been made your version will be `0.0.0-SNAPSHOT`.
 - If no valid tags are detected then your version will be `0.0.0-SNAPSHOT`.
-- If you've used a valid version tag matching the pattern `v\d+\.\d+\.\d+` then your version will be that tag.
-- If you've made commits after a valid version tag then your version will be `v\d+\.\d+\.\d+-SNAPSHOT-\d+-g\\p{XDigit}{7}`. You'll note that we've made one change from the semver4j library, we're subclassing in order to replace the `+` with `-` as that's what the maven version specification uses.
+- If a valid tag pattern `v\d+\.\d+\.\d+` matchs the current sha then your version will be that tag. e.g. `v1.0.0` translates to `1.0.0`
+- If you've made commits after a valid version tag then your version will be `v\d+\.\d+\.\d+-SNAPSHOT-\d+-g\\p{XDigit}{7}`, e.g. `1.0.0-SNAPSHOT-1-g1abc234` You'll note that we've made one change from the semver4j library, we're subclassing in order to replace the `+` with `-` as that's what the maven version specification uses.
+
+If you want you can do things like this
+
+```kt
+version = semver.version // almost same as version = semver because semver.toString() calls semver.version
+semver.major
+semver.minor
+```
+
+See [Semver](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html) for more methods.
 
 ## Goals
 

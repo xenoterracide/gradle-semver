@@ -7,6 +7,7 @@ plugins {
   `java-gradle-plugin`
   id("our.javalibrary")
   alias(libs.plugins.dependency.analysis)
+  alias(libs.plugins.gradle.plugin.publish)
 }
 
 version = "0.9.0"

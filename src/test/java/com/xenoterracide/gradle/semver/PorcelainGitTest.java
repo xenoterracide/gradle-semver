@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
@@ -44,8 +45,9 @@ class PorcelainGitTest {
       var pg = new PorcelainGit(git);
 
       var v000 = pg.getSemver();
-      assertThat(v000.getVersion()).isEqualTo("0.0.0-SNAPSHOT");
+      assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-SNAPSHOT");
       assertThat(v000)
+        .hasToString("0.0.0-SNAPSHOT")
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
         .containsExactly(0, 0, 0, List.of("SNAPSHOT"));
 
@@ -53,9 +55,25 @@ class PorcelainGitTest {
       git.commit().setMessage("second commit").call();
 
       var v010 = pg.getSemver();
-      assertThat(v010.getVersion()).matches("^0\\.1\\.0-SNAPSHOT-1-g\\p{XDigit}{7}$");
+
+      assertThat(v010)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o).isInstanceOf(String.class);
+          if (o instanceof String s) {
+            assertThat(s).matches("^0\\.1\\.0-SNAPSHOT-1-g\\p{XDigit}{7}$");
+          }
+        });
 
       git.tag().setName("v0.1.1").call();
+
+      var v011 = pg.getSemver();
+
+      assertThat(v011)
+        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
+        .containsExactly(0, 1, 1, Collections.emptyList());
+
+      assertThat(v011).hasToString("0.1.1");
     }
   }
 
