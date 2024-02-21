@@ -8,18 +8,7 @@ import org.semver4j.Semver;
 
 public interface VersionDetails {
   @Nullable
-  String getBranchName();
-
-  @Nullable
-  String getGitHashFull();
-
-  @Nullable
-  String getGitHash();
-
-  @Nullable
   String getLastTag();
-
-  int getCommitDistance();
 
   boolean getIsCleanTag();
 

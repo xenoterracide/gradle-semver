@@ -8,14 +8,15 @@ import java.util.Objects;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 class PorcelainGit implements VersionDetails {
 
-  private static final String VERSION_PREFIX = "v";
-  private static final String VERSION_GLOB = VERSION_PREFIX + "[0-9]*.[0-9]*.[0-9]*";
+  // this is not a regex but a glob (`man glob`)
+  private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String PRE_VERSION = "0.0.0";
   private static final String SNAPSHOT = "SNAPSHOT";
 
@@ -26,32 +27,12 @@ class PorcelainGit implements VersionDetails {
   }
 
   @Override
-  public @Nullable String getBranchName() {
-    return null;
-  }
-
-  @Override
-  public @Nullable String getGitHashFull() {
-    return null;
-  }
-
-  @Override
-  public @Nullable String getGitHash() {
-    return null;
-  }
-
-  @Override
   public @Nullable String getLastTag() {
     return Try
       .of(() -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
       .onFailure(ExceptionTools::rethrow)
       .getOrNull();
-  }
-
-  @Override
-  public int getCommitDistance() {
-    return 0;
   }
 
   @Override
@@ -72,19 +53,24 @@ class PorcelainGit implements VersionDetails {
         v
           .getPreRelease()
           .stream()
-          .filter(p -> p.matches("^\\d-+g\\p{XDigit}{7}$"))
+          .filter(p -> p.matches("^\\d+-+g\\p{XDigit}{7}$"))
           .findFirst()
           .map(p -> v.withClearedPreRelease().withPreRelease(SNAPSHOT).withBuild(p))
           .orElse(v)
       )
-      .map(v ->
-        new Semver(v.getVersion()) {
-          @Override
-          public String getVersion() {
-            return v.getVersion().replace("+", "-");
-          }
-        }
-      )
+      .map(v -> new MavenSemver(v.getVersion()))
       .get();
+  }
+
+  static class MavenSemver extends Semver {
+
+    MavenSemver(@NotNull String version) {
+      super(version);
+    }
+
+    @Override
+    public String getVersion() {
+      return super.getVersion().replace("+", "-");
+    }
   }
 }

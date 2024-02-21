@@ -6,6 +6,7 @@ package com.xenoterracide.gradle.semver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
@@ -72,6 +73,22 @@ class PorcelainGitTest {
       git.tag().setName("v0.1.0").call();
 
       assertThat(pg.getSemver().getVersion()).isEqualTo("0.1.0");
+    }
+  }
+
+  @Test
+  void isCleanTag() throws Exception {
+    try (var git = Git.init().setDirectory(projectDir).call()) {
+      git.commit().setMessage("initial commit").call();
+      git.tag().setName("v0.1.0").call();
+
+      var pg = new PorcelainGit(git);
+
+      assertThat(pg.getIsCleanTag()).isTrue();
+
+      Files.createFile(projectDir.toPath().resolve("test.txt"));
+
+      assertThat(pg.getIsCleanTag()).isFalse();
     }
   }
 }
