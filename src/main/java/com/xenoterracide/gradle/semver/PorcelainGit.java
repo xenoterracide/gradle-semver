@@ -17,6 +17,7 @@ class PorcelainGit implements VersionDetails {
   private static final String VERSION_PREFIX = "v";
   private static final String VERSION_GLOB = VERSION_PREFIX + "[0-9]*.[0-9]*.[0-9]*";
   private static final String PRE_VERSION = "0.0.0";
+  private static final String SNAPSHOT = "SNAPSHOT";
 
   private final Git git;
 
@@ -66,14 +67,14 @@ class PorcelainGit implements VersionDetails {
       .onFailure(ExceptionTools::rethrow)
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
-      .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease("SNAPSHOT") : v)
+      .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
       .map(v ->
         v
           .getPreRelease()
           .stream()
           .filter(p -> p.matches("^\\d-+g\\p{XDigit}{7}$"))
           .findFirst()
-          .map(p -> v.withClearedPreRelease().withPreRelease("SNAPSHOT").withBuild(p))
+          .map(p -> v.withClearedPreRelease().withPreRelease(SNAPSHOT).withBuild(p))
           .orElse(v)
       )
       .map(v ->

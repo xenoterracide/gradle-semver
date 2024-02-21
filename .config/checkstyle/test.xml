@@ -7,9 +7,9 @@
   <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
   <module name="SuppressionFilter">
     <property
+      default="checkstyle-suppressions.xml"
       name="file"
       value="${org.checkstyle.sun.suppressionfilter.config}"
-      default="checkstyle-suppressions.xml"
     />
     <property name="optional" value="true" />
   </module>
@@ -213,13 +213,14 @@
     <module name="RedundantModifier" />
     <module name="AbstractClassName" />
 
-    <!-- Checks for blocks. You know, those {}'s         -->
-    <!-- See https://checkstyle.org/config_blocks.html -->
+    <!-- https://checkstyle.sourceforge.io/checks/blocks/ -->
     <module name="AvoidNestedBlocks">
       <property name="allowInSwitchCase" value="true" />
     </module>
     <module name="EmptyBlock" />
-    <module name="NeedBraces" />
+    <module name="NeedBraces">
+      <property name="allowSingleLineStatement" value="true" />
+    </module>
 
     <!-- https://checkstyle.org/checks/coding/ -->
     <module name="EqualsAvoidNull" />
