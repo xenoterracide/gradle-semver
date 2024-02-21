@@ -61,10 +61,10 @@ class PorcelainGit implements VersionDetails {
     return Try
       .of(() -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
+      .onFailure(ExceptionTools::rethrow)
       .filter(Objects::nonNull)
       .map(v -> v.substring(1))
       .map(v -> v.contains("g") ? v + "-SNAPSHOT" : v)
-      .onFailure(ExceptionTools::rethrow)
       .getOrNull();
   }
 }

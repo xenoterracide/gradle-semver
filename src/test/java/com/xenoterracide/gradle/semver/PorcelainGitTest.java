@@ -25,62 +25,50 @@ class PorcelainGitTest {
       git.commit().setMessage("initial commit").call();
 
       var pg = new PorcelainGit(git);
-
       assertThat(pg.getLastTag()).isNull();
 
       git.tag().setName("v0.1.0").call();
-
       assertThat(pg.getLastTag()).matches("v0.1.0");
 
+      git.commit().setMessage("second commit").call();
       git.tag().setName("v0.1.1").call();
-
       assertThat(pg.getLastTag()).matches("v0.1.1");
     }
   }
 
   @Test
-  void gitVersionNull() throws Exception {
+  void getVersion() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
+      assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> new PorcelainGit(git).getVersion())
+        .withCauseInstanceOf(RefNotFoundException.class);
+
       git.commit().setMessage("initial commit").call();
+      var pg = new PorcelainGit(git);
 
-      var version = new PorcelainGit(git).getVersion();
+      assertThat(pg.getVersion()).isNull();
 
-      assertThat(version).isNull();
-    }
-  }
-
-  @Test
-  void gitVersionNextVersion() throws Exception {
-    try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
       git.commit().setMessage("second commit").call();
 
-      var version = new PorcelainGit(git).getVersion();
-
-      assertThat(version).matches("v0\\.1\\.0-1-g.*");
+      assertThat(pg.getVersion()).matches("0\\.1\\.0-1-g.*");
     }
   }
 
   @Test
-  void gitMismatchTag() throws Exception {
+  void getVersionMismatchTag() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("latest").call();
       git.commit().setMessage("second commit").call();
 
-      var version = new PorcelainGit(git).getVersion();
+      var pg = new PorcelainGit(git);
 
-      assertThat(version).isNull();
-    }
-  }
+      assertThat(pg.getVersion()).isNull();
 
-  @Test
-  void gitNoCommit() throws Exception {
-    try (var git = Git.init().setDirectory(projectDir).call()) {
-      assertThatExceptionOfType(RuntimeException.class)
-        .isThrownBy(() -> new PorcelainGit(git).getVersion())
-        .withCauseInstanceOf(RefNotFoundException.class);
+      git.tag().setName("v0.1.0").call();
+
+      assertThat(pg.getVersion()).isEqualTo("0.1.0");
     }
   }
 }
