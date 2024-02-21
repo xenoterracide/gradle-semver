@@ -21,6 +21,7 @@ dependencyLocking {
 
 dependencies {
   implementation(libs.jgit)
+  implementation(libs.vavr)
   testImplementation(libs.junit.api)
   testImplementation(gradleTestKit())
 }

@@ -31,7 +31,7 @@ class SemVerPluginIntegrationTest {
       }
 
       task getSemVer {
-        logger.quiet("version:" + gitVersion.get())
+        logger.quiet("version:" + xgit.version)
       }
       """
     );
