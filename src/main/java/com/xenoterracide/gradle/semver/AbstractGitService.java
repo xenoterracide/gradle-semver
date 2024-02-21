@@ -17,8 +17,8 @@ import org.jspecify.annotations.Nullable;
 public abstract class AbstractGitService implements BuildService<Params>, AutoCloseable {
 
   private final FileRepositoryBuilder builder;
-  private @Nullable Git git = null;
-  private @Nullable Repository repository = null;
+  private @Nullable Git git;
+  private @Nullable Repository repository;
 
   @Inject
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
