@@ -3,7 +3,7 @@
 
 package com.xenoterracide.gradle.semver;
 
-import org.eclipse.jgit.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface VersionDetails {
   @Nullable

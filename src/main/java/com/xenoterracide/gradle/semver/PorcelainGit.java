@@ -5,13 +5,11 @@ package com.xenoterracide.gradle.semver;
 
 import io.vavr.control.Try;
 import java.util.Objects;
-import org.eclipse.jgit.annotations.NonNull;
-import org.eclipse.jgit.annotations.Nullable;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.InvalidPatternException;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class PorcelainGit implements VersionDetails {
 
@@ -22,14 +20,6 @@ class PorcelainGit implements VersionDetails {
 
   PorcelainGit(@NonNull Git git) {
     this.git = Objects.requireNonNull(git);
-  }
-
-  String describe() {
-    try {
-      return git.describe().setMatch(VERSION_GLOB).call();
-    } catch (GitAPIException | InvalidPatternException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   @Override
@@ -67,6 +57,9 @@ class PorcelainGit implements VersionDetails {
     return Try
       .of(() -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
-      .getOrElseThrow(ExceptionTools::rethrow);
+      .map(v -> v.substring(1))
+      .map(v -> v.contains("g") ? v + "-SNAPSHOT" : v)
+      .onFailure(ExceptionTools::rethrow)
+      .getOrNull();
   }
 }

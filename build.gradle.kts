@@ -20,6 +20,7 @@ dependencyLocking {
 }
 
 dependencies {
+  compileOnlyApi(libs.jspecify)
   implementation(libs.jgit)
   implementation(libs.vavr)
   testImplementation(libs.junit.api)

@@ -25,7 +25,7 @@ class PorcelainGitTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var version = new PorcelainGit(git).describe();
+      var version = new PorcelainGit(git).getVersion();
 
       assertThat(version).matches("v[0-9]+\\.[0-9]+\\.[0-9].*");
     }
@@ -36,7 +36,7 @@ class PorcelainGitTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var version = new PorcelainGit(git).describe();
+      var version = new PorcelainGit(git).getVersion();
 
       assertThat(version).isNull();
     }
@@ -49,7 +49,7 @@ class PorcelainGitTest {
       git.tag().setName("v0.1.0").call();
       git.commit().setMessage("second commit").call();
 
-      var version = new PorcelainGit(git).describe();
+      var version = new PorcelainGit(git).getVersion();
 
       assertThat(version).matches("v0\\.1\\.0-1-g.*");
     }
@@ -62,7 +62,7 @@ class PorcelainGitTest {
       git.tag().setName("latest").call();
       git.commit().setMessage("second commit").call();
 
-      var version = new PorcelainGit(git).describe();
+      var version = new PorcelainGit(git).getVersion();
 
       assertThat(version).isNull();
     }
@@ -72,7 +72,7 @@ class PorcelainGitTest {
   void gitNoCommit() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       assertThatExceptionOfType(RuntimeException.class)
-        .isThrownBy(() -> new PorcelainGit(git).describe())
+        .isThrownBy(() -> new PorcelainGit(git).getVersion())
         .withCauseInstanceOf(RefNotFoundException.class);
     }
   }

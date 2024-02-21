@@ -5,13 +5,12 @@ package com.xenoterracide.gradle.semver;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 import javax.inject.Provider;
-import org.eclipse.jgit.annotations.NonNull;
-import org.eclipse.jgit.annotations.Nullable;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.SystemReader;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class GitVersionProvider implements Provider<String> {
 
@@ -30,11 +29,7 @@ class GitVersionProvider implements Provider<String> {
 
     try (var repo = builder.build()) {
       var git = new PorcelainGit(new Git(repo));
-      return Optional
-        .ofNullable(git.describe())
-        .map(v -> v.substring(1))
-        .map(v -> v.contains("g") ? v + "-SNAPSHOT" : v)
-        .orElse(null);
+      return git.getVersion();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -127,6 +127,7 @@ org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.1=spotless996156776
 org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.4.1=spotless996156776
 org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1=spotless996156776
 org.jetbrains:annotations:13.0=spotless996156776
+org.jspecify:jspecify:0.3.0=compileClasspath,testCompileClasspath
 org.junit.jupiter:junit-jupiter-api:5.10.2=testCompileClasspath,testRuntimeClasspath
 org.junit.jupiter:junit-jupiter-engine:5.10.2=testRuntimeClasspath
 org.junit.jupiter:junit-jupiter-params:5.10.2=testCompileClasspath,testRuntimeClasspath
