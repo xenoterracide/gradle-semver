@@ -1,5 +1,7 @@
 # README
 
+A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
+
 _Plugin ID_: `"com.xenoterracide.gradle.semver"`
 _Version_: `0.9.+`
 
