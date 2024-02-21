@@ -15,10 +15,12 @@ plugin {
 version = semver.version
 ```
 
+The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.
+
 - If no commits, or version tags have been made your version will be `0.0.0-SNAPSHOT`.
 - If no valid tags are detected then your version will be `0.0.0-SNAPSHOT`.
 - If you've used a valid version tag matching the pattern `v\d+\.\d+\.\d+` then your version will be that tag.
-- If you've made commits after a valid version tag then your version will be `v\d+\.\d+\.\d+-SNAPSHOT-\d+-g\\p{XDigit}{7}`.
+- If you've made commits after a valid version tag then your version will be `v\d+\.\d+\.\d+-SNAPSHOT-\d+-g\\p{XDigit}{7}`. You'll note that we've made one change from the semver4j library, we're subclassing in order to replace the `+` with `-` as that's what the maven version specification uses.
 
 ## Goals
 
