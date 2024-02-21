@@ -51,7 +51,7 @@ gradlePlugin {
       displayName = "Semver with Git"
       description = "A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe."
       tags = setOf("semver", "versioning", "git")
-      implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
+      implementationClass = "com.xenoterracide.gradle.semver.SemVerPlugin"
     }
   }
 }
