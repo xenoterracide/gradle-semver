@@ -9,7 +9,7 @@ plugins {
 
 gradleEnterprise {
   buildScan {
-    publishOnFailureIf(providers.environmentVariable("CI").isPresent)
+    publishAlwaysIf(providers.environmentVariable("CI").isPresent)
     termsOfServiceUrl = "https://gradle.com/terms-of-service"
     termsOfServiceAgree = "yes"
   }
