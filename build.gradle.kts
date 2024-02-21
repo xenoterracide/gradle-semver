@@ -43,6 +43,8 @@ dependencyAnalysis {
 }
 
 gradlePlugin {
+  website.set("https://github.com/xenoterracide/gradle-semver")
+  vcsUrl.set("${website.get()}.git")
   plugins {
     create("plugin") {
       id = "com.xenoterracide.gradle.semver"
