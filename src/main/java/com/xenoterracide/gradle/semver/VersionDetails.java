@@ -4,6 +4,7 @@
 package com.xenoterracide.gradle.semver;
 
 import org.jspecify.annotations.Nullable;
+import org.semver4j.Semver;
 
 public interface VersionDetails {
   @Nullable
@@ -22,6 +23,5 @@ public interface VersionDetails {
 
   boolean getIsCleanTag();
 
-  @Nullable
-  String getVersion();
+  Semver getSemver();
 }

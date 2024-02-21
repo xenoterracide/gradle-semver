@@ -40,6 +40,7 @@ plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:3.+"
 plugin-spotbugs = "com.github.spotbugs.snom:spotbugs-gradle-plugin:5.+"
 plugin-spotless = "com.diffplug.spotless:spotless-plugin-gradle:6.+"
 plugin-git-version = "com.palantir.git-version:gradle-git-version:3.+"
+semver = "org.semver4j:semver4j:5.+"
 slf4j-nop = { module = "org.slf4j:slf4j-nop" }
 spotbugs = "com.github.spotbugs:spotbugs:4.+"
 spring-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring" }

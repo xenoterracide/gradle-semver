@@ -10,11 +10,13 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.semver4j.Semver;
 
 class PorcelainGit implements VersionDetails {
 
   private static final String VERSION_PREFIX = "v";
   private static final String VERSION_GLOB = VERSION_PREFIX + "[0-9]*.[0-9]*.[0-9]*";
+  private static final String PRE_VERSION = "0.0.0";
 
   private final Git git;
 
@@ -57,14 +59,31 @@ class PorcelainGit implements VersionDetails {
   }
 
   @Override
-  public @Nullable String getVersion() {
+  public Semver getSemver() {
     return Try
       .of(() -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
       .onFailure(ExceptionTools::rethrow)
-      .filter(Objects::nonNull)
-      .map(v -> v.substring(1))
-      .map(v -> v.contains("g") ? v + "-SNAPSHOT" : v)
-      .getOrNull();
+      .map(v -> null == v ? PRE_VERSION : v)
+      .map(Semver::coerce)
+      .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease("SNAPSHOT") : v)
+      .map(v ->
+        v
+          .getPreRelease()
+          .stream()
+          .filter(p -> p.matches("^\\d-+g\\p{XDigit}{7}$"))
+          .findFirst()
+          .map(p -> v.withClearedPreRelease().withPreRelease("SNAPSHOT").withBuild(p))
+          .orElse(v)
+      )
+      .map(v ->
+        new Semver(v.getVersion()) {
+          @Override
+          public String getVersion() {
+            return v.getVersion().replace("+", "-");
+          }
+        }
+      )
+      .get();
   }
 }

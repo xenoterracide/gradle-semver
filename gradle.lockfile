@@ -144,6 +144,7 @@ org.ow2.asm:asm:9.4=spotless1659553931
 org.ow2.asm:asm:9.6=jacocoAnt,spotbugs
 org.pcollections:pcollections:4.0.1=annotationProcessor,errorprone,testAnnotationProcessor
 org.reflections:reflections:0.10.2=checkstyle
+org.semver4j:semver4j:5.2.2=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.slf4j:slf4j-api:1.7.36=compileClasspath,runtimeClasspath,spotless1659553931,testCompileClasspath,testRuntimeClasspath
 org.slf4j:slf4j-api:2.0.0=spotbugsSlf4j
 org.slf4j:slf4j-api:2.0.7=spotless996156776

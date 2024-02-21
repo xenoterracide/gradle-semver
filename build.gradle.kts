@@ -23,6 +23,7 @@ dependencies {
   compileOnlyApi(libs.jspecify)
   implementation(libs.jgit)
   implementation(libs.vavr)
+  api(libs.semver)
   testImplementation(libs.junit.api)
   testImplementation(gradleTestKit())
 }

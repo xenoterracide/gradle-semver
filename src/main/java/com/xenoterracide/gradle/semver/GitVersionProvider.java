@@ -29,7 +29,7 @@ class GitVersionProvider implements Provider<String> {
 
     try (var repo = builder.build()) {
       var git = new PorcelainGit(new Git(repo));
-      return git.getVersion();
+      return git.getSemver().getVersion();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
