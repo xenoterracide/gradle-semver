@@ -12,7 +12,7 @@ plugin {
   id("com.xenoterracide.gradle.semver") version "0.+"
 }
 
-version = semver.version
+version = semver
 ```
 
 The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.

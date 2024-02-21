@@ -30,8 +30,10 @@ class SemVerPluginIntegrationTest {
         id("com.xenoterracide.gradle.semver")
       }
 
+      version = semver
+
       task getSemVer {
-        logger.quiet("version:" + semver.version)
+        logger.quiet("version:" + version)
       }
       """
     );
