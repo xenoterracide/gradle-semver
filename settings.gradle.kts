@@ -3,6 +3,12 @@
 
 rootProject.name = "gradle-semver"
 
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+  }
+}
+
 plugins {
   id("com.gradle.enterprise") version ("3.16.2")
 }
@@ -20,3 +26,5 @@ gradleEnterprise {
     termsOfServiceAgree = "yes"
   }
 }
+
+includeBuild("build-logic")
