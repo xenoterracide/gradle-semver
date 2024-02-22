@@ -10,5 +10,4 @@ plugins {
   id("our.spotbugs")
   id("our.spotless")
   id("our.coverage")
-  id("our.publish")
 }
