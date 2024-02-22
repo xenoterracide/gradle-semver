@@ -12,7 +12,7 @@ plugins {
   alias(libs.plugins.gradle.plugin.publish)
 }
 
-version = "0.9.0-SNAPSHOT"
+version = "0.9.0"
 group = "com.xenoterracide"
 
 repositories {
