@@ -1,18 +1,14 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2024 Caleb Cushing.
 
-import com.gradle.scan.agent.serialization.scan.serializer.kryo.id
-import com.squareup.kotlinpoet.Dynamic.tags
-
-// SPDX-License-Identifier: MIT
-// Copyright © 2024 Caleb Cushing.
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
-  `java-gradle-plugin`
   id("our.javalibrary")
   alias(libs.plugins.dependency.analysis)
+  alias(libs.plugins.shadow)
   alias(libs.plugins.gradle.plugin.publish)
 }
 
@@ -53,6 +49,12 @@ val githubUrl = "https://github.com"
 val repoShort = "$username/gradle-semver"
 val pub = "pub"
 
+tasks.withType<ShadowJar>().configureEach {
+  archiveClassifier.set("")
+  relocationPrefix = "com.xenoterracide.gradle.semver"
+  isEnableRelocation = true
+}
+
 gradlePlugin {
   website.set("$githubUrl/$repoShort")
   vcsUrl.set("${website.get()}.git")
@@ -69,8 +71,7 @@ gradlePlugin {
 
 publishing {
   publications {
-    create<MavenPublication>("maven") {
-      from(components["java"])
+    withType<MavenPublication>().matching { it.name == "pluginMaven" }.configureEach {
       versionMapping {
         allVariants {
           fromResolutionResult()
