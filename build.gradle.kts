@@ -53,7 +53,6 @@ val githubUrl = "https://github.com"
 val repoShort = "$username/gradle-semver"
 val pub = "pub"
 
-
 gradlePlugin {
   website.set("$githubUrl/$repoShort")
   vcsUrl.set("${website.get()}.git")
@@ -70,14 +69,15 @@ gradlePlugin {
 
 publishing {
   publications {
-    this.named("pluginMaven", MavenPublication::class) {
-    versionMapping {
+    create<MavenPublication>("maven") {
+      from(components["java"])
+      versionMapping {
         allVariants {
           fromResolutionResult()
         }
       }
       pom {
-        inceptionYear = "2024"
+        inceptionYear = "2018"
         licenses {
           license {
             name = "Apache-2.0"
