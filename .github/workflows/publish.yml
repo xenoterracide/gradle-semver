@@ -1,10 +1,10 @@
-name: Publish to GitHub Packages
+name: Publish to the Gradle Plugin Portal
 on:
   push:
     tags:
       - "v*.*.*"
 jobs:
-  publish:
+  publish-portal:
     runs-on: ubuntu-latest
     permissions:
       contents: read
