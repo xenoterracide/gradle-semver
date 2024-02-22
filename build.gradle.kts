@@ -52,21 +52,32 @@ val username = "xenoterracide"
 val githubUrl = "https://github.com"
 val repoShort = "$username/gradle-semver"
 val pub = "pub"
+
+
+gradlePlugin {
+  website.set("$githubUrl/$repoShort")
+  vcsUrl.set("${website.get()}.git")
+  plugins {
+    create(pub) {
+      id = "com.xenoterracide.gradle.semver"
+      displayName = "Semver with Git"
+      description = "A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe."
+      tags = setOf("semver", "versioning", "git")
+      implementationClass = "com.xenoterracide.gradle.semver.SemVerPlugin"
+    }
+  }
+}
+
 publishing {
   publications {
-    create<MavenPublication>(pub) {
-      versionMapping {
+    this.named("pluginMaven", MavenPublication::class) {
+    versionMapping {
         allVariants {
           fromResolutionResult()
         }
       }
       pom {
-        artifactId = project.name
-        groupId = rootProject.group.toString()
-//        version = gitVersion()
-        description = project.description
         inceptionYear = "2024"
-        url = "$githubUrl/$repoShort"
         licenses {
           license {
             name = "Apache-2.0"
@@ -87,7 +98,6 @@ publishing {
           url = "$githubUrl/$repoShort"
         }
       }
-      from(components["java"])
     }
   }
 
@@ -96,20 +106,6 @@ publishing {
       name = "GH"
       url = uri("https://maven.pkg.github.com/$repoShort")
       credentials(PasswordCredentials::class)
-    }
-  }
-}
-
-gradlePlugin {
-  website.set("$githubUrl/$repoShort")
-  vcsUrl.set("${website.get()}.git")
-  plugins {
-    create(pub) {
-      id = "com.xenoterracide.gradle.semver"
-      displayName = "Semver with Git"
-      description = "A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe."
-      tags = setOf("semver", "versioning", "git")
-      implementationClass = "com.xenoterracide.gradle.semver.SemVerPlugin"
     }
   }
 }
