@@ -6,7 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
-  id("our.javalibrary")
+  our.javalibrary
   alias(libs.plugins.dependency.analysis)
   alias(libs.plugins.shadow)
   alias(libs.plugins.gradle.plugin.publish)
@@ -14,6 +14,7 @@ plugins {
 
 version = "0.9.0-SNAPSHOT"
 group = "com.xenoterracide"
+
 repositories {
   mavenCentral()
 }
