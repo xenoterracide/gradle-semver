@@ -27,7 +27,7 @@ tasks.compileJava {
   options.release = 11
 }
 tasks.compileTestJava {
-  options.release = 17
+  options.release = 21
 }
 
 tasks.withType<Jar> {
