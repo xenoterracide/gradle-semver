@@ -12,7 +12,7 @@ plugins {
   alias(libs.plugins.gradle.plugin.publish)
 }
 
-version = "0.9.0"
+version = "0.9.0-SNAPSHOT"
 group = "com.xenoterracide"
 repositories {
   mavenCentral()
@@ -45,8 +45,10 @@ dependencyAnalysis {
 }
 
 val username = "xenoterracide"
-val githubUrl = "https://github.com"
-val repoShort = "$username/gradle-semver"
+val githubTld = "github.com"
+val repoShort = "$username/${project.name}"
+val githubUrl = "https://$githubTld/$repoShort"
+
 val pub = "pub"
 
 tasks.withType<ShadowJar>().configureEach {
@@ -56,8 +58,8 @@ tasks.withType<ShadowJar>().configureEach {
 }
 
 gradlePlugin {
-  website.set("$githubUrl/$repoShort")
-  vcsUrl.set("${website.get()}.git")
+  website.set(githubUrl)
+  vcsUrl.set("$githubUrl.git")
   plugins {
     create(pub) {
       id = "com.xenoterracide.gradle.semver"
@@ -94,9 +96,9 @@ publishing {
           }
         }
         scm {
-          connection = "$githubUrl/$repoShort.git"
-          developerConnection = "scm:git:$githubUrl/$repoShort.git"
-          url = "$githubUrl/$repoShort"
+          connection = "$githubUrl.git"
+          developerConnection = "scm:git:$githubTld/$repoShort.git"
+          url = githubUrl
         }
       }
     }
@@ -105,7 +107,7 @@ publishing {
   repositories {
     maven {
       name = "GH"
-      url = uri("https://maven.pkg.github.com/$repoShort")
+      url = uri("https://maven.pkg.$githubTld/$repoShort")
       credentials(PasswordCredentials::class)
     }
   }
