@@ -1,16 +1,27 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright © 2020-2024 Caleb Cushing.
+// © Copyright 2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 
 import org.jspecify.annotations.Nullable;
-import org.semver4j.Semver;
 
 public interface VersionDetails {
   @Nullable
+  String getBranchName();
+
+  @Nullable
+  String getGitHashFull();
+
+  @Nullable
+  String getGitHash();
+
+  @Nullable
   String getLastTag();
 
-  boolean getIsCleanTag();
+  @Nullable
+  String getDescribe();
 
-  Semver getSemver();
+  int getCommitDistance();
+
+  boolean getIsCleanTag();
 }

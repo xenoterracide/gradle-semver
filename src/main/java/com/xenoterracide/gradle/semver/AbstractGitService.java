@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright © 2024 Caleb Cushing.
+// © Copyright 2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 
@@ -16,24 +16,28 @@ import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractGitService implements BuildService<Params>, AutoCloseable {
 
-  private final FileRepositoryBuilder builder;
   private @Nullable Git git;
   private @Nullable Repository repository;
 
   @Inject
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
-  public AbstractGitService() {
-    this.builder =
-      new FileRepositoryBuilder()
+  public AbstractGitService() {}
+
+  Git lazyGit() throws IOException {
+    if (this.git == null) {
+      var builder = new FileRepositoryBuilder()
         .readEnvironment()
         .setMustExist(true)
         .findGitDir(this.getParameters().getProjectDirectory().get().getAsFile());
+      this.repository = builder.build();
+      this.git = new Git(this.repository);
+    }
+
+    return this.git;
   }
 
-  PorcelainGit getPorcelainGit() throws IOException {
-    this.repository = this.builder.build();
-    this.git = new Git(this.repository);
-    return new PorcelainGit(this.git);
+  public SemverExtension getExtension() throws IOException {
+    return new SemverExtension(this.lazyGit());
   }
 
   @Override

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright © 2018-2024 Caleb Cushing.
+// © Copyright 2018-2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 
@@ -45,11 +45,7 @@ public class SemVerPlugin implements Plugin<Project> {
         }
       );
 
-    project
-      .getExtensions()
-      .add(
-        EXTENSION,
-        serviceProvider.map(s -> Try.of(s::getPorcelainGit).getOrElseThrow(ExceptionTools::rethrow)).get().getSemver()
-      );
+    var ext = project.getExtensions();
+    ext.add(EXTENSION, serviceProvider.map(s -> Try.of(s::getExtension).getOrElseThrow(ExceptionTools::rethrow)).get());
   }
 }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright © 2018-2024 Caleb Cushing.
+// © Copyright 2018-2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.semver4j.Semver;
 
-class PorcelainGitTest {
+class SemverExtensionTest {
 
   @TempDir
   @NonNull
@@ -26,7 +26,7 @@ class PorcelainGitTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var pg = new PorcelainGit(git);
+      var pg = new VersionDetailsImpl(git);
       assertThat(pg.getLastTag()).isNull();
 
       git.tag().setName("v0.1.0").call();
@@ -42,7 +42,7 @@ class PorcelainGitTest {
   void getVersion() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new PorcelainGit(git);
+      var pg = new VersionDetailsImpl(git);
 
       var v000 = pg.getSemver();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-SNAPSHOT");
@@ -84,7 +84,7 @@ class PorcelainGitTest {
       git.tag().setName("latest").call();
       git.commit().setMessage("second commit").call();
 
-      var pg = new PorcelainGit(git);
+      var pg = new VersionDetailsImpl(git);
 
       assertThat(pg.getSemver().getVersion()).isEqualTo("0.0.0-SNAPSHOT");
 
@@ -100,7 +100,7 @@ class PorcelainGitTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new PorcelainGit(git);
+      var pg = new VersionDetailsImpl(git);
 
       assertThat(pg.getIsCleanTag()).isTrue();
 

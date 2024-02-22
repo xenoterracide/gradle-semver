@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright © 2018-2024 Caleb Cushing.
+// © Copyright 2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 
@@ -7,13 +7,11 @@ import io.vavr.control.Try;
 import java.util.Objects;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
-class PorcelainGit implements VersionDetails {
+public class SemverExtension {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
@@ -22,30 +20,29 @@ class PorcelainGit implements VersionDetails {
 
   private final Git git;
 
-  PorcelainGit(@NonNull Git git) {
+  SemverExtension(@NonNull Git git) {
     this.git = Objects.requireNonNull(git);
   }
 
-  @Override
-  public @Nullable String getLastTag() {
+  Try<@Nullable String> describe() {
     return Try
-      .of(() -> git.describe().setMatch(VERSION_GLOB))
+      .of(() -> this.git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
-      .onFailure(ExceptionTools::rethrow)
-      .getOrNull();
+      .onFailure(ExceptionTools::rethrow);
   }
 
-  @Override
-  public boolean getIsCleanTag() {
-    return Try.ofCallable(git.status()).map(Status::isClean).getOrElseThrow(ExceptionTools::rethrow);
+  public Semver gradlePluginSemver() {
+    return describe()
+      .map(v -> null == v ? PRE_VERSION : v)
+      .map(Semver::coerce)
+      .map(v ->
+        !(v.getPreRelease().isEmpty() || v.getBuild().isEmpty()) ? v.withClearedPreReleaseAndBuild().nextPatch() : v
+      )
+      .get();
   }
 
-  @Override
-  public Semver getSemver() {
-    return Try
-      .of(() -> git.describe().setMatch(VERSION_GLOB))
-      .mapTry(DescribeCommand::call)
-      .onFailure(ExceptionTools::rethrow)
+  public Semver mavenSemver() {
+    return describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
@@ -60,17 +57,5 @@ class PorcelainGit implements VersionDetails {
       )
       .map(v -> new MavenSemver(v.getVersion()))
       .get();
-  }
-
-  static class MavenSemver extends Semver {
-
-    MavenSemver(@NotNull String version) {
-      super(version);
-    }
-
-    @Override
-    public String getVersion() {
-      return super.getVersion().replace("+", "-");
-    }
   }
 }
