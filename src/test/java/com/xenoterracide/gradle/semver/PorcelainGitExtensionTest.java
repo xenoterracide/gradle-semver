@@ -23,9 +23,11 @@ class PorcelainGitExtensionTest {
   void getBranchName() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
+      git.branchCreate().setName("topic/test").call();
+      git.checkout().setName("topic/test").call();
 
       var pg = new PorcelainGitExtension(() -> git);
-      assertThat(pg.getBranchName()).isEqualTo("main");
+      assertThat(pg.getBranchName()).isEqualTo("topic/test");
     }
   }
 
