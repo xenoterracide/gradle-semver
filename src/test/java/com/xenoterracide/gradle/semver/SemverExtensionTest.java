@@ -24,7 +24,7 @@ class SemverExtensionTest {
   void getVersion() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new SemverExtension(git);
+      var pg = new SemverExtension(() -> git);
 
       var v000 = pg.getMaven();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-SNAPSHOT");
@@ -66,7 +66,7 @@ class SemverExtensionTest {
       git.tag().setName("latest").call();
       git.commit().setMessage("second commit").call();
 
-      var pg = new SemverExtension(git);
+      var pg = new SemverExtension(() -> git);
 
       assertThat(pg.getMaven()).hasToString("0.0.0-SNAPSHOT");
 

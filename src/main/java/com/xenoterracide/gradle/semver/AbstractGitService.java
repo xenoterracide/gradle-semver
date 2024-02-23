@@ -4,6 +4,7 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.AbstractGitService.Params;
+import io.vavr.control.Try;
 import java.io.IOException;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
@@ -36,12 +37,8 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
     return this.git;
   }
 
-  public PorcelainGitExtension gitExtension() throws IOException {
-    return new PorcelainGitExtension(this.lazyGit());
-  }
-
-  public SemverExtension semverExtension() throws IOException {
-    return new SemverExtension(this.lazyGit());
+  public SemverExtension extension() {
+    return new SemverExtension(() -> Try.of(this::lazyGit).onFailure(ExceptionTools::rethrow).get());
   }
 
   @Override

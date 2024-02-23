@@ -38,7 +38,7 @@ class PorcelainGitExtensionTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var pg = new PorcelainGitExtension(git);
+      var pg = new PorcelainGitExtension(() -> git);
       assertThat(pg.getLastTag()).isNull();
 
       git.tag().setName("v0.1.0").call();
@@ -62,7 +62,7 @@ class PorcelainGitExtensionTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new PorcelainGitExtension(git);
+      var pg = new PorcelainGitExtension(() -> git);
 
       assertThat(pg.isDirty()).isFalse();
 

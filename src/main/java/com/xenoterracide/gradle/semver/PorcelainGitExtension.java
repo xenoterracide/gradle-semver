@@ -7,6 +7,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.function.Supplier;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -23,15 +24,14 @@ public class PorcelainGitExtension {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String HEAD = "HEAD";
 
-  private final Git git;
+  private final Supplier<Git> git;
 
-  PorcelainGitExtension(@NonNull Git git) {
+  PorcelainGitExtension(Supplier<Git> git) {
     this.git = Objects.requireNonNull(git);
   }
 
-  @NonNull
   Try<Repository> gitRepository() {
-    return Try.of(this.git::getRepository).onFailure(ExceptionTools::rethrow);
+    return Try.of(() -> this.git.get().getRepository()).onFailure(ExceptionTools::rethrow);
   }
 
   public @Nullable String getBranchName() {
@@ -56,19 +56,19 @@ public class PorcelainGitExtension {
 
   public @Nullable String getLastTag() {
     return Try
-      .of(() -> git.describe().setMatch(VERSION_GLOB))
+      .of(() -> git.get().describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
       .onFailure(ExceptionTools::rethrow)
       .getOrNull();
   }
 
   public @Nullable String getDescribe() {
-    return Try.ofCallable(git.describe()).onFailure(ExceptionTools::rethrow).getOrNull();
+    return Try.ofCallable(git.get().describe()).onFailure(ExceptionTools::rethrow).getOrNull();
   }
 
   public int getCommitDistance() {
     return Try
-      .ofCallable(git.describe())
+      .ofCallable(git.get().describe())
       .onFailure(ExceptionTools::rethrow)
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
@@ -77,7 +77,7 @@ public class PorcelainGitExtension {
 
   public boolean isDirty() {
     return Try
-      .ofCallable(git.status())
+      .ofCallable(git.get().status())
       .map(Status::isClean)
       .map(clean -> !clean) // flip, dirty is the porcelain option
       .getOrElseThrow(ExceptionTools::rethrow);
