@@ -23,8 +23,15 @@ version = semver.maven
 ```
 
 ```kt
-logger.quiet("maven:{}", semver.maven)
+logger.quiet("maven:{}", semver.maven )
 logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
+logger.quiet("branch:{}", semver.git.branch )
+logger.quiet("commit:{}", semver.git.commit)
+logger.quiet("commitShort:{}", semver.git.commitShort)
+logger.quiet("latestTag:{}", semver.git.latestTag)
+logger.quiet("describe:{}", semver.git.describe)
+logger.quiet("commitDistance:{}", semver.git.commitDistance)
+logger.quiet("dirty:{}", semver.git.dirty)
 ```
 
 The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.
