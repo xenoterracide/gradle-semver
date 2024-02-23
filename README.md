@@ -1,3 +1,8 @@
+<!--
+SPDX-License-Identifier: CC-BY-4.0
+© Copyright 2024 Caleb Cushing. All rights reserved.
+-->
+
 # README
 
 A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
@@ -10,11 +15,16 @@ _Version_: `0.9.+`
 _IMPORTANT_: this plugin will not work if you haven't run `git init` in your project.
 
 ```kt
-plugin {
-  id("com.xenoterracide.gradle.semver") version "0.+"
+plugins {
+  id("com.xenoterracide.gradle.semver")
 }
 
-version = semver
+version = semver.maven
+```
+
+```kt
+logger.quiet("maven:{}", semver.maven)
+logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
 ```
 
 The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.
@@ -64,4 +74,8 @@ Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## License
 
-Apache 2.0
+Java: [Apache 2.0](https://choosealicense.com/licenses/apache-2.0/)
+Gradle Kotlin and Config Files: [MIT](https://choosealicense.com/licenses/mit/)
+Documentation including Javadoc: [CC BY 4.0](https://choosealicense.com/licenses/cc-by-4.0/)
+
+© Copyright 2024 Caleb Cushing. All rights reserved.

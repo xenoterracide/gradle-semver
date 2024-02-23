@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright © 2024 Caleb Cushing.
+// © Copyright 2024 Caleb Cushing. All rights reserved.
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
@@ -27,6 +27,7 @@ dependencies {
   compileOnlyApi(libs.jspecify)
   implementation(libs.jgit)
   implementation(libs.vavr)
+  implementation(libs.guava)
   api(libs.semver)
   testImplementation(libs.junit.api)
   testImplementation(gradleTestKit())
@@ -65,14 +66,14 @@ gradlePlugin {
       displayName = "Semver with Git"
       description = "A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe."
       tags = setOf("semver", "versioning", "git")
-      implementationClass = "com.xenoterracide.gradle.semver.SemVerPlugin"
+      implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
     }
   }
 }
 
 publishing {
   publications {
-    withType<MavenPublication>().matching { it.name == "pluginMaven" }.configureEach {
+    withType<MavenPublication>().configureEach {
       versionMapping {
         allVariants {
           fromResolutionResult()
@@ -83,8 +84,21 @@ publishing {
         licenses {
           license {
             name = "Apache-2.0"
-            url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            url = "https://choosealicense.com/licenses/apache-2.0/"
             distribution = "repo"
+            comments = "Java"
+          }
+          license {
+            name = "MIT"
+            url = "https://choosealicense.com/licenses/mit/"
+            distribution = "repo"
+            comments = "Gradle Build Files and Configuration Files"
+          }
+          license {
+            name = "CC-BY-4.0"
+            url = "https://choosealicense.com/licenses/cc-by-4.0/"
+            distribution = "repo"
+            comments = "Documentation including Javadoc"
           }
         }
         developers {
@@ -100,14 +114,6 @@ publishing {
           url = "$githubUrl/$repoShort"
         }
       }
-    }
-  }
-
-  repositories {
-    maven {
-      name = "GH"
-      url = uri("https://maven.pkg.github.com/$repoShort")
-      credentials(PasswordCredentials::class)
     }
   }
 }

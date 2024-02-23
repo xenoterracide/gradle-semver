@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright © 2018-2024 Caleb Cushing.
+// © Copyright 2018-2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 
@@ -11,9 +11,8 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.semver4j.Semver;
 
-class SemVerPluginTest {
+class SemverPluginTest {
 
   Project project;
   Git git;
@@ -38,17 +37,17 @@ class SemVerPluginTest {
 
   @Test
   void apply() {
-    project.getPluginManager().apply(SemVerPlugin.class);
-    var semver = project.getExtensions().getByType(Semver.class);
-    assertThat(semver.getVersion()).isEqualTo("0.1.3");
+    project.getPluginManager().apply(SemverPlugin.class);
+    var semver = project.getExtensions().getByType(SemverExtension.class);
+    assertThat(semver.getMaven()).hasToString("0.1.3");
   }
 
   @Test
   void snapshot() throws Exception {
     git.commit().setMessage("four").setAllowEmpty(true).call();
-    project.getPluginManager().apply(SemVerPlugin.class);
-    var semver = project.getExtensions().getByType(Semver.class);
+    project.getPluginManager().apply(SemverPlugin.class);
+    var semver = project.getExtensions().getByType(SemverExtension.class);
 
-    assertThat(semver.getVersion()).startsWith("0.1.3-SNAPSHOT-1-g");
+    assertThat(semver.getMaven().toString()).startsWith("0.1.3-SNAPSHOT-1-g");
   }
 }

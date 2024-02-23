@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright © 2024 Caleb Cushing.
+// © Copyright 2024 Caleb Cushing. All rights reserved.
 
 rootProject.name = "gradle-semver"
 
