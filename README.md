@@ -76,6 +76,6 @@ Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 Java: [Apache 2.0](https://choosealicense.com/licenses/apache-2.0/)
 Gradle Kotlin and Config Files: [MIT](https://choosealicense.com/licenses/mit/)
-Documentation: [CC BY 4.0](https://choosealicense.com/licenses/cc-by-4.0/)
+Documentation including Javadoc: [CC BY 4.0](https://choosealicense.com/licenses/cc-by-4.0/)
 
 © Copyright 2024 Caleb Cushing. All rights reserved.

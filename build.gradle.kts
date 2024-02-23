@@ -86,7 +86,7 @@ publishing {
             name = "Apache-2.0"
             url = "https://choosealicense.com/licenses/apache-2.0/"
             distribution = "repo"
-            comments = "Java Source Code"
+            comments = "Java"
           }
           license {
             name = "MIT"
@@ -98,7 +98,7 @@ publishing {
             name = "CC-BY-4.0"
             url = "https://choosealicense.com/licenses/cc-by-4.0/"
             distribution = "repo"
-            comments = "Documentation"
+            comments = "Documentation including Javadoc"
           }
         }
         developers {
