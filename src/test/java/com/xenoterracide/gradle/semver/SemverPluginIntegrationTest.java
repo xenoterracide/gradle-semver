@@ -13,6 +13,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +22,19 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 class SemverPluginIntegrationTest {
+
+  static final String BUILD_FILE = "build.gradle";
+  static final String GROOVY_SCRIPT =
+    """
+    plugins {
+      id("com.xenoterracide.gradle.semver")
+    }
+
+    task getSemVer {
+      logger.quiet("maven:{}", semver.maven)
+      logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
+    }
+    """;
 
   @TempDir
   File testProjectDir;
@@ -34,10 +48,9 @@ class SemverPluginIntegrationTest {
     }
   }
 
-  @ParameterizedTest
-  @ArgumentsSource(BuildScriptArgumentsProvider.class)
-  void debug(String fileName, String buildScript) throws IOException {
-    Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
+  @Test
+  void debug() throws IOException {
+    Files.writeString(testProjectDir.toPath().resolve(BUILD_FILE), GROOVY_SCRIPT);
     var build = GradleRunner
       .create()
       .withDebug(true)
@@ -68,18 +81,7 @@ class SemverPluginIntegrationTest {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
       return Stream.of(
-        Arguments.of(
-          "build.gradle",
-          """
-          plugins {
-            id("com.xenoterracide.gradle.semver")
-          }
-
-          task getSemVer {
-            logger.quiet("maven:{}", semver.mavenSemver())
-          }
-          """
-        ),
+        Arguments.of(BUILD_FILE, GROOVY_SCRIPT),
         Arguments.of(
           "build.gradle.kts",
           """
@@ -88,7 +90,8 @@ class SemverPluginIntegrationTest {
           }
 
           tasks.register("getSemVer") {
-            logger.quiet("maven:{}", semver.mavenSemver() )
+            logger.quiet("maven:{}", semver.maven )
+            logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
           }
           """
         )

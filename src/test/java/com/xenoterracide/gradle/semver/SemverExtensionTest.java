@@ -26,7 +26,7 @@ class SemverExtensionTest {
       git.commit().setMessage("initial commit").call();
       var pg = new SemverExtension(git);
 
-      var v000 = pg.mavenSemver();
+      var v000 = pg.getMaven();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-SNAPSHOT");
       assertThat(v000)
         .hasToString("0.0.0-SNAPSHOT")
@@ -36,7 +36,7 @@ class SemverExtensionTest {
       git.tag().setName("v0.1.0").call();
       git.commit().setMessage("second commit").call();
 
-      var v010 = pg.mavenSemver();
+      var v010 = pg.getMaven();
 
       assertThat(v010)
         .extracting(Semver::getVersion, Semver::toString)
@@ -49,7 +49,7 @@ class SemverExtensionTest {
 
       git.tag().setName("v0.1.1").call();
 
-      var v011 = pg.mavenSemver();
+      var v011 = pg.getMaven();
 
       assertThat(v011)
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
@@ -68,16 +68,16 @@ class SemverExtensionTest {
 
       var pg = new SemverExtension(git);
 
-      assertThat(pg.mavenSemver()).hasToString("0.0.0-SNAPSHOT");
+      assertThat(pg.getMaven()).hasToString("0.0.0-SNAPSHOT");
 
       git.tag().setName("v0.1.0").call();
 
-      assertThat(pg.mavenSemver()).hasToString("0.1.0");
+      assertThat(pg.getMaven()).hasToString("0.1.0");
     }
   }
 
   @Test
   void classTest() {
-    assertThat(SemverExtension.class).isPublic().hasPublicMethods("mavenSemver", "getGradlePluginSemver");
+    assertThat(SemverExtension.class).isPublic().hasPublicMethods("getMaven", "getGradlePlugin");
   }
 }

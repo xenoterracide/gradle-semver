@@ -31,7 +31,7 @@ public class SemverExtension {
       .onFailure(ExceptionTools::rethrow);
   }
 
-  public Semver gradlePluginSemver() {
+  public Semver getGradlePlugin() {
     return describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
@@ -41,7 +41,7 @@ public class SemverExtension {
       .get();
   }
 
-  public Semver mavenSemver() {
+  public Semver getMaven() {
     return describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
