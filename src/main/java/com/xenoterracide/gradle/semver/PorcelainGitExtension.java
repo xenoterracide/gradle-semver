@@ -17,7 +17,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class PorcelainGit {
+public class PorcelainGitExtension {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
@@ -25,7 +25,7 @@ public class PorcelainGit {
 
   private final Git git;
 
-  PorcelainGit(@NonNull Git git) {
+  PorcelainGitExtension(@NonNull Git git) {
     this.git = Objects.requireNonNull(git);
   }
 

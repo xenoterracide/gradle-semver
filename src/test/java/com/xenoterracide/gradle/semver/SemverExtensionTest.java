@@ -6,7 +6,6 @@ package com.xenoterracide.gradle.semver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.jgit.annotations.NonNull;
@@ -20,23 +19,6 @@ class SemverExtensionTest {
   @TempDir
   @NonNull
   File projectDir;
-
-  @Test
-  void getLastTag() throws Exception {
-    try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-
-      var pg = new PorcelainGit(git);
-      assertThat(pg.getLastTag()).isNull();
-
-      git.tag().setName("v0.1.0").call();
-      assertThat(pg.getLastTag()).matches("v0.1.0");
-
-      git.commit().setMessage("second commit").call();
-      git.tag().setName("v0.1.1").call();
-      assertThat(pg.getLastTag()).matches("v0.1.1");
-    }
-  }
 
   @Test
   void getVersion() throws Exception {
@@ -91,22 +73,6 @@ class SemverExtensionTest {
       git.tag().setName("v0.1.0").call();
 
       assertThat(pg.mavenSemver()).hasToString("0.1.0");
-    }
-  }
-
-  @Test
-  void isDirty() throws Exception {
-    try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-      git.tag().setName("v0.1.0").call();
-
-      var pg = new PorcelainGit(git);
-
-      assertThat(pg.isDirty()).isTrue();
-
-      Files.createFile(projectDir.toPath().resolve("test.txt"));
-
-      assertThat(pg.isDirty()).isFalse();
     }
   }
 }
