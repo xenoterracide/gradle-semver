@@ -35,7 +35,6 @@ class PorcelainGitExtensionTest {
   void getObjectIdFor() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      git.commit().setMessage("initial commit").call();
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
@@ -51,7 +50,6 @@ class PorcelainGitExtensionTest {
   @Test
   void getSha() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
       git.commit().setMessage("initial commit").call();
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
@@ -69,9 +67,11 @@ class PorcelainGitExtensionTest {
   void getHeadSha() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
+      git.branchCreate().setName("topic/test").call();
+      git.checkout().setName("topic/test").call();
 
       var pg = new PorcelainGitExtension(() -> git);
-      var main = pg.getSha("main");
+      var main = pg.getSha("topic/test");
       var head = pg.getHeadSha();
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(40);
@@ -83,9 +83,11 @@ class PorcelainGitExtensionTest {
   void getHeadShortSha() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
+      git.branchCreate().setName("topic/test").call();
+      git.checkout().setName("topic/test").call();
 
       var pg = new PorcelainGitExtension(() -> git);
-      var main = pg.getSha("main");
+      var main = pg.getSha("topic/test");
       var head = pg.getHeadShortSha();
       assertThat(main).isNotNull();
       assertThat(main).hasSize(40);

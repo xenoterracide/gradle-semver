@@ -34,8 +34,6 @@ tasks.withType<Test>().configureEach {
       exceptionFormat = TestExceptionFormat.FULL
       events.addAll(
         listOf(
-          TestLogEvent.STARTED,
-          TestLogEvent.PASSED,
           TestLogEvent.SKIPPED,
           TestLogEvent.FAILED,
         ),
