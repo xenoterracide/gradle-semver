@@ -46,7 +46,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("version:0.1.0");
+    assertThat(build.getOutput()).contains("maven:0.1.0");
   }
 
   @ParameterizedTest
@@ -60,7 +60,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("version:0.1.0");
+    assertThat(build.getOutput()).contains("maven:0.1.0");
   }
 
   static class BuildScriptArgumentsProvider implements ArgumentsProvider {
@@ -76,7 +76,7 @@ class SemverPluginIntegrationTest {
           }
 
           task getSemVer {
-            logger.quiet("version:" + semver.mavenSemver())
+            logger.quiet("maven:{}", semver.mavenSemver())
           }
           """
         ),
@@ -88,7 +88,7 @@ class SemverPluginIntegrationTest {
           }
 
           tasks.register("getSemVer") {
-            logger.quiet("version: {}", semver.mavenSemver() )
+            logger.quiet("maven:{}", semver.mavenSemver() )
           }
           """
         )
