@@ -1,3 +1,8 @@
+<!--
+SPDX-License-Identifier: CC-BY-4.0
+© Copyright 2024 Caleb Cushing. All rights reserved.
+-->
+
 # README
 
 A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
@@ -64,4 +69,8 @@ Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## License
 
-Apache 2.0
+Java: [Apache 2.0](https://spdx.org/licenses/Apache-2.0.html)
+Gradle Kotlin and Config Files: [MIT](https://spdx.org/licenses/MIT.html)
+Documentation: [CC BY 4.0](https://spdx.org/licenses/CC-BY-4.0.html)
+
+© Copyright 2024 Caleb Cushing. All rights reserved.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright © 2024 Caleb Cushing.
+// © Copyright 2024 Caleb Cushing. All rights reserved.
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
@@ -27,6 +27,7 @@ dependencies {
   compileOnlyApi(libs.jspecify)
   implementation(libs.jgit)
   implementation(libs.vavr)
+  implementation(libs.guava)
   api(libs.semver)
   testImplementation(libs.junit.api)
   testImplementation(gradleTestKit())
