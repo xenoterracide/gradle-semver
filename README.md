@@ -44,9 +44,11 @@ The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses
 If you want you can do things like this
 
 ```kt
-version = semver.version // almost same as version = semver because semver.toString() calls semver.version
-semver.major
-semver.minor
+version = semver.maven // almost same as  semver.maven.version, because semver.toString() is the same as  semver.getVersion()
+version = semver.gradlePlugin // semver.gradlePlugin.version
+
+version.major // e.g. 1
+version.minor // e.g. 0
 ```
 
 See [Semver](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html) for more methods.
