@@ -84,19 +84,19 @@ publishing {
         licenses {
           license {
             name = "Apache-2.0"
-            url = "$githubUrl/$repoShort/blob/main/LICENSE.Apache-2.0.txt"
+            url = "https://choosealicense.com/licenses/apache-2.0/"
             distribution = "repo"
             comments = "Java Source Code"
           }
           license {
             name = "MIT"
-            url = "$githubUrl/$repoShort/blob/main/LICENSE.MIT.txt"
+            url = "https://choosealicense.com/licenses/mit/"
             distribution = "repo"
             comments = "Gradle Build Files and Configuration Files"
           }
           license {
             name = "CC-BY-4.0"
-            url = "$githubUrl/$repoShort/blob/main/LICENSE.CC-BY-4.0.txt"
+            url = "https://choosealicense.com/licenses/cc-by-4.0/"
             distribution = "repo"
             comments = "Documentation"
           }
