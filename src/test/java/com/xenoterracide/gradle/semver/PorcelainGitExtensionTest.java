@@ -35,9 +35,12 @@ class PorcelainGitExtensionTest {
   void getObjectIdFor() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
+      git.commit().setMessage("initial commit").call();
+      git.branchCreate().setName("topic/test").call();
+      git.checkout().setName("topic/test").call();
 
       var pg = new PorcelainGitExtension(() -> git);
-      var main = pg.getObjectIdFor("main").get().getName();
+      var main = pg.getObjectIdFor("topic/test").get().getName();
       var head = pg.getObjectIdFor("HEAD").get().getName();
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(40);
@@ -49,9 +52,12 @@ class PorcelainGitExtensionTest {
   void getSha() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
+      git.commit().setMessage("initial commit").call();
+      git.branchCreate().setName("topic/test").call();
+      git.checkout().setName("topic/test").call();
 
       var pg = new PorcelainGitExtension(() -> git);
-      var main = pg.getSha("main");
+      var main = pg.getSha("topic/test");
       var head = pg.getSha("HEAD");
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(40);
