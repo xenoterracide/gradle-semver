@@ -23,7 +23,18 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 class SemverPluginIntegrationTest {
 
-  static final String BUILD_FILE = "build.gradle";
+  static final String LOGGING =
+    """
+    logger.quiet("maven:{}", semver.maven )
+    logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
+    logger.quiet("branch:{}", semver.git.branch )
+    logger.quiet("commit:{}", semver.git.commit)
+    logger.quiet("commitShort:{}", semver.git.commitShort)
+    logger.quiet("latestTag:{}", semver.git.latestTag)
+    logger.quiet("describe:{}", semver.git.describe)
+    logger.quiet("commitDistance:{}", semver.git.commitDistance)
+    logger.quiet("status:{}", semver.git.status)
+    """;
   static final String GROOVY_SCRIPT =
     """
     plugins {
@@ -31,8 +42,17 @@ class SemverPluginIntegrationTest {
     }
 
     task getSemVer {
-      logger.quiet("maven:{}", semver.maven)
-      logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
+    %s
+    }
+    """;
+  static final String KOTLIN_SCRIPT =
+    """
+    plugins {
+      id("com.xenoterracide.gradle.semver")
+    }
+
+    tasks.register("getSemVer") {
+    %s
     }
     """;
 
@@ -50,7 +70,7 @@ class SemverPluginIntegrationTest {
 
   @Test
   void debug() throws IOException {
-    Files.writeString(testProjectDir.toPath().resolve(BUILD_FILE), GROOVY_SCRIPT);
+    Files.writeString(testProjectDir.toPath().resolve("build.gradle"), String.format(GROOVY_SCRIPT, LOGGING));
     var build = GradleRunner
       .create()
       .withDebug(true)
@@ -81,20 +101,8 @@ class SemverPluginIntegrationTest {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
       return Stream.of(
-        Arguments.of(BUILD_FILE, GROOVY_SCRIPT),
-        Arguments.of(
-          "build.gradle.kts",
-          """
-          plugins {
-            id("com.xenoterracide.gradle.semver")
-          }
-
-          tasks.register("getSemVer") {
-            logger.quiet("maven:{}", semver.maven )
-            logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
-          }
-          """
-        )
+        Arguments.of("build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
       );
     }
   }
