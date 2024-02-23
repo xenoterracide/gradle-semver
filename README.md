@@ -15,11 +15,16 @@ _Version_: `0.9.+`
 _IMPORTANT_: this plugin will not work if you haven't run `git init` in your project.
 
 ```kt
-plugin {
-  id("com.xenoterracide.gradle.semver") version "0.+"
+plugins {
+  id("com.xenoterracide.gradle.semver")
 }
 
-version = semver
+version = semver.maven
+```
+
+```kt
+logger.quiet("maven:{}", semver.maven)
+logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
 ```
 
 The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.

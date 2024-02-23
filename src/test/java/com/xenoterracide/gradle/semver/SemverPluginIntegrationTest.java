@@ -34,7 +34,7 @@ class SemverPluginIntegrationTest {
       logger.quiet("maven:{}", semver.maven)
       logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
     }
-    """.trim();
+    """;
 
   @TempDir
   File testProjectDir;
