@@ -33,7 +33,7 @@ class SemverPluginIntegrationTest {
     logger.quiet("latestTag:{}", semver.git.latestTag)
     logger.quiet("describe:{}", semver.git.describe)
     logger.quiet("commitDistance:{}", semver.git.commitDistance)
-    logger.quiet("dirty:{}", semver.git.status)
+    logger.quiet("status:{}", semver.git.status)
     """;
   static final String GROOVY_SCRIPT =
     """

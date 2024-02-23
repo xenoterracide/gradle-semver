@@ -15,4 +15,9 @@
       <Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR" />
     </Or>
   </Match>
+  <Match>
+    <!-- safe to ignore in tests due to gitattributes -->
+    <Class name="~.*Test$?.*" />
+    <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
+  </Match>
 </FindBugsFilter>

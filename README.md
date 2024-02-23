@@ -31,7 +31,7 @@ logger.quiet("commitShort:{}", semver.git.commitShort)
 logger.quiet("latestTag:{}", semver.git.latestTag)
 logger.quiet("describe:{}", semver.git.describe)
 logger.quiet("commitDistance:{}", semver.git.commitDistance)
-logger.quiet("dirty:{}", semver.git.dirty)
+logger.quiet("status:{}", semver.git.status)
 ```
 
 The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.
