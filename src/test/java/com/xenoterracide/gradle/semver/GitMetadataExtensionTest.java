@@ -151,18 +151,18 @@ class GitMetadataExtensionTest {
   }
 
   @Test
-  void isDirty() throws Exception {
+  void getStatus() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
       var pg = new GitMetadataExtension(() -> git);
 
-      assertThat(pg.isDirty()).isFalse();
+      assertThat(pg.getStatus()).isEqualTo(GitStatus.CLEAN);
 
       Files.createFile(projectDir.toPath().resolve("test.txt"));
 
-      assertThat(pg.isDirty()).isTrue();
+      assertThat(pg.getStatus()).isEqualTo(GitStatus.DIRTY);
     }
   }
 }

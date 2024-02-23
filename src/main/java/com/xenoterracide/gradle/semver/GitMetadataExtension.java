@@ -75,11 +75,11 @@ public class GitMetadataExtension {
       .getOrElse(0);
   }
 
-  public boolean isDirty() {
+  public GitStatus getStatus() {
     return Try
       .ofCallable(git.get().status())
       .map(Status::isClean)
-      .map(clean -> !clean) // flip, dirty is the porcelain option
+      .map(clean -> clean ? GitStatus.CLEAN : GitStatus.DIRTY) // flip, dirty is the porcelain option
       .getOrElseThrow(ExceptionTools::rethrow);
   }
 }
