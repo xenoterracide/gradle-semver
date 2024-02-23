@@ -8,12 +8,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.stream.Stream;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 class SemverPluginIntegrationTest {
 
@@ -23,28 +28,16 @@ class SemverPluginIntegrationTest {
   @BeforeEach
   public void setupRunner() throws IOException, GitAPIException {
     Files.writeString(testProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = 'hello-world'");
-    Files.writeString(
-      testProjectDir.toPath().resolve("build.gradle"),
-      """
-      plugins {
-        id("com.xenoterracide.gradle.semver")
-      }
-
-      version = semver
-
-      task getSemVer {
-        logger.quiet("version:" + version)
-      }
-      """
-    );
     try (var git = Git.init().setDirectory(testProjectDir).call()) {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
     }
   }
 
-  @Test
-  void debug() {
+  @ParameterizedTest
+  @ArgumentsSource(BuildScriptArgumentsProvider.class)
+  void debug(String fileName, String buildScript) throws IOException {
+    Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
     var build = GradleRunner
       .create()
       .withDebug(true)
@@ -56,8 +49,10 @@ class SemverPluginIntegrationTest {
     assertThat(build.getOutput()).contains("version:0.1.0");
   }
 
-  @Test
-  void configurationCache() {
+  @ParameterizedTest
+  @ArgumentsSource(BuildScriptArgumentsProvider.class)
+  void configurationCache(String fileName, String buildScript) throws IOException {
+    Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
     var build = GradleRunner
       .create()
       .withProjectDir(testProjectDir)
@@ -66,5 +61,38 @@ class SemverPluginIntegrationTest {
       .build();
 
     assertThat(build.getOutput()).contains("version:0.1.0");
+  }
+
+  static class BuildScriptArgumentsProvider implements ArgumentsProvider {
+
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+      return Stream.of(
+        Arguments.of(
+          "build.gradle",
+          """
+          plugins {
+            id("com.xenoterracide.gradle.semver")
+          }
+
+          task getSemVer {
+            logger.quiet("version:" + semver.mavenSemver())
+          }
+          """
+        ),
+        Arguments.of(
+          "build.gradle.kts",
+          """
+          plugins {
+            id("com.xenoterracide.gradle.semver")
+          }
+
+          tasks.register("getSemVer") {
+            logger.quiet("version: {}", semver.mavenSemver() )
+          }
+          """
+        )
+      );
+    }
   }
 }

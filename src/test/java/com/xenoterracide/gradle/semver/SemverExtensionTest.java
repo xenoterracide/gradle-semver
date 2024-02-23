@@ -75,4 +75,9 @@ class SemverExtensionTest {
       assertThat(pg.mavenSemver()).hasToString("0.1.0");
     }
   }
+
+  @Test
+  void classTest() {
+    assertThat(SemverExtension.class).isPublic().hasPublicMethods("mavenSemver", "getGradlePluginSemver");
+  }
 }
