@@ -36,7 +36,11 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
     return this.git;
   }
 
-  public SemverExtension getExtension() throws IOException {
+  public PorcelainGitExtension gitExtension() throws IOException {
+    return new PorcelainGitExtension(this.lazyGit());
+  }
+
+  public SemverExtension semverExtension() throws IOException {
     return new SemverExtension(this.lazyGit());
   }
 

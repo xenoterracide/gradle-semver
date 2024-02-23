@@ -8,9 +8,10 @@ import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-public class SemVerPlugin implements Plugin<Project> {
+public class SemverPlugin implements Plugin<Project> {
 
-  static final String EXTENSION = "semver";
+  private static final String SEMVER = "semver";
+  private static final String GIT = "porcelainGit";
 
   static {
     preventJGitFromCallingExecutables();
@@ -38,7 +39,7 @@ public class SemVerPlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    var serviceProvider = project
+    var svcPrvdr = project
       .getGradle()
       .getSharedServices()
       .registerIfAbsent(
@@ -50,6 +51,10 @@ public class SemVerPlugin implements Plugin<Project> {
       );
 
     var ext = project.getExtensions();
-    ext.add(EXTENSION, serviceProvider.map(s -> Try.of(s::getExtension).getOrElseThrow(ExceptionTools::rethrow)).get());
+    ext.add(
+      SEMVER,
+      svcPrvdr.map(gitSvc -> Try.of(gitSvc::semverExtension).getOrElseThrow(ExceptionTools::rethrow)).get()
+    );
+    ext.add(GIT, svcPrvdr.map(gitSvc -> Try.of(gitSvc::gitExtension).getOrElseThrow(ExceptionTools::rethrow)).get());
   }
 }

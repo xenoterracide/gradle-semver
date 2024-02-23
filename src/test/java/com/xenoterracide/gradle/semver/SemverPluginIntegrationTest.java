@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright © 2024 Caleb Cushing.
+// © Copyright 2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class SemVerPluginIntegrationTest {
+class SemverPluginIntegrationTest {
 
   @TempDir
   File testProjectDir;
