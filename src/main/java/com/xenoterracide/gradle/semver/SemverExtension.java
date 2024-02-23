@@ -32,8 +32,8 @@ public class SemverExtension {
       .onFailure(ExceptionTools::rethrow);
   }
 
-  public PorcelainGitExtension getGit() {
-    return new PorcelainGitExtension(this.git);
+  public GitMetadataExtension getGit() {
+    return new GitMetadataExtension(this.git);
   }
 
   public Semver getGradlePlugin() {

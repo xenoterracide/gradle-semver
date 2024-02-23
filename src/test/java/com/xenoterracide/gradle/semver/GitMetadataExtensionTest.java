@@ -13,7 +13,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class PorcelainGitExtensionTest {
+class GitMetadataExtensionTest {
 
   @TempDir
   @NonNull
@@ -26,8 +26,8 @@ class PorcelainGitExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
-      assertThat(pg.getBranchName()).isEqualTo("topic/test");
+      var pg = new GitMetadataExtension(() -> git);
+      assertThat(pg.getBranch()).isEqualTo("topic/test");
     }
   }
 
@@ -38,7 +38,7 @@ class PorcelainGitExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> git);
       var main = pg.getObjectIdFor("topic/test").get().getName();
       var head = pg.getObjectIdFor("HEAD").get().getName();
       assertThat(main).hasSize(40);
@@ -54,9 +54,9 @@ class PorcelainGitExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
-      var main = pg.getSha("topic/test");
-      var head = pg.getSha("HEAD");
+      var pg = new GitMetadataExtension(() -> git);
+      var main = pg.getRev("topic/test");
+      var head = pg.getRev("HEAD");
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(40);
       assertThat(main).isEqualTo(head);
@@ -70,9 +70,9 @@ class PorcelainGitExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
-      var main = pg.getSha("topic/test");
-      var head = pg.getHeadSha();
+      var pg = new GitMetadataExtension(() -> git);
+      var main = pg.getRev("topic/test");
+      var head = pg.getCommit();
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(40);
       assertThat(main).isEqualTo(head);
@@ -86,9 +86,9 @@ class PorcelainGitExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
-      var main = pg.getSha("topic/test");
-      var head = pg.getHeadShortSha();
+      var pg = new GitMetadataExtension(() -> git);
+      var main = pg.getRev("topic/test");
+      var head = pg.getCommitShort();
       assertThat(main).isNotNull();
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(7);
@@ -101,15 +101,15 @@ class PorcelainGitExtensionTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
-      assertThat(pg.getLastTag()).isNull();
+      var pg = new GitMetadataExtension(() -> git);
+      assertThat(pg.getLatestTag()).isNull();
 
       git.tag().setName("v0.1.0").call();
-      assertThat(pg.getLastTag()).matches("v0.1.0");
+      assertThat(pg.getLatestTag()).matches("v0.1.0");
 
       git.commit().setMessage("second commit").call();
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getLastTag()).matches("v0.1.1");
+      assertThat(pg.getLatestTag()).matches("v0.1.1");
     }
   }
 
@@ -118,7 +118,7 @@ class PorcelainGitExtensionTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> git);
       git.tag().setName("v0.1.0").call();
       assertThat(pg.getDescribe()).isEqualTo("v0.1.0");
 
@@ -126,7 +126,7 @@ class PorcelainGitExtensionTest {
       assertThat(pg.getDescribe()).matches("v0\\.1\\.0-1-g[0-9a-f]{7}");
 
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getLastTag()).isEqualTo("v0.1.1");
+      assertThat(pg.getLatestTag()).isEqualTo("v0.1.1");
     }
   }
 
@@ -136,7 +136,7 @@ class PorcelainGitExtensionTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> git);
       assertThat(pg.getCommitDistance()).isEqualTo(0);
 
       git.commit().setMessage("second commit").call();
@@ -156,7 +156,7 @@ class PorcelainGitExtensionTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new PorcelainGitExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> git);
 
       assertThat(pg.isDirty()).isFalse();
 

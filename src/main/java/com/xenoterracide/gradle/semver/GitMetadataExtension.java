@@ -18,7 +18,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class PorcelainGitExtension {
+public class GitMetadataExtension {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
@@ -26,7 +26,7 @@ public class PorcelainGitExtension {
 
   private final Supplier<Git> git;
 
-  PorcelainGitExtension(Supplier<Git> git) {
+  GitMetadataExtension(Supplier<Git> git) {
     this.git = Objects.requireNonNull(git);
   }
 
@@ -34,7 +34,7 @@ public class PorcelainGitExtension {
     return Try.of(() -> this.git.get().getRepository()).onFailure(ExceptionTools::rethrow);
   }
 
-  public @Nullable String getBranchName() {
+  public @Nullable String getBranch() {
     return this.gitRepository().mapTry(Repository::getBranch).getOrNull();
   }
 
@@ -42,19 +42,19 @@ public class PorcelainGitExtension {
     return this.gitRepository().mapTry(r -> r.resolve(Objects.requireNonNull(shalike)));
   }
 
-  public @Nullable String getSha(@NonNull String shalike) {
+  public @Nullable String getRev(@NonNull String shalike) {
     return this.getObjectIdFor(shalike).map(AnyObjectId::getName).getOrNull();
   }
 
-  public @Nullable String getHeadSha() {
-    return this.getSha(HEAD);
+  public @Nullable String getCommit() {
+    return this.getRev(HEAD);
   }
 
-  public @Nullable String getHeadShortSha() {
+  public @Nullable String getCommitShort() {
     return this.getObjectIdFor(HEAD).map(o -> o.abbreviate(7)).map(AbbreviatedObjectId::name).getOrNull();
   }
 
-  public @Nullable String getLastTag() {
+  public @Nullable String getLatestTag() {
     return Try
       .of(() -> git.get().describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
