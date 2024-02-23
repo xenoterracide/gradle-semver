@@ -73,7 +73,7 @@ gradlePlugin {
 
 publishing {
   publications {
-    withType<MavenPublication>().matching { it.name == "pluginMaven" }.configureEach {
+    withType<MavenPublication>().configureEach {
       versionMapping {
         allVariants {
           fromResolutionResult()
@@ -84,8 +84,21 @@ publishing {
         licenses {
           license {
             name = "Apache-2.0"
-            url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            url = "$githubUrl/$repoShort/blob/main/LICENSE.Apache-2.0.txt"
             distribution = "repo"
+            comments = "Java Source Code"
+          }
+          license {
+            name = "MIT"
+            url = "$githubUrl/$repoShort/blob/main/LICENSE.MIT.txt"
+            distribution = "repo"
+            comments = "Gradle Build Files and Configuration Files"
+          }
+          license {
+            name = "CC-BY-4.0"
+            url = "$githubUrl/$repoShort/blob/main/LICENSE.CC-BY-4.0.txt"
+            distribution = "repo"
+            comments = "Documentation"
           }
         }
         developers {
@@ -101,14 +114,6 @@ publishing {
           url = "$githubUrl/$repoShort"
         }
       }
-    }
-  }
-
-  repositories {
-    maven {
-      name = "GH"
-      url = uri("https://maven.pkg.github.com/$repoShort")
-      credentials(PasswordCredentials::class)
     }
   }
 }
