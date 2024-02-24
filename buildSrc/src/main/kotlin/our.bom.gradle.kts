@@ -16,6 +16,8 @@ val libs = the<LibrariesForLibs>()
 configurations.configureEach {
   exclude(group = "org.slf4j", module = "slf4j-nop")
   exclude(group = "junit", module = "junit")
+  exclude(group = "commons-codec", module = "commons-codec")
+  exclude(group = "com.googlecode.javaewah", module = "JavaEWAH")
 
   resolutionStrategy {
     componentSelection {
@@ -33,4 +35,10 @@ configurations.configureEach {
       }
     }
   }
+}
+
+configurations.matching { it.name == "runtimeClasspath" || it.name == "testRuntimeClasspath" }.configureEach {
+  exclude(group = "com.google.code.findbugs", module = "jsr305")
+  exclude(group = "com.google.errorprone", module = "error_prone_annotations")
+  exclude(group = "org.checkerframework", module = "checker-qual")
 }
