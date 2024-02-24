@@ -12,7 +12,7 @@ plugins {
   alias(libs.plugins.gradle.plugin.publish)
 }
 
-version = "0.9.0"
+version = "0.9.1"
 group = "com.xenoterracide"
 
 repositories {
@@ -33,6 +33,17 @@ dependencies {
   testImplementation(gradleTestKit())
 }
 
+tasks.withType<ShadowJar>().configureEach {
+  archiveClassifier.set("")
+  relocationPrefix = "com.xenoterracide.gradle.semver"
+  isEnableRelocation = true
+  dependencies {
+    exclude { it.moduleGroup == "io.vavr" }
+    exclude { it.moduleGroup == "org.semver4j" }
+    exclude { it.moduleGroup == "org.slf4j" }
+  }
+}
+
 dependencyAnalysis {
   issues {
     all {
@@ -50,12 +61,6 @@ val username = "xenoterracide"
 val githubUrl = "https://github.com"
 val repoShort = "$username/gradle-semver"
 val pub = "pub"
-
-tasks.withType<ShadowJar>().configureEach {
-  archiveClassifier.set("")
-  relocationPrefix = "com.xenoterracide.gradle.semver"
-  isEnableRelocation = true
-}
 
 gradlePlugin {
   website.set("$githubUrl/$repoShort")
