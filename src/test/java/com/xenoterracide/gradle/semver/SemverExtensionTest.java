@@ -22,7 +22,43 @@ class SemverExtensionTest {
   File projectDir;
 
   @Test
-  void getVersion() throws Exception {
+  void getGradlePlugin() throws Exception {
+    try (var git = Git.init().setDirectory(projectDir).call()) {
+      git.commit().setMessage("initial commit").call();
+      var pg = new SemverExtension(() -> git);
+
+      var v000 = pg.getGradlePlugin();
+      assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0");
+      assertThat(v000)
+        .hasToString("0.0.0")
+        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
+        .containsExactly(0, 0, 0, List.of());
+
+      git.tag().setName("v0.1.0").call();
+      git.commit().setMessage("second commit").call();
+
+      var v010 = pg.getGradlePlugin();
+
+      assertThat(v010)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).matches("^0\\.1\\.0-1-g\\p{XDigit}{7}$");
+        });
+
+      git.tag().setName("v0.1.1").call();
+
+      var v011 = pg.getGradlePlugin();
+
+      assertThat(v011)
+        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
+        .containsExactly(0, 1, 1, Collections.emptyList());
+
+      assertThat(v011).hasToString("0.1.1");
+    }
+  }
+
+  @Test
+  void getMaven() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
       var pg = new SemverExtension(() -> git);
