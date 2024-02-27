@@ -16,6 +16,10 @@ plugins {
 version = semver.gradlePlugin
 group = "com.xenoterracide"
 
+var printVersion = tasks.register("printVersion") {
+  println("version: $version")
+}
+
 repositories {
   mavenCentral()
 }
@@ -35,6 +39,7 @@ dependencies {
 }
 
 tasks.withType<ShadowJar>().configureEach {
+  dependsOn(printVersion)
   archiveClassifier.set("")
   relocationPrefix = "com.xenoterracide.gradle.semver"
   isEnableRelocation = true
