@@ -83,4 +83,4 @@ spring-test = ["spring-test", "spring-boot-test-core", "spring-boot-autoconfigur
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "1.+" }
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version = "1.+" }
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.+" }
-semver = { id = "com.xenoterracide.gradle.semver", version = "0.+" }
+semver = { id = "com.xenoterracide.gradle.semver", version = "0.9.3-1-g35a741b" }
