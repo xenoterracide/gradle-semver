@@ -21,6 +21,10 @@ jobs:
       - uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
       - uses: gradle/actions/setup-gradle@v3
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
