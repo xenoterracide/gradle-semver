@@ -13,6 +13,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.io.TempDir;
@@ -69,10 +70,10 @@ class SemverPluginIntegrationTest {
   }
 
   @Test
+  @Disabled("enable for local debuggin only")
   void debug() throws IOException {
     Files.writeString(testProjectDir.toPath().resolve("build.gradle"), String.format(GROOVY_SCRIPT, LOGGING));
-    var build = GradleRunner
-      .create()
+    var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(testProjectDir)
       .withArguments("getSemVer", "--stacktrace")
@@ -86,8 +87,7 @@ class SemverPluginIntegrationTest {
   @ArgumentsSource(BuildScriptArgumentsProvider.class)
   void configurationCache(String fileName, String buildScript) throws IOException {
     Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
-    var build = GradleRunner
-      .create()
+    var build = GradleRunner.create()
       .withProjectDir(testProjectDir)
       .withArguments("getSemVer", "--configuration-cache", "--stacktrace")
       .withPluginClasspath()
