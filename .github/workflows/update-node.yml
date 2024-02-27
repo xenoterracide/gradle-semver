@@ -22,7 +22,7 @@ jobs:
       - run: npm update
       - uses: peter-evans/create-pull-request@v6
         with:
-          title: "chore: Update Node Dependencies"
+          title: "chore(deps): update node"
           branch: topic/update-node
           token: ${{ secrets.GH_MERGE_PAT }}
       - run: gh pr merge --auto --squash ${{ env.PULL_REQUEST_NUMBER }}
