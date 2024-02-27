@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.junit.jupiter.api.Test;
@@ -41,10 +42,9 @@ class SemverExtensionTest {
       assertThat(v010)
         .extracting(Semver::getVersion, Semver::toString)
         .allSatisfy(o -> {
-          assertThat(o).isInstanceOf(String.class);
-          if (o instanceof String s) {
-            assertThat(s).matches("^0\\.1\\.0-SNAPSHOT-1-g\\p{XDigit}{7}$");
-          }
+          assertThat(o)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .matches("^0\\.1\\.0-SNAPSHOT-1-g\\p{XDigit}{7}$");
         });
 
       git.tag().setName("v0.1.1").call();
