@@ -14,7 +14,15 @@
     "prettier-plugin-toml": "^2.0.1"
   },
   "scripts": {
-    "dependencies-for": "./gradlew dependencies --configuration",
+    "up": "npm run dependencies:update",
+    "why": "./gradlew dependencyInsight --quiet --dependency",
+    "prerelease:prepare": "echo $npm_config_semver",
+    "release:prepare": "git tag -m $npm_config_semver -a v$npm_config_semver && ./gradlew clean build assemble shadowJar",
+    "release:dry-run": "npm run release:prepare && git tag -d v$npm_config_semver",
+    "prerelease": "npm run prerelease:prepare",
+    "release": "git push -f --tags && gh release create v$npm_config_semver --generate-notes build/libs/*.jar --verify-tag",
+    "dependencies:update": "./gradlew dependencies --quiet 2>&1 | cat > /dev/null",
+    "dependencies:for": "./gradlew dependencies --configuration",
     "postinstall": "git config core.hooksPath .config/git/hooks",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
