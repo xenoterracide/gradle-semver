@@ -26,8 +26,7 @@ public class SemverExtension {
   }
 
   Try<@Nullable String> describe() {
-    return Try
-      .of(() -> this.git.get().describe().setMatch(VERSION_GLOB))
+    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB).setTags(true))
       .mapTry(DescribeCommand::call)
       .onFailure(ExceptionTools::rethrow);
   }
@@ -40,8 +39,9 @@ public class SemverExtension {
     return describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
-      .map(v ->
-        !(v.getPreRelease().isEmpty() || v.getBuild().isEmpty()) ? v.withClearedPreReleaseAndBuild().nextPatch() : v
+      .map(
+        v ->
+          !(v.getPreRelease().isEmpty() || v.getBuild().isEmpty()) ? v.withClearedPreReleaseAndBuild().nextPatch() : v
       )
       .get();
   }
@@ -51,14 +51,15 @@ public class SemverExtension {
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
-      .map(v ->
-        v
-          .getPreRelease()
-          .stream()
-          .filter(p -> p.matches("^\\d+-+g\\p{XDigit}{7}$"))
-          .findFirst()
-          .map(p -> v.withClearedPreRelease().withPreRelease(SNAPSHOT).withBuild(p))
-          .orElse(v)
+      .map(
+        v ->
+          v
+            .getPreRelease()
+            .stream()
+            .filter(p -> p.matches("^\\d+-+g\\p{XDigit}{7}$"))
+            .findFirst()
+            .map(p -> v.withClearedPreRelease().withPreRelease(SNAPSHOT).withBuild(p))
+            .orElse(v)
       )
       .map(v -> new MavenSemver(v.getVersion()))
       .get();
