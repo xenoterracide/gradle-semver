@@ -8,12 +8,13 @@
     "lint-staged": "^15.2.0",
     "pinst": "3",
     "prettier": "^3.1.1",
-    "prettier-plugin-java": "^2.5.0",
+    "prettier-plugin-java": "^2.6.0",
     "prettier-plugin-properties": "^0.3.0",
     "prettier-plugin-sh": "^0.14.0",
     "prettier-plugin-toml": "^2.0.1"
   },
   "scripts": {
+    "dependencies-for": "./gradlew dependencies --configuration",
     "postinstall": "git config core.hooksPath .config/git/hooks",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
