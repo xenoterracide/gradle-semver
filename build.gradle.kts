@@ -10,9 +10,10 @@ plugins {
   alias(libs.plugins.dependency.analysis)
   alias(libs.plugins.shadow)
   alias(libs.plugins.gradle.plugin.publish)
+  alias(libs.plugins.semver)
 }
 
-version = "0.9.1"
+version = semver.gradlePlugin
 group = "com.xenoterracide"
 
 repositories {
