@@ -25,6 +25,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   public AbstractGitService() {}
 
   Git lazyGit() throws IOException {
+    this.git.checkout();
     if (this.git == null) {
       var builder = new FileRepositoryBuilder()
         .readEnvironment()
