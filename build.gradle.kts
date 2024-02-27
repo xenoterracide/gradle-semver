@@ -13,7 +13,7 @@ plugins {
   alias(libs.plugins.semver)
 }
 
-version = semver.maven
+version = semver.gradlePlugin
 group = "com.xenoterracide"
 
 repositories {
