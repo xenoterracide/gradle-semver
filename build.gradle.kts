@@ -29,7 +29,10 @@ dependencyLocking {
 }
 
 dependencies {
+  runtimeOnly(platform(libs.slf4j.bom))
+  runtimeOnly(libs.slf4j.nop)
   compileOnlyApi(libs.jspecify)
+  implementation(platform(libs.slf4j.bom))
   implementation(libs.jgit)
   implementation(libs.vavr)
   implementation(libs.guava)
