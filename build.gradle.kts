@@ -21,6 +21,7 @@ var printVersion = tasks.register("printVersion") {
 }
 
 repositories {
+  mavenLocal()
   mavenCentral()
 }
 
@@ -30,7 +31,7 @@ dependencyLocking {
 
 dependencies {
   runtimeOnly(platform(libs.slf4j.bom))
-  runtimeOnly(libs.slf4j.simple)
+  runtimeOnly(libs.slf4j.nop)
   compileOnlyApi(libs.jspecify)
   api(libs.jgit)
   api(libs.semver)
@@ -44,8 +45,8 @@ dependencies {
 tasks.withType<ShadowJar>().configureEach {
   dependsOn(printVersion)
   archiveClassifier.set("")
-  relocationPrefix = "com.xenoterracide.gradle.semver"
-  isEnableRelocation = true
+  relocate("org.eclipse.jgit", "com.xenoterracide.gradle.semver.jgit")
+  relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
 }
 
 dependencyAnalysis {
