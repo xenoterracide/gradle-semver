@@ -9,7 +9,7 @@
     <Class name="~.*Test.*" />
   </Match>
   <Match>
-    <Class name="com.xenoterracide.gradle.semver.AbstractGitService" />
+    <Class name="com.xenoterracide.gradle.semver.internal.AbstractGitService" />
     <Or>
       <Bug pattern="BC_UNCONFIRMED_CAST_OF_RETURN_VALUE" />
       <Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR" />

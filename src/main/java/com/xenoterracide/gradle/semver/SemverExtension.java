@@ -3,6 +3,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -21,7 +22,7 @@ public class SemverExtension {
 
   private final Supplier<Git> git;
 
-  SemverExtension(@NonNull Supplier<@NonNull Git> git) {
+  public SemverExtension(@NonNull Supplier<@NonNull Git> git) {
     this.git = Objects.requireNonNull(git);
   }
 

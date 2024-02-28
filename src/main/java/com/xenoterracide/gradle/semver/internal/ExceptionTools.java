@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 // © Copyright 2024 Caleb Cushing. All rights reserved.
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.internal;
 
-final class ExceptionTools {
+public final class ExceptionTools {
 
   private ExceptionTools() {}
 
-  static RuntimeException rethrow(Throwable e) {
+  public static RuntimeException rethrow(Throwable e) {
     throw new RuntimeException(e);
   }
 }

@@ -5,6 +5,7 @@ package com.xenoterracide.gradle.semver;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -55,8 +56,7 @@ public class PorcelainGitExtension {
   }
 
   public @Nullable String getLastTag() {
-    return Try
-      .of(() -> git.get().describe().setMatch(VERSION_GLOB))
+    return Try.of(() -> git.get().describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
       .onFailure(ExceptionTools::rethrow)
       .getOrNull();
@@ -67,8 +67,7 @@ public class PorcelainGitExtension {
   }
 
   public int getCommitDistance() {
-    return Try
-      .ofCallable(git.get().describe())
+    return Try.ofCallable(git.get().describe())
       .onFailure(ExceptionTools::rethrow)
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
@@ -76,8 +75,7 @@ public class PorcelainGitExtension {
   }
 
   public boolean isDirty() {
-    return Try
-      .ofCallable(git.get().status())
+    return Try.ofCallable(git.get().status())
       .map(Status::isClean)
       .map(clean -> !clean) // flip, dirty is the porcelain option
       .getOrElseThrow(ExceptionTools::rethrow);
