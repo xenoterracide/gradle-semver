@@ -30,13 +30,13 @@ dependencyLocking {
 
 dependencies {
   runtimeOnly(platform(libs.slf4j.bom))
-  runtimeOnly(libs.slf4j.nop)
+  runtimeOnly(libs.slf4j.simple)
   compileOnlyApi(libs.jspecify)
+  api(libs.jgit)
+  api(libs.semver)
   implementation(platform(libs.slf4j.bom))
-  implementation(libs.jgit)
   implementation(libs.vavr)
   implementation(libs.guava)
-  api(libs.semver)
   testImplementation(libs.junit.api)
   testImplementation(gradleTestKit())
 }
@@ -46,10 +46,6 @@ tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
   relocationPrefix = "com.xenoterracide.gradle.semver"
   isEnableRelocation = true
-  dependencies {
-    exclude { it.moduleName == "slf4j-nop" }
-    exclude { it.moduleGroup == "io.vavr" }
-  }
 }
 
 dependencyAnalysis {
