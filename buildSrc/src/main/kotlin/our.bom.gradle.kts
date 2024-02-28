@@ -14,7 +14,6 @@ dependencyLocking {
 val libs = the<LibrariesForLibs>()
 
 configurations.configureEach {
-  exclude(group = "org.slf4j", module = "slf4j-nop")
   exclude(group = "junit", module = "junit")
   exclude(group = "commons-codec", module = "commons-codec")
   exclude(group = "com.googlecode.javaewah", module = "JavaEWAH")
@@ -24,7 +23,7 @@ configurations.configureEach {
       all {
         val spotbugs = Regex("^spotbugs.*")
         if (!name.matches(spotbugs) && !candidate.module.matches(spotbugs)) {
-          val nonRelease = Regex("^[\\d.]+-(M|ea|beta).*$")
+          val nonRelease = Regex("^[\\d.]+-(M|ea|beta|alpha).*$")
           if (candidate.version.matches(nonRelease)) reject("no pre-release")
         }
 
