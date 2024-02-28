@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // © Copyright 2024 Caleb Cushing. All rights reserved.
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.internal;
 
 import org.eclipse.jgit.lib.Config;
 import org.eclipse.jgit.storage.file.FileBasedConfig;
