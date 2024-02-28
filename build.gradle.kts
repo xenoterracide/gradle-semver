@@ -48,7 +48,6 @@ tasks.withType<ShadowJar>().configureEach {
   isEnableRelocation = true
   dependencies {
     exclude { it.moduleName == "slf4j-nop" }
-    exclude { it.moduleGroup == "io.vavr" }
   }
 }
 
