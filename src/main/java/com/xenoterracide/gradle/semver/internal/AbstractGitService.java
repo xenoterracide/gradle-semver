@@ -29,6 +29,9 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   private @Nullable Git git;
   private @Nullable Repository repository;
 
+  /**
+   * Constructor for the Git Service.
+   */
   @Inject
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
   public AbstractGitService() {}
@@ -46,6 +49,11 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
     return this.git;
   }
 
+  /**
+   * Create the SemverExtension.
+   *
+   * @return The SemverExtension.
+   */
   public SemverExtension extension() {
     return new SemverExtension(() -> Try.of(this::lazyGit).onFailure(ExceptionTools::rethrow).get());
   }
@@ -76,7 +84,15 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
     );
   }
 
+  /**
+   * Parameters for the Git Service.
+   */
   public interface Params extends BuildServiceParameters {
+    /**
+     * The project directory.
+     *
+     * @return The project directory.
+     */
     DirectoryProperty getProjectDirectory();
   }
 }
