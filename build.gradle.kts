@@ -46,6 +46,9 @@ tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
   relocationPrefix = "com.xenoterracide.gradle.semver"
   isEnableRelocation = true
+  dependencies {
+    exclude { it.moduleName == "slf4j-nop" }
+  }
 }
 
 dependencyAnalysis {
