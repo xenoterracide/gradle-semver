@@ -17,7 +17,7 @@
     "up": "npm run dependencies:update",
     "why": "./gradlew dependencyInsight --quiet --dependency",
     "prerelease:prepare": "echo $npm_config_semver",
-    "release:prepare": "git tag -m $npm_config_semver -a v$npm_config_semver && ./gradlew clean build assemble shadowJar",
+    "release:prepare": "git tag -m $npm_config_semver -a v$npm_config_semver && ./gradlew build && ./gradlew clean assemble shadowJar",
     "prerelease": "npm run release:prepare",
     "release": "git push --tags && gh release create v$npm_config_semver --generate-notes build/libs/*.jar --verify-tag",
     "release:dry-run": "npm run release:prepare && git tag -d v$npm_config_semver",
