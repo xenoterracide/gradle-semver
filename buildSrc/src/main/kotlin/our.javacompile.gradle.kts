@@ -18,16 +18,19 @@ dependencies {
 }
 
 java {
+  withJavadocJar()
+  withSourcesJar()
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(21))
   }
 }
 
-tasks.compileJava {
-  options.release = 11
-}
-tasks.compileTestJava {
-  options.release = 21
+tasks.withType<Javadoc>().configureEach {
+  (options as StandardJavadocDocletOptions).apply {
+    encoding = "UTF-8"
+    addStringOption("tag", "apiNote:a:API Note:")
+    addStringOption("tag", "implNote:a:Implementation Note:")
+  }
 }
 
 tasks.withType<Jar> {
@@ -46,11 +49,12 @@ tasks.withType<JavaCompile>().configureEach {
       "-Xlint:-exports",
       "-Xlint:-requires-transitive-automatic",
       "-Xlint:-requires-automatic",
-      "-Xlint:-fallthrough", // handled by error prone in a smarter way
+      "-Xlint:-fallthrough", // handled by error-prone in a smarter way
     ),
   )
 
   options.errorprone {
+    disable("InvalidInlineTag") // false? positive on @snippet
     disableWarningsInGeneratedCode.set(true)
     excludedPaths.set(".*/build/generated/sources/annotationProcessor/.*")
     option("NullAway:AnnotatedPackages", "com.xenoterracide")
