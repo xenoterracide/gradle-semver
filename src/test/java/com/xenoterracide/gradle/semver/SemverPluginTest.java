@@ -1,5 +1,5 @@
+// © Copyright 2018-2024 Caleb Cushing
 // SPDX-License-Identifier: Apache-2.0
-// © Copyright 2018-2024 Caleb Cushing. All rights reserved.
 
 package com.xenoterracide.gradle.semver;
 

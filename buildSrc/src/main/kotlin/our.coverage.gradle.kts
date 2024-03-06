@@ -1,5 +1,5 @@
+// © Copyright 2023-2024 Caleb Cushing
 // SPDX-License-Identifier: MIT
-// © Copyright 2023-2024 Caleb Cushing. All rights reserved.
 
 plugins {
   jacoco
