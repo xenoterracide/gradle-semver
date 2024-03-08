@@ -5,8 +5,17 @@ package com.xenoterracide.gradle.semver;
 
 import com.google.common.base.Ascii;
 
+/**
+ * The enum Git status.
+ */
 public enum GitStatus {
+  /**
+   * Clean git status.
+   */
   CLEAN,
+  /**
+   * Dirty git status.
+   */
   DIRTY;
 
   @Override
