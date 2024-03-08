@@ -2,13 +2,18 @@
 // SPDX-License-Identifier: MIT
 
 buildscript {
-  dependencyLocking.lockAllConfigurations()
+  dependencyLocking {
+    lockAllConfigurations()
+  }
 }
+
 plugins {
   `kotlin-dsl`
 }
 
-dependencyLocking.lockAllConfigurations()
+dependencyLocking {
+  lockAllConfigurations()
+}
 
 dependencies {
   implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))

@@ -34,7 +34,8 @@ jobs:
       - run: find . -name '*gradle.lockfile' -delete
       - run: ./gradlew wrapper --write-locks
       - run: ./gradlew wrapper # somehow the final bat was not generated before
-      - run: ./gradlew build shadowJar buildHealth --write-locks --scan
+      - run: ./gradlew dependencies build shadowJar buildHealth --write-locks --scan
+      - run: ./gradlew build --scan
       - uses: peter-evans/create-pull-request@v6
         with:
           title: "chore(deps): java"

@@ -20,6 +20,10 @@ var printVersion = tasks.register("printVersion") {
   println("version: $version")
 }
 
+tasks.compileJava {
+  options.release = 11
+}
+
 repositories {
   mavenLocal()
   mavenCentral()

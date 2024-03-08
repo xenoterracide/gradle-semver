@@ -1,5 +1,5 @@
 {
-  "name": "java-commons",
+  "name": "gradle-semver",
   "private": true,
   "license": "Apache-2.0",
   "devDependencies": {
@@ -15,14 +15,14 @@
   },
   "scripts": {
     "up": "npm run dependencies:update",
-    "why": "./gradlew dependencyInsight --quiet --dependency",
+    "merge": "gh pr create --fill-first; sleep 2 && gh run watch --exit-status && gh pr merge --squash --delete-branch --auto",
+    "dependencies:update": "./gradlew dependencies --write-locks --quiet 2>&1 | cat > /dev/null",
+    "dependencies:for": "./gradlew dependencies --configuration",
+    "release": "git push --tags && gh release create v$npm_config_semver --generate-notes build/libs/*.jar --verify-tag",
+    "release:dry-run": "npm run release:prepare && git tag -d v$npm_config_semver",
     "prerelease:prepare": "echo $npm_config_semver",
     "release:prepare": "git tag -m $npm_config_semver -a v$npm_config_semver && ./gradlew build && ./gradlew clean assemble shadowJar",
     "prerelease": "npm run release:prepare",
-    "release": "git push --tags && gh release create v$npm_config_semver --generate-notes build/libs/*.jar --verify-tag",
-    "release:dry-run": "npm run release:prepare && git tag -d v$npm_config_semver",
-    "dependencies:update": "./gradlew dependencies --quiet 2>&1 | cat > /dev/null",
-    "dependencies:for": "./gradlew dependencies --configuration",
     "postinstall": "git config core.hooksPath .config/git/hooks",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"

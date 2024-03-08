@@ -7,9 +7,17 @@ import com.xenoterracide.gradle.semver.internal.AbstractGitService;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+/**
+ * The type Semver plugin.
+ */
 public class SemverPlugin implements Plugin<Project> {
 
   private static final String SEMVER = "semver";
+
+  /**
+   * Instantiates a new Semver plugin.
+   */
+  public SemverPlugin() {}
 
   @Override
   public void apply(Project project) {
