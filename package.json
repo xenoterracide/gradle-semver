@@ -15,7 +15,7 @@
   },
   "scripts": {
     "up": "npm run dependencies:update",
-    "merge": "gh pr create --fill-first; sleep 2 && gh run watch --exit-status && gh pr merge --squash --delete-branch --auto",
+    "merge": "gh pr create --fill-first; sleep 3 && gh run watch --exit-status && gh pr merge --squash --delete-branch --auto",
     "dependencies:update": "./gradlew dependencies --write-locks --quiet 2>&1 | cat > /dev/null",
     "dependencies:for": "./gradlew dependencies --configuration",
     "release": "git push --tags && gh release create v$npm_config_semver --generate-notes build/libs/*.jar --verify-tag",
