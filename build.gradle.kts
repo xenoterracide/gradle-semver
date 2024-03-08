@@ -25,7 +25,6 @@ tasks.compileJava {
 }
 
 repositories {
-  mavenLocal()
   mavenCentral()
 }
 
@@ -70,9 +69,10 @@ dependencyAnalysis {
   }
 }
 
+val repo = "gradle-semver"
 val username = "xenoterracide"
 val githubUrl = "https://github.com"
-val repoShort = "$username/gradle-semver"
+val repoShort = "$username/$repo"
 val pub = "pub"
 
 gradlePlugin {
