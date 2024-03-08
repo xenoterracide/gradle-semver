@@ -22,7 +22,6 @@ dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
 
   repositories {
-    mavenLocal()
     mavenCentral()
     gradlePluginPortal() // this should only be necessary in buildSrc/settings.gradle.kts
   }
