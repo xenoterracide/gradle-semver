@@ -13,6 +13,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
+/**
+ * The type Semver extension.
+ */
 public class SemverExtension {
 
   // this is not a regex but a glob (`man glob`)
@@ -22,6 +25,11 @@ public class SemverExtension {
 
   private final Supplier<Git> git;
 
+  /**
+   * Instantiates a new Semver extension.
+   *
+   * @param git {@link Supplier} of {@link Git}
+   */
   public SemverExtension(@NonNull Supplier<@NonNull Git> git) {
     this.git = Objects.requireNonNull(git);
   }
@@ -32,10 +40,24 @@ public class SemverExtension {
       .onFailure(ExceptionTools::rethrow);
   }
 
+  /**
+   * Gets git metatdata exstension.
+   *
+   * @implNote does not invoke {@link org.eclipse.jgit.lib.Repository}
+   *
+   * @return the extension for accessing git metdata
+   */
   public GitMetadataExtension getGit() {
     return new GitMetadataExtension(this.git);
   }
 
+  /**
+   * Gets gradle plugin compatible version
+   *
+   * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
+   *
+   * @return the gradle plugin semver.
+   */
   public Semver getGradlePlugin() {
     return describe()
       .map(v -> null == v ? PRE_VERSION : v)
@@ -47,6 +69,13 @@ public class SemverExtension {
       .get();
   }
 
+  /**
+   * Gets maven compatible version.
+   *
+   * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
+   *
+   * @return the maven compatible semver
+   */
   public Semver getMaven() {
     return describe()
       .map(v -> null == v ? PRE_VERSION : v)

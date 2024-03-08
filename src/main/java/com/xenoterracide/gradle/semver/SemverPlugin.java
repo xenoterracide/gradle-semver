@@ -8,7 +8,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 /**
- * The type Semver plugin.
+ * Pure Java, configuration cache safe semantic versioning with git plugin for gradle
  */
 public class SemverPlugin implements Plugin<Project> {
 
