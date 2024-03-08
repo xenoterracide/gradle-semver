@@ -5,7 +5,6 @@ rootProject.name = "gradle-semver"
 
 pluginManagement {
   repositories {
-    mavenLocal()
     gradlePluginPortal()
   }
 }
