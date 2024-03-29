@@ -1,14 +1,20 @@
 name: Publish to the Gradle Plugin Portal
 on:
   push:
+    branches:
+      - main
     tags:
-      - "v*.*.*"
+      - v*
 jobs:
   publish-portal:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
       packages: write
+    env:
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,12 +28,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - run: ./gradlew build buildHealth --scan
-      - run: ./gradlew publishPlugins --no-configuration-cache --validate-only
+      - run: ./gradlew build buildHealth --build-cache --scan
+      - run: ./gradlew publishPlugins --no-configuration-cache --validate-only --scan
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-      - run: ./gradlew publishPlugins --no-configuration-cache
+      - run: ./gradlew publishPlugins --no-configuration-cache --scan
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
