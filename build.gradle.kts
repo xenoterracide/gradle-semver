@@ -33,11 +33,12 @@ dependencyLocking {
 }
 
 dependencies {
-  compileOnlyApi(libs.jspecify)
+  compileOnly(libs.jspecify)
   api(libs.jgit)
   api(libs.semver)
   implementation(libs.vavr)
   implementation(libs.guava)
+  implementation(libs.java.tools)
   testImplementation(libs.junit.api)
   testImplementation(gradleTestKit())
   shadow(libs.vavr)
@@ -49,6 +50,7 @@ tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
   relocate("org.eclipse.jgit", "com.xenoterracide.gradle.semver.jgit")
   relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
+  relocate("com.xenoterracide.tools.java", "com.xenoterracide.gradle.semver.tools.java")
   dependencies {
     exclude { it.moduleGroup == "io.vavr" }
     exclude { it.moduleGroup == "org.slf4j" }

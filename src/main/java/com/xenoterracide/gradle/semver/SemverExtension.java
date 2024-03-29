@@ -3,7 +3,6 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -35,9 +34,7 @@ public class SemverExtension {
   }
 
   Try<@Nullable String> describe() {
-    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB).setTags(true))
-      .mapTry(DescribeCommand::call)
-      .onFailure(ExceptionTools::rethrow);
+    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB).setTags(true)).mapTry(DescribeCommand::call);
   }
 
   /**
@@ -52,14 +49,14 @@ public class SemverExtension {
   }
 
   /**
-   * Gets gradle plugin compatible version
+   * Gets gradle plugin compatible version.
    *
    * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
    *
    * @return the gradle plugin semver.
    */
   public Semver getGradlePlugin() {
-    return describe()
+    return this.describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
       .map(
@@ -77,7 +74,7 @@ public class SemverExtension {
    * @return the maven compatible semver
    */
   public Semver getMaven() {
-    return describe()
+    return this.describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)

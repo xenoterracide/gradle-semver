@@ -18,41 +18,41 @@ class DelegatingSystemReader extends SystemReader {
 
   @Override
   public String getHostname() {
-    return reader.getHostname();
+    return this.reader.getHostname();
   }
 
   @Override
   public String getenv(String variable) {
-    return reader.getenv(variable);
+    return this.reader.getenv(variable);
   }
 
   @Override
   public String getProperty(String key) {
-    return reader.getProperty(key);
+    return this.reader.getProperty(key);
   }
 
   @Override
   public FileBasedConfig openUserConfig(Config parent, FS fs) {
-    return reader.openUserConfig(parent, fs);
+    return this.reader.openUserConfig(parent, fs);
   }
 
   @Override
   public FileBasedConfig openSystemConfig(Config parent, FS fs) {
-    return reader.openSystemConfig(parent, fs);
+    return this.reader.openSystemConfig(parent, fs);
   }
 
   @Override
   public FileBasedConfig openJGitConfig(Config parent, FS fs) {
-    return reader.openJGitConfig(parent, fs);
+    return this.reader.openJGitConfig(parent, fs);
   }
 
   @Override
   public long getCurrentTime() {
-    return reader.getCurrentTime();
+    return this.reader.getCurrentTime();
   }
 
   @Override
   public int getTimezone(long when) {
-    return reader.getTimezone(when);
+    return this.reader.getTimezone(when);
   }
 }

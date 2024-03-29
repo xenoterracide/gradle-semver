@@ -7,6 +7,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
   `java-library`
+  `java-test-fixtures`
 }
 
 val libs = the<LibrariesForLibs>()
@@ -26,7 +27,10 @@ val available = tasks.register("tests available") {
 
 tasks.withType<Test>().configureEach {
   useJUnitPlatform()
-
+  reports {
+    junitXml.required.set(false)
+    html.required.set(false)
+  }
   testLogging {
     lifecycle {
       showStandardStreams = true

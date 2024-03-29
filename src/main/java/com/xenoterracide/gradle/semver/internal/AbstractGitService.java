@@ -5,6 +5,7 @@ package com.xenoterracide.gradle.semver.internal;
 
 import com.xenoterracide.gradle.semver.SemverExtension;
 import com.xenoterracide.gradle.semver.internal.AbstractGitService.Params;
+import com.xenoterracide.tools.java.function.ExceptionTools;
 import io.vavr.control.Try;
 import java.io.IOException;
 import javax.inject.Inject;
@@ -55,7 +56,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
    * @return The SemverExtension.
    */
   public SemverExtension extension() {
-    return new SemverExtension(() -> Try.of(this::lazyGit).onFailure(ExceptionTools::rethrow).get());
+    return new SemverExtension(() -> Try.of(this::lazyGit).getOrElseThrow(ExceptionTools::toRuntime));
   }
 
   @Override

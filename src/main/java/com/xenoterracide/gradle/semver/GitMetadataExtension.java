@@ -5,7 +5,7 @@ package com.xenoterracide.gradle.semver;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.xenoterracide.gradle.semver.internal.ExceptionTools;
+import com.xenoterracide.tools.java.function.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -35,7 +35,7 @@ public class GitMetadataExtension {
   }
 
   Try<Repository> gitRepository() {
-    return Try.of(() -> this.git.get().getRepository()).onFailure(ExceptionTools::rethrow);
+    return Try.of(() -> this.git.get().getRepository());
   }
 
   /**
@@ -91,10 +91,9 @@ public class GitMetadataExtension {
    * @return the latest tag
    */
   public @Nullable String getLatestTag() {
-    return Try.of(() -> git.get().describe().setMatch(VERSION_GLOB))
+    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
-      .onFailure(ExceptionTools::rethrow)
-      .getOrNull();
+      .getOrElseThrow(ExceptionTools::toRuntime);
   }
 
   /**
@@ -103,7 +102,7 @@ public class GitMetadataExtension {
    * @return the describe
    */
   public @Nullable String getDescribe() {
-    return Try.ofCallable(git.get().describe()).onFailure(ExceptionTools::rethrow).getOrNull();
+    return Try.ofCallable(this.git.get().describe()).getOrElseThrow(ExceptionTools::toRuntime);
   }
 
   /**
@@ -112,8 +111,7 @@ public class GitMetadataExtension {
    * @return the commit distance
    */
   public int getCommitDistance() {
-    return Try.ofCallable(git.get().describe())
-      .onFailure(ExceptionTools::rethrow)
+    return Try.ofCallable(this.git.get().describe())
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
       .getOrElse(0);
@@ -125,9 +123,9 @@ public class GitMetadataExtension {
    * @return the status
    */
   public GitStatus getStatus() {
-    return Try.ofCallable(git.get().status())
+    return Try.ofCallable(this.git.get().status())
       .map(Status::isClean)
       .map(clean -> clean ? GitStatus.CLEAN : GitStatus.DIRTY) // flip, dirty is the porcelain option
-      .getOrElseThrow(ExceptionTools::rethrow);
+      .getOrElseThrow(ExceptionTools::toRuntime);
   }
 }
