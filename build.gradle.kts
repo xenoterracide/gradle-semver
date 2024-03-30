@@ -24,10 +24,6 @@ tasks.compileJava {
   options.release = 11
 }
 
-repositories {
-  mavenCentral()
-}
-
 dependencyLocking {
   lockAllConfigurations()
 }

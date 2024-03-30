@@ -56,7 +56,7 @@ public class SemverPlugin implements Plugin<Project> {
         SEMVER,
         SemverExtension.class,
         Try.withResources(() -> {
-          this.log.info("openning git");
+          this.log.warn("openning git");
           return Git.open(project.getLayout().getProjectDirectory().getAsFile());
         })
       );
