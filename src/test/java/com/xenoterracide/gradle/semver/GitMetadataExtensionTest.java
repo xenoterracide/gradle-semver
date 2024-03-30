@@ -4,6 +4,7 @@
 package com.xenoterracide.gradle.semver;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import io.vavr.CheckedFunction1;
 import io.vavr.control.Try;
@@ -158,5 +159,12 @@ class GitMetadataExtensionTest {
 
       assertThat(pg.getStatus()).isEqualTo(GitStatus.DIRTY);
     }
+  }
+
+  @Test
+  void logging() {
+    var wRsrc = Try.withResources(() -> Git.open(File.createTempFile("test", "git")));
+    var pg = new GitMetadataExtension(wRsrc);
+    assertThat(assertDoesNotThrow(() -> pg.getBranch())).isNull();
   }
 }

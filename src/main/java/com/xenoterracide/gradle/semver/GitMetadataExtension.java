@@ -39,7 +39,7 @@ public class GitMetadataExtension {
   }
 
   Try<Repository> gitRepository() {
-    return this.git.of(Git::getRepository).onFailure(e -> this.log.error("failed to get repository", e));
+    return this.git.of(Git::getRepository);
   }
 
   /**

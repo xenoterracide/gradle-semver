@@ -8,8 +8,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Pure Java, configuration cache safe semantic versioning with git plugin for gradle.
@@ -20,8 +18,6 @@ public class SemverPlugin implements Plugin<Project> {
   }
 
   private static final String SEMVER = "semver";
-
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   /**
    * Instantiates a new Semver plugin.
@@ -55,10 +51,7 @@ public class SemverPlugin implements Plugin<Project> {
       .create(
         SEMVER,
         SemverExtension.class,
-        Try.withResources(() -> {
-          this.log.warn("openning git");
-          return Git.open(project.getLayout().getProjectDirectory().getAsFile());
-        })
+        Try.withResources(() -> Git.open(project.getLayout().getProjectDirectory().getAsFile()))
       );
   }
 }
