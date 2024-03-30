@@ -5,10 +5,8 @@ package com.xenoterracide.gradle.semver;
 
 import io.vavr.control.Try;
 import java.util.Objects;
-import java.util.function.Supplier;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 import org.slf4j.Logger;
@@ -26,19 +24,19 @@ public class SemverExtension {
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  private final Supplier<Git> git;
+  private final Try.WithResources1<Git> git;
 
   /**
    * Instantiates a new Semver extension.
    *
-   * @param git {@link Supplier} of {@link Git}
+   * @param git the git
    */
-  public SemverExtension(@NonNull Supplier<@NonNull Git> git) {
+  public SemverExtension(Try.WithResources1<Git> git) {
     this.git = Objects.requireNonNull(git);
   }
 
   Try<@Nullable String> describe() {
-    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB).setTags(true))
+    return this.git.of(git -> git.describe().setMatch(VERSION_GLOB).setTags(true))
       .onFailure(e -> this.log.error("failed to get describe", e))
       .mapTry(DescribeCommand::call);
   }

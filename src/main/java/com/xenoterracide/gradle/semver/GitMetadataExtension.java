@@ -8,10 +8,10 @@ import com.google.common.collect.Iterables;
 import com.xenoterracide.tools.java.function.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.Objects;
-import java.util.function.Supplier;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectId;
@@ -26,20 +26,20 @@ import org.slf4j.LoggerFactory;
  */
 public class GitMetadataExtension {
 
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
-
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String HEAD = "HEAD";
 
-  private final Supplier<Git> git;
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  GitMetadataExtension(Supplier<Git> git) {
+  private final Try.WithResources1<Git> git;
+
+  GitMetadataExtension(Try.WithResources1<Git> git) {
     this.git = Objects.requireNonNull(git);
   }
 
   Try<Repository> gitRepository() {
-    return Try.of(() -> this.git.get().getRepository()).onFailure(e -> this.log.error("failed to get repository", e));
+    return this.git.of(Git::getRepository).onFailure(e -> this.log.error("failed to get repository", e));
   }
 
   /**
@@ -95,7 +95,7 @@ public class GitMetadataExtension {
    * @return the latest tag
    */
   public @Nullable String getLatestTag() {
-    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB))
+    return this.git.of(git -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
       .onFailure(e -> this.log.error("failed to get latest tag", e))
       .getOrNull();
@@ -107,7 +107,8 @@ public class GitMetadataExtension {
    * @return the describe
    */
   public @Nullable String getDescribe() {
-    return Try.ofCallable(this.git.get().describe())
+    return this.git.of(Git::describe)
+      .mapTry(DescribeCommand::call)
       .onFailure(e -> this.log.error("failed to get describe", e))
       .getOrNull();
   }
@@ -118,10 +119,12 @@ public class GitMetadataExtension {
    * @return the commit distance
    */
   public int getCommitDistance() {
-    return Try.ofCallable(this.git.get().describe())
+    return this.git.of(Git::describe)
+      .mapTry(DescribeCommand::call)
+      .onFailure(e -> this.log.error("failed to describe", e))
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
-      .onFailure(e -> this.log.error("failed to get commit distance", e))
+      .onFailure(e -> this.log.trace("failed to get commit distance", e)) // expecting Iterables to throw if on tag
       .getOrElse(0);
   }
 
@@ -131,7 +134,8 @@ public class GitMetadataExtension {
    * @return the status
    */
   public GitStatus getStatus() {
-    return Try.ofCallable(this.git.get().status())
+    return this.git.of(Git::status)
+      .mapTry(StatusCommand::call)
       .map(Status::isClean)
       .map(clean -> clean ? GitStatus.CLEAN : GitStatus.DIRTY) // flip, dirty is the porcelain option
       .getOrElseThrow(ExceptionTools::toRuntime);

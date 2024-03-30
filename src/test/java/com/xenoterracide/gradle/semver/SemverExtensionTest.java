@@ -5,6 +5,8 @@ package com.xenoterracide.gradle.semver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.vavr.CheckedFunction1;
+import io.vavr.control.Try;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -21,11 +23,20 @@ class SemverExtensionTest {
   @NonNull
   File projectDir;
 
+  Try.WithResources1<Git> withResources = Try.withResources(() -> Git.init().setDirectory(projectDir).call());
+
+  CheckedFunction1<Git, Git> setup = git -> {
+    git.commit().setMessage("initial commit").call();
+    git.branchCreate().setName("topic/test").call();
+    git.checkout().setName("topic/test").call();
+    return git;
+  };
+
   @Test
   void getGradlePlugin() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new SemverExtension(() -> git);
+      var pg = new SemverExtension(withResources);
 
       var v000 = pg.getGradlePlugin();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0");
@@ -61,7 +72,7 @@ class SemverExtensionTest {
   void getMaven() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new SemverExtension(() -> git);
+      var pg = new SemverExtension(withResources);
 
       var v000 = pg.getMaven();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-SNAPSHOT");
@@ -102,7 +113,7 @@ class SemverExtensionTest {
       git.tag().setName("latest").call();
       git.commit().setMessage("second commit").call();
 
-      var pg = new SemverExtension(() -> git);
+      var pg = new SemverExtension(withResources);
 
       assertThat(pg.getMaven()).hasToString("0.0.0-SNAPSHOT");
 
