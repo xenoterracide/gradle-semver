@@ -18,11 +18,15 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Git metadata extension.
  */
 public class GitMetadataExtension {
+
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
@@ -35,7 +39,7 @@ public class GitMetadataExtension {
   }
 
   Try<Repository> gitRepository() {
-    return Try.of(() -> this.git.get().getRepository());
+    return Try.of(() -> this.git.get().getRepository()).onFailure(e -> this.log.error("failed to get repository", e));
   }
 
   /**
@@ -93,7 +97,8 @@ public class GitMetadataExtension {
   public @Nullable String getLatestTag() {
     return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
-      .getOrElseThrow(ExceptionTools::toRuntime);
+      .onFailure(e -> this.log.error("failed to get latest tag", e))
+      .getOrNull();
   }
 
   /**
@@ -102,7 +107,9 @@ public class GitMetadataExtension {
    * @return the describe
    */
   public @Nullable String getDescribe() {
-    return Try.ofCallable(this.git.get().describe()).getOrElseThrow(ExceptionTools::toRuntime);
+    return Try.ofCallable(this.git.get().describe())
+      .onFailure(e -> this.log.error("failed to get describe", e))
+      .getOrNull();
   }
 
   /**
@@ -114,6 +121,7 @@ public class GitMetadataExtension {
     return Try.ofCallable(this.git.get().describe())
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
+      .onFailure(e -> this.log.error("failed to get commit distance", e))
       .getOrElse(0);
   }
 

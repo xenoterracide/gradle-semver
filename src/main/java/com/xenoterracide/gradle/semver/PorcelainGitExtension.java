@@ -18,11 +18,15 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Porcelain git extension. Methods only return {@code null} if an exception is thrown.
  */
 public class PorcelainGitExtension {
+
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
@@ -35,7 +39,7 @@ public class PorcelainGitExtension {
   }
 
   Try<Repository> gitRepository() {
-    return Try.of(() -> this.git.get().getRepository());
+    return Try.of(() -> this.git.get().getRepository()).onFailure(e -> this.log.error("failed to get repository", e));
   }
 
   /**
@@ -91,7 +95,10 @@ public class PorcelainGitExtension {
    * @return the last tag
    */
   public @Nullable String getLastTag() {
-    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB)).mapTry(DescribeCommand::call).getOrNull();
+    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB))
+      .mapTry(DescribeCommand::call)
+      .onFailure(e -> this.log.error("failed to get latest tag", e))
+      .getOrNull();
   }
 
   /**
@@ -100,7 +107,9 @@ public class PorcelainGitExtension {
    * @return the describe string.
    */
   public @Nullable String getDescribe() {
-    return Try.ofCallable(this.git.get().describe()).getOrNull();
+    return Try.ofCallable(this.git.get().describe())
+      .onFailure(e -> this.log.error("failed to get describe", e))
+      .getOrNull();
   }
 
   /**
@@ -112,6 +121,7 @@ public class PorcelainGitExtension {
     return Try.ofCallable(this.git.get().describe())
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
+      .onFailure(e -> this.log.error("failed to get commit distance", e))
       .getOrElse(0);
   }
 

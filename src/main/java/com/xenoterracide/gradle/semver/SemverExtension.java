@@ -11,6 +11,8 @@ import org.eclipse.jgit.api.Git;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Semver extension.
@@ -21,6 +23,8 @@ public class SemverExtension {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String PRE_VERSION = "0.0.0";
   private static final String SNAPSHOT = "SNAPSHOT";
+
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Supplier<Git> git;
 
@@ -34,7 +38,9 @@ public class SemverExtension {
   }
 
   Try<@Nullable String> describe() {
-    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB).setTags(true)).mapTry(DescribeCommand::call);
+    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB).setTags(true))
+      .onFailure(e -> this.log.error("failed to get describe", e))
+      .mapTry(DescribeCommand::call);
   }
 
   /**
