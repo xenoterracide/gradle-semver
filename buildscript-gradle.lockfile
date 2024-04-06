@@ -1,10 +1,10 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-com.autonomousapps.dependency-analysis:com.autonomousapps.dependency-analysis.gradle.plugin:1.30.0=classpath
+com.autonomousapps.dependency-analysis:com.autonomousapps.dependency-analysis.gradle.plugin:1.31.0=classpath
 com.autonomousapps:antlr:4.10.1.6=classpath
 com.autonomousapps:asm-relocated:9.6.0.1=classpath
-com.autonomousapps:dependency-analysis-gradle-plugin:1.30.0=classpath
+com.autonomousapps:dependency-analysis-gradle-plugin:1.31.0=classpath
 com.autonomousapps:graph-support:0.2=classpath
 com.github.ben-manes.caffeine:caffeine:3.1.0=classpath
 com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:8.1.1=classpath
