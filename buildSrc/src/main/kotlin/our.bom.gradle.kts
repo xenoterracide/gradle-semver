@@ -14,11 +14,14 @@ dependencyLocking {
 val libs = the<LibrariesForLibs>()
 
 configurations.configureEach {
+  exclude(group = "org.slf4j", module = "slf4j-nop")
   exclude(group = "junit", module = "junit")
   exclude(group = "commons-codec", module = "commons-codec")
   exclude(group = "com.googlecode.javaewah", module = "JavaEWAH")
 
   resolutionStrategy {
+    // we really want to do a full timestamp based lock, but this'll have to do for now
+    // cacheChangingModulesFor(5, TimeUnit.MINUTES)
     componentSelection {
       all {
         val spotbugs = Regex("^spotbugs.*")

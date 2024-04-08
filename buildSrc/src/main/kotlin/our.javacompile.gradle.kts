@@ -26,10 +26,15 @@ java {
 }
 
 tasks.withType<Javadoc>().configureEach {
+  dependsOn(tasks.classes)
+  source(sourceSets.main.map { it.output.generatedSourcesDirs })
   (options as StandardJavadocDocletOptions).apply {
-    encoding = "UTF-8"
-    addStringOption("tag", "apiNote:a:API Note:")
-    addStringOption("tag", "implNote:a:Implementation Note:")
+    addMultilineStringsOption("tag").value = listOf(
+      "apiSpec:a:API Spec:",
+      "apiNote:a:API Note:",
+      "implSpec:a:Implementation Spec:",
+      "implNote:a:Implementation Note:",
+    )
   }
 }
 
@@ -42,6 +47,7 @@ tasks.withType<JavaCompile>().configureEach {
   options.compilerArgs.addAll(
     listOf(
       "-parameters",
+      "-implicit:class",
       "-g",
       "-Xdiags:verbose",
       "-Xlint:all",
@@ -54,7 +60,10 @@ tasks.withType<JavaCompile>().configureEach {
   )
 
   options.errorprone {
-    disable("InvalidInlineTag") // false? positive on @snippet
+    disable(
+      "InvalidInlineTag", // https://github.com/google/error-prone/issues/4308
+      "MultipleNullnessAnnotations", // https://github.com/google/error-prone/issues/4334
+    )
     disableWarningsInGeneratedCode.set(true)
     excludedPaths.set(".*/build/generated/sources/annotationProcessor/.*")
     option("NullAway:AnnotatedPackages", "com.xenoterracide")
@@ -121,7 +130,6 @@ tasks.withType<JavaCompile>().configureEach {
       "JavaLangClash",
       "JavaLocalDateTimeGetNano",
       "JavaLocalTimeGetNano",
-      "JavaTimeDefaultTimeZone",
       "LockNotBeforeTry",
       "LockOnBoxedPrimitive",
       "LogicalAssignment",
@@ -229,9 +237,8 @@ tasks.withType<JavaCompile>().configureEach {
     }
 
     if (name != "compileTestJava") {
-      options.compilerArgs.add("-Werror")
       option("NullAway:CheckOptionalEmptiness", true)
-      errors.add("NullAway")
+      errors.addAll(listOf("NullAway", "JavaTimeDefaultTimeZone"))
     }
 
     if (name == "compileTestJava") {
@@ -241,6 +248,7 @@ tasks.withType<JavaCompile>().configureEach {
           "-Xlint:-varargs",
         ),
       )
+      disable("JavaTimeDefaultTimeZone")
       option("NullAway:HandleTestAssertionLibraries", true)
       option("NullAway:ExcludedFieldAnnotations", "org.junit.jupiter.api.io.TempDir")
     }

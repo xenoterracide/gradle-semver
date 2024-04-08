@@ -11,16 +11,14 @@ plugins {
   id("com.github.spotbugs")
 }
 
-spotbugs {
+tasks.withType<SpotBugsTask>().configureEach {
+  if (name != "spotbugsMain") {
+    enabled = false
+  }
   excludeFilter.set(rootProject.file(".config/spotbugs/exclude.xml"))
   effort.set(Effort.MAX)
   reportLevel.set(Confidence.LOW)
-}
-
-tasks.withType<SpotBugsTask>().configureEach {
-  reports.register("html") {
-    enabled = true
-  }
+  extraArgs = listOf("-longBugCodes")
 }
 
 val libs = the<LibrariesForLibs>()

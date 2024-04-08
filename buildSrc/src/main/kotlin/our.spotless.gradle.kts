@@ -17,7 +17,6 @@ spotless {
 
   java {
     licenseHeader(copyright + javaLicense)
-    cleanthat().addMutators(listOf("SafeAndConsensual", "SafeButNotConsensual"))
   }
 
   kotlinGradle {

@@ -3,6 +3,7 @@ on: [push, workflow_call]
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -14,4 +15,4 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - run: ./gradlew build buildHealth
+      - run: ./gradlew build buildHealth --build-cache
