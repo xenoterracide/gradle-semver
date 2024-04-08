@@ -26,15 +26,15 @@ class SemverPluginIntegrationTest {
 
   static final String LOGGING =
     """
-    logger.quiet("maven:{}", semver.maven )
-    logger.quiet("gradlePlugin:{}", semver.gradlePlugin)
-    logger.quiet("branch:{}", semver.git.branch )
-    logger.quiet("commit:{}", semver.git.commit)
-    logger.quiet("commitShort:{}", semver.git.commitShort)
-    logger.quiet("latestTag:{}", semver.git.latestTag)
-    logger.quiet("describe:{}", semver.git.describe)
-    logger.quiet("commitDistance:{}", semver.git.commitDistance)
-    logger.quiet("status:{}", semver.git.status)
+    logger.quiet("maven:" + semver.maven )
+    logger.quiet("gradlePlugin:" + semver.gradlePlugin)
+    logger.quiet("branch:" + semver.git.branch )
+    logger.quiet("commit:" + semver.git.commit)
+    logger.quiet("commitShort:" + semver.git.commitShort)
+    logger.quiet("latestTag:" + semver.git.latestTag)
+    logger.quiet("describe:" + semver.git.describe)
+    logger.quiet("commitDistance:" + semver.git.commitDistance)
+    logger.quiet("status:" + semver.git.status)
     """;
   static final String GROOVY_SCRIPT =
     """
@@ -90,6 +90,23 @@ class SemverPluginIntegrationTest {
       .build();
 
     assertThat(build.getOutput()).contains("maven:0.1.0");
+  }
+
+  @Test
+  // @Disabled("enable for local debuggin only")
+  void noGitDebug() throws IOException {
+    Files.writeString(
+      noGitProjectDir.toPath().resolve("build.gradle"),
+      String.format(GROOVY_SCRIPT, LOGGING)
+    );
+    var build = GradleRunner.create()
+      .withDebug(true)
+      .withProjectDir(noGitProjectDir)
+      .withArguments("getSemVer", "--stacktrace")
+      .withPluginClasspath()
+      .build();
+
+    assertThat(build.getOutput()).contains("maven:0.0.0");
   }
 
   @ParameterizedTest

@@ -12,13 +12,14 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Git metadata extension.
@@ -28,26 +29,28 @@ public class GitMetadataExtension {
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String HEAD = "HEAD";
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Supplier<Optional<Git>> git;
 
   GitMetadataExtension(Supplier<Optional<Git>> git) {
-    this.git = Objects.requireNonNull(git);
+    this.git = git;
   }
 
   Try<Repository> gitRepository() {
     return this.git.get()
       .map(g -> Try.of(() -> g.getRepository()))
-      .orElseGet(() -> Try.failure(new IllegalArgumentException()))
-      .recover(IllegalArgumentException.class, e -> null);
+      .orElseGet(NoGitDirException::failure)
+      .recover(NoGitDirException.class, e -> null);
   }
 
   Try<@Nullable String> describe() {
     return this.git.get()
       .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setTags(true)))
-      .orElseGet(() -> Try.failure(new IllegalArgumentException()))
+      .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
-      .recover(IllegalArgumentException.class, e -> null);
+      .recover(NoGitDirException.class, e -> null)
+      .onFailure(e -> this.log.warn("describe failed", e));
   }
 
   /**
@@ -56,7 +59,7 @@ public class GitMetadataExtension {
    * @return the branch
    */
   public @Nullable String getBranch() {
-    return this.gitRepository().mapTry(Repository::getBranch).getOrNull();
+    return this.gitRepository().mapTry(r -> r.getBranch()).getOrNull();
   }
 
   /**
@@ -108,7 +111,7 @@ public class GitMetadataExtension {
   public @Nullable String getLatestTag() {
     return this.git.get()
       .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB)))
-      .orElseGet(() -> Try.failure(new IllegalArgumentException()))
+      .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
       .getOrNull();
   }
@@ -142,11 +145,15 @@ public class GitMetadataExtension {
   public GitStatus getStatus() {
     return this.git.get()
       .map(g -> Try.of(() -> g.status()))
-      .orElseGet(() -> Try.failure(new IllegalArgumentException()))
+      .orElseGet(NoGitDirException::failure)
+      .filter(Objects::nonNull)
       .mapTry(s -> s.call())
-      .map(Status::isClean)
-      .recover(IllegalArgumentException.class, e -> false)
-      .map(clean -> clean ? GitStatus.CLEAN : GitStatus.DIRTY) // flip, dirty is the porcelain option
+      .recover(NoGitDirException.class, e -> null)
+      // flip, dirty is the porcelain option.
+      .map(
+        status ->
+          status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY
+      )
       .getOrElseThrow(ExceptionTools::toRuntime);
   }
 }

@@ -33,6 +33,18 @@ class GitMetadataExtensionTest {
   }
 
   @Test
+  void noGit() {
+    var pg = new GitMetadataExtension(() -> Optional.empty());
+    assertThat(pg.getCommitDistance()).isSameAs(0);
+    assertThat(pg.getBranch()).isNull();
+    assertThat(pg.getCommit()).isNull();
+    assertThat(pg.getDescribe()).isNull();
+    assertThat(pg.getLatestTag()).isNull();
+    assertThat(pg.getCommitShort()).isNull();
+    assertThat(pg.getStatus()).isSameAs(GitStatus.NO_REPO);
+  }
+
+  @Test
   void getObjectIdFor() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
