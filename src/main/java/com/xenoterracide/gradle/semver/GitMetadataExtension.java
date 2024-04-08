@@ -18,8 +18,6 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The type Git metadata extension.
@@ -30,8 +28,6 @@ public class GitMetadataExtension {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String HEAD = "HEAD";
 
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
-
   private final Try.WithResources1<Git> git;
 
   GitMetadataExtension(Try.WithResources1<Git> git) {
@@ -39,7 +35,7 @@ public class GitMetadataExtension {
   }
 
   Try<Repository> gitRepository() {
-    return this.git.of(Git::getRepository);
+    return this.git.of(Git::getRepository).onFailure(e -> {});
   }
 
   /**
@@ -97,7 +93,7 @@ public class GitMetadataExtension {
   public @Nullable String getLatestTag() {
     return this.git.of(git -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
-      .onFailure(e -> this.log.error("failed to get latest tag", e))
+      .onFailure(e -> {})
       .getOrNull();
   }
 
@@ -107,10 +103,7 @@ public class GitMetadataExtension {
    * @return the describe
    */
   public @Nullable String getDescribe() {
-    return this.git.of(Git::describe)
-      .mapTry(DescribeCommand::call)
-      .onFailure(e -> this.log.error("failed to get describe", e))
-      .getOrNull();
+    return this.git.of(Git::describe).mapTry(DescribeCommand::call).onFailure(e -> {}).getOrNull();
   }
 
   /**
@@ -121,10 +114,10 @@ public class GitMetadataExtension {
   public int getCommitDistance() {
     return this.git.of(Git::describe)
       .mapTry(DescribeCommand::call)
-      .onFailure(e -> this.log.error("failed to describe", e))
+      .onFailure(e -> {})
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
-      .onFailure(e -> this.log.trace("failed to get commit distance", e)) // expecting Iterables to throw if on tag
+      .onFailure(e -> {}) // expecting Iterables to throw if on tag
       .getOrElse(0);
   }
 
@@ -136,6 +129,7 @@ public class GitMetadataExtension {
   public GitStatus getStatus() {
     return this.git.of(Git::status)
       .mapTry(StatusCommand::call)
+      .onFailure(e -> {})
       .map(Status::isClean)
       .map(clean -> clean ? GitStatus.CLEAN : GitStatus.DIRTY) // flip, dirty is the porcelain option
       .getOrElseThrow(ExceptionTools::toRuntime);

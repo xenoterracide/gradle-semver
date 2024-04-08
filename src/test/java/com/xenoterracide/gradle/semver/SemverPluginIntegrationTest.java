@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -66,6 +67,7 @@ class SemverPluginIntegrationTest {
     try (var git = Git.init().setDirectory(testProjectDir).call()) {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
+      System.out.println("initial commit " + testProjectDir);
     }
   }
 
@@ -89,6 +91,20 @@ class SemverPluginIntegrationTest {
     Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
     var build = GradleRunner.create()
       .withProjectDir(testProjectDir)
+      .withArguments("getSemVer", "--configuration-cache", "--stacktrace")
+      .withPluginClasspath()
+      .build();
+
+    assertThat(build.getOutput()).contains("maven:0.1.0");
+  }
+
+  @ParameterizedTest
+  @ArgumentsSource(BuildScriptArgumentsProvider.class)
+  void noGit(String fileName, String buildScript, @TempDir(cleanup = CleanupMode.ON_SUCCESS) File noGit)
+    throws IOException {
+    Files.writeString(noGit.toPath().resolve(fileName), buildScript);
+    var build = GradleRunner.create()
+      .withProjectDir(noGit)
       .withArguments("getSemVer", "--configuration-cache", "--stacktrace")
       .withPluginClasspath()
       .build();

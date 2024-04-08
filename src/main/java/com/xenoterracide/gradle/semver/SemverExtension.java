@@ -9,8 +9,6 @@ import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The type Semver extension.
@@ -21,8 +19,6 @@ public class SemverExtension {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String PRE_VERSION = "0.0.0";
   private static final String SNAPSHOT = "SNAPSHOT";
-
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Try.WithResources1<Git> git;
 
@@ -37,7 +33,7 @@ public class SemverExtension {
 
   Try<@Nullable String> describe() {
     return this.git.of(git -> git.describe().setMatch(VERSION_GLOB).setTags(true))
-      .onFailure(e -> this.log.error("failed to get describe", e))
+      .onFailure(e -> {})
       .mapTry(DescribeCommand::call);
   }
 
@@ -62,6 +58,7 @@ public class SemverExtension {
   public Semver getGradlePlugin() {
     return this.describe()
       .map(v -> null == v ? PRE_VERSION : v)
+      .recover(e -> PRE_VERSION)
       .map(Semver::coerce)
       .map(
         v ->
@@ -80,6 +77,7 @@ public class SemverExtension {
   public Semver getMaven() {
     return this.describe()
       .map(v -> null == v ? PRE_VERSION : v)
+      .recover(e -> PRE_VERSION)
       .map(Semver::coerce)
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
       .map(

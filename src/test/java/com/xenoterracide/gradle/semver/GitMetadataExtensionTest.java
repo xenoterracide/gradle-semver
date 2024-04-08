@@ -163,7 +163,7 @@ class GitMetadataExtensionTest {
 
   @Test
   void logging() {
-    var wRsrc = Try.withResources(() -> Git.open(File.createTempFile("test", "git")));
+    var wRsrc = Try.withResources(() -> Git.open(Files.createTempDirectory("gradle-semver").toFile()));
     var pg = new GitMetadataExtension(wRsrc);
     assertThat(assertDoesNotThrow(() -> pg.getBranch())).isNull();
   }

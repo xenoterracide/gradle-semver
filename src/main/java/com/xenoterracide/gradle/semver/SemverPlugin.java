@@ -48,10 +48,9 @@ public class SemverPlugin implements Plugin<Project> {
   public void apply(Project project) {
     project
       .getExtensions()
-      .create(
+      .add(
         SEMVER,
-        SemverExtension.class,
-        Try.withResources(() -> Git.open(project.getLayout().getProjectDirectory().getAsFile()))
+        new SemverExtension(Try.withResources(() -> Git.open(project.getLayout().getProjectDirectory().getAsFile())))
       );
   }
 }
