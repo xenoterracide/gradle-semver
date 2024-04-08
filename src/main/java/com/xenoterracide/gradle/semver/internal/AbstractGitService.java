@@ -7,9 +7,9 @@ import com.xenoterracide.gradle.semver.SemverExtension;
 import com.xenoterracide.gradle.semver.internal.AbstractGitService.Params;
 import io.vavr.control.Try;
 import java.io.IOException;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.file.DirectoryProperty;
@@ -27,7 +27,6 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   }
 
   private @Nullable Git git;
-  private @Nullable Repository repository;
 
   /**
    * Constructor for the Git Service.
@@ -36,17 +35,19 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
   public AbstractGitService() {}
 
-  Git lazyGit() throws IOException {
+  Optional<Git> lazyGit() throws IOException {
     if (this.git == null) {
-      var builder = new FileRepositoryBuilder()
+      var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
+      var gitDir = new FileRepositoryBuilder()
         .readEnvironment()
-        .setMustExist(true)
-        .findGitDir(this.getParameters().getProjectDirectory().get().getAsFile());
-      this.repository = builder.build();
-      this.git = new Git(this.repository);
+        .setMustExist(false)
+        .findGitDir(projectDir)
+        .getGitDir();
+
+      this.git = gitDir != null ? Git.open(projectDir) : null;
     }
 
-    return this.git;
+    return Optional.ofNullable(this.git);
   }
 
   /**
@@ -55,13 +56,12 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
    * @return The SemverExtension.
    */
   public SemverExtension extension() {
-    return new SemverExtension(() -> Try.of(this::lazyGit).onFailure(ExceptionTools::rethrow).get());
+    return new SemverExtension(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
   }
 
   @Override
   public void close() {
     if (this.git != null) this.git.close();
-    if (this.repository != null) this.repository.close();
   }
 
   // preventJGitFromCallingExecutables is copied from

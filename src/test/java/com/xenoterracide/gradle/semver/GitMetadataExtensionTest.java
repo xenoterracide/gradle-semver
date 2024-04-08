@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Optional;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -26,7 +27,7 @@ class GitMetadataExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       assertThat(pg.getBranch()).isEqualTo("topic/test");
     }
   }
@@ -38,7 +39,7 @@ class GitMetadataExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       var main = pg.getObjectIdFor("topic/test").get().getName();
       var head = pg.getObjectIdFor("HEAD").get().getName();
       assertThat(main).hasSize(40);
@@ -54,7 +55,7 @@ class GitMetadataExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
       var head = pg.getRev("HEAD");
       assertThat(main).hasSize(40);
@@ -70,7 +71,7 @@ class GitMetadataExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
       var head = pg.getCommit();
       assertThat(main).hasSize(40);
@@ -86,7 +87,7 @@ class GitMetadataExtensionTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
       var head = pg.getCommitShort();
       assertThat(main).isNotNull();
@@ -101,7 +102,7 @@ class GitMetadataExtensionTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       assertThat(pg.getLatestTag()).isNull();
 
       git.tag().setName("v0.1.0").call();
@@ -118,7 +119,7 @@ class GitMetadataExtensionTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       git.tag().setName("v0.1.0").call();
       assertThat(pg.getDescribe()).isEqualTo("v0.1.0");
 
@@ -136,7 +137,7 @@ class GitMetadataExtensionTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
       assertThat(pg.getCommitDistance()).isEqualTo(0);
 
       git.commit().setMessage("second commit").call();
@@ -156,7 +157,7 @@ class GitMetadataExtensionTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new GitMetadataExtension(() -> git);
+      var pg = new GitMetadataExtension(() -> Optional.of(git));
 
       assertThat(pg.getStatus()).isEqualTo(GitStatus.CLEAN);
 

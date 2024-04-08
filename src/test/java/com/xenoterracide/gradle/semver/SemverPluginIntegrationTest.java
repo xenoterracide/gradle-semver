@@ -60,9 +60,15 @@ class SemverPluginIntegrationTest {
   @TempDir
   File testProjectDir;
 
+  @TempDir
+  File noGitProjectDir;
+
   @BeforeEach
   public void setupRunner() throws IOException, GitAPIException {
-    Files.writeString(testProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = 'hello-world'");
+    Files.writeString(
+      testProjectDir.toPath().resolve("settings.gradle"),
+      "rootProject.name = 'hello-world'"
+    );
     try (var git = Git.init().setDirectory(testProjectDir).call()) {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
@@ -72,7 +78,10 @@ class SemverPluginIntegrationTest {
   @Test
   @Disabled("enable for local debuggin only")
   void debug() throws IOException {
-    Files.writeString(testProjectDir.toPath().resolve("build.gradle"), String.format(GROOVY_SCRIPT, LOGGING));
+    Files.writeString(
+      testProjectDir.toPath().resolve("build.gradle"),
+      String.format(GROOVY_SCRIPT, LOGGING)
+    );
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(testProjectDir)
@@ -94,6 +103,24 @@ class SemverPluginIntegrationTest {
       .build();
 
     assertThat(build.getOutput()).contains("maven:0.1.0");
+  }
+
+  @ParameterizedTest
+  @ArgumentsSource(BuildScriptArgumentsProvider.class)
+  void noGit(String fileName, String buildScript) throws IOException {
+    Files.writeString(
+      noGitProjectDir.toPath().resolve("settings.gradle"),
+      "rootProject.name = 'hello-world'"
+    );
+    Files.writeString(noGitProjectDir.toPath().resolve(fileName), buildScript);
+
+    var build = GradleRunner.create()
+      .withProjectDir(noGitProjectDir)
+      .withArguments("getSemVer", "--configuration-cache", "--stacktrace")
+      .withPluginClasspath()
+      .build();
+
+    assertThat(build.getOutput()).contains("maven:0.0.0");
   }
 
   static class BuildScriptArgumentsProvider implements ArgumentsProvider {
