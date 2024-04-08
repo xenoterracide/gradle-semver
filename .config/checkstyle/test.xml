@@ -4,9 +4,6 @@
 <module name="Checker">
   <module name="SuppressWarningsFilter" />
 
-  <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
-  <module name="SuppressWithPlainTextCommentFilter" />
-
   <!--- PRETTIER START -->
 
   <module name="BeforeExecutionExclusionFileFilter">
@@ -101,20 +98,19 @@
     </module>
   </module>
 
-  <module name="TreeWalker">
-    <!-- https://checkstyle.org/filters/suppressioncommentfilter.html -->
-    <module name="SuppressionCommentFilter" />
+  <!--- PRETTIER END -->
 
-    <!-- Checks for Javadoc comments.                     -->
-    <!-- See https://checkstyle.org/config_javadoc.html -->
-    <!--
-    <module name="InvalidJavadocPosition"/>
-    <module name="JavadocMethod"/>
-    <module name="JavadocType"/>
-    <module name="JavadocVariable"/>
-    <module name="JavadocStyle"/>
-    <module name="MissingJavadocMethod"/>
-    -->
+  <module name="TreeWalker">
+    <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
+    <module name="SuppressionCommentFilter">
+      <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)" />
+      <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)" />
+      <property name="checkFormat" value="$1" />
+    </module>
+
+    <!-- https://checkstyle.org/checks/annotation/ checked all 2024 -->
+    <module name="MissingDeprecated" />
+    <module name="MissingOverride" />
 
     <!-- Checks for Naming Conventions https://checkstyle.org/checks/naming/ -->
     <module name="AbbreviationAsWordInName" />
@@ -144,7 +140,8 @@
 
     <!-- imports https://checkstyle.org/checks/imports -->
     <module name="AvoidStarImport" />
-    <module name="IllegalImport" /> <!-- defaults to sun.* packages -->
+    <module name="IllegalImport" />
+    <!-- defaults to sun.* packages -->
     <module name="RedundantImport" />
     <module name="UnusedImports">
       <property name="processJavadoc" value="false" />
@@ -159,8 +156,14 @@
     <module name="NPathComplexity" />
 
     <!-- Checks for Size Violations https://checkstyle.org/checks/sizes/ -->
+    <module name="AnonInnerLength" />
+    <module name="ExecutableStatementCount" />
+    <module name="LambdaBodyLength" />
+    <module name="MethodCount" />
     <module name="MethodLength" />
+    <module name="OuterTypeNumber" />
     <module name="ParameterNumber" />
+    <module name="RecordComponentNumber" />
 
     <!-- whitespace https://checkstyle.org/checks/whitespace/ -->
     <module name="OperatorWrap">
@@ -175,7 +178,12 @@
       <property name="option" value="eol" />
     </module>
     <module name="EmptyForIteratorPad" />
-    <module name="NoWhitespaceAfter" />
+    <module name="NoWhitespaceAfter">
+      <property
+        name="tokens"
+        value="AT, INC, DEC, UNARY_MINUS, UNARY_PLUS, BNOT, LNOT, DOT, ARRAY_DECLARATOR, INDEX_OP"
+      />
+    </module>
     <module name="CommentsIndentation" />
     <module name="AvoidEscapedUnicodeCharacters">
       <property name="allowNonPrintableEscapes" value="true" />
@@ -199,11 +207,9 @@
     <module name="UnnecessarySemicolonInTryWithResources" />
     <module name="VariableDeclarationUsageDistance" />
 
-
     <!-- Modifier Checks                                    -->
     <!-- See https://checkstyle.org/config_modifiers.html -->
     <module name="RedundantModifier" />
-    <module name="AbstractClassName" />
 
     <!-- https://checkstyle.sourceforge.io/checks/blocks/ -->
     <module name="AvoidNestedBlocks">
@@ -219,10 +225,7 @@
     <module name="FallThrough" />
     <module name="EmptyStatement" />
     <module name="EqualsHashCode" />
-    <module name="HiddenField">
-      <property name="ignoreConstructorParameter" value="true" />
-      <property name="ignoreSetter" value="true" />
-    </module>
+    <module name="RequireThis" />
     <module name="ExplicitInitialization" />
     <module name="IllegalInstantiation" />
     <module name="IllegalCatch" />
@@ -241,7 +244,6 @@
     <module name="NestedTryDepth" />
     <module name="NoArrayTrailingComma" />
     <module name="NoClone" />
-    <module name="NoEnumTrailingComma" />
     <module name="NoFinalizer" />
     <module name="PackageDeclaration" />
 
@@ -260,6 +262,7 @@
     <module name="ArrayTypeStyle" />
     <module name="TodoComment" />
     <module name="UpperEll" />
+    <module name="UncommentedMain" />
 
     <module name="SuppressWarningsHolder" />
   </module>
@@ -267,9 +270,8 @@
 
   <module name="Translation" />
 
-  <!--- PRETTIER END -->
-
-  <module name="RegexpSingleline"><!-- trailing whitespace -->
+  <module name="RegexpSingleline">
+    <!-- trailing whitespace -->
     <property name="format" value="\s+$" />
     <property name="minimum" value="0" />
     <property name="maximum" value="0" />
@@ -281,10 +283,8 @@
   <!-- <module name="JavadocPackage"/> -->
 
   <!-- Miscellaneous https://checkstyle.org/checks/misc/ -->
-  <module name="FileLength">
-    <property name="max" value="500" />
-    <property name="fileExtensions" value="java" />
-  </module>
+  <module name="FileLength" />
+  <!-- use method count for SRP instead -->
   <module name="LineLength">
     <property name="max" value="120" />
     <property name="fileExtensions" value="java" />
