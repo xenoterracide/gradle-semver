@@ -18,8 +18,6 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The type Git metadata extension.
@@ -29,7 +27,6 @@ public class GitMetadataExtension {
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String HEAD = "HEAD";
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Supplier<Optional<Git>> git;
 
@@ -49,8 +46,7 @@ public class GitMetadataExtension {
       .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setTags(true)))
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
-      .recover(NoGitDirException.class, e -> null)
-      .onFailure(e -> this.log.warn("describe failed", e));
+      .recover(NoGitDirException.class, e -> null);
   }
 
   /**
