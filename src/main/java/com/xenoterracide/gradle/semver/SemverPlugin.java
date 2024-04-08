@@ -5,6 +5,7 @@ package com.xenoterracide.gradle.semver;
 
 import io.vavr.control.Try;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -50,7 +51,17 @@ public class SemverPlugin implements Plugin<Project> {
       .getExtensions()
       .add(
         SEMVER,
-        new SemverExtension(Try.withResources(() -> Git.open(project.getLayout().getProjectDirectory().getAsFile())))
+        new SemverExtension(
+          Try.withResources(() -> {
+            var currentDir = project.getLayout().getProjectDirectory().getAsFile();
+            var builder = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(currentDir);
+
+            try (var repo = builder.build()) {
+              // doing it this way because Jgit won't cloase all resources if you create it from the built version
+              return repo.getFS() != null ? Git.open(repo.getWorkTree()) : null;
+            }
+          })
+        )
       );
   }
 }

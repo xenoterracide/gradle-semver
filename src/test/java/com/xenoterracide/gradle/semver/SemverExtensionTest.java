@@ -124,6 +124,13 @@ class SemverExtensionTest {
   }
 
   @Test
+  void noRepo() {
+    var pg = new SemverExtension(Try.withResources(() -> null));
+    assertThat(pg.getMaven()).hasToString("0.0.0-SNAPSHOT");
+    assertThat(pg.getGradlePlugin()).hasToString("0.0.0");
+  }
+
+  @Test
   void classTest() {
     assertThat(SemverExtension.class).isPublic().hasPublicMethods("getMaven", "getGradlePlugin");
   }
