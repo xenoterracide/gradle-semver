@@ -16,7 +16,11 @@ public enum GitStatus {
   /**
    * Dirty git status.
    */
-  DIRTY;
+  DIRTY,
+  /**
+   * No Repository found.
+   */
+  NO_REPO;
 
   @Override
   public String toString() {

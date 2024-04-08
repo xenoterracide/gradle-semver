@@ -8,8 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -18,14 +18,13 @@ import org.semver4j.Semver;
 class SemverExtensionTest {
 
   @TempDir
-  @NonNull
   File projectDir;
 
   @Test
   void getGradlePlugin() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new SemverExtension(() -> git);
+      var pg = new SemverExtension(() -> Optional.of(git));
 
       var v000 = pg.getGradlePlugin();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0");
@@ -42,7 +41,9 @@ class SemverExtensionTest {
       assertThat(v010)
         .extracting(Semver::getVersion, Semver::toString)
         .allSatisfy(o -> {
-          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).matches("^0\\.1\\.0-1-g\\p{XDigit}{7}$");
+          assertThat(o)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .matches("^0\\.1\\.0-1-g\\p{XDigit}{7}$");
         });
 
       git.tag().setName("v0.1.1").call();
@@ -61,7 +62,7 @@ class SemverExtensionTest {
   void getMaven() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new SemverExtension(() -> git);
+      var pg = new SemverExtension(() -> Optional.of(git));
 
       var v000 = pg.getMaven();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-SNAPSHOT");
@@ -102,7 +103,7 @@ class SemverExtensionTest {
       git.tag().setName("latest").call();
       git.commit().setMessage("second commit").call();
 
-      var pg = new SemverExtension(() -> git);
+      var pg = new SemverExtension(() -> Optional.of(git));
 
       assertThat(pg.getMaven()).hasToString("0.0.0-SNAPSHOT");
 

@@ -8,10 +8,10 @@ import com.google.common.collect.Iterables;
 import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectId;
@@ -28,14 +28,25 @@ public class GitMetadataExtension {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String HEAD = "HEAD";
 
-  private final Supplier<Git> git;
+  private final Supplier<Optional<Git>> git;
 
-  GitMetadataExtension(Supplier<Git> git) {
-    this.git = Objects.requireNonNull(git);
+  GitMetadataExtension(Supplier<Optional<Git>> git) {
+    this.git = git;
   }
 
   Try<Repository> gitRepository() {
-    return Try.of(() -> this.git.get().getRepository()).onFailure(ExceptionTools::rethrow);
+    return this.git.get()
+      .map(g -> Try.of(() -> g.getRepository()))
+      .orElseGet(NoGitDirException::failure)
+      .recover(NoGitDirException.class, e -> null);
+  }
+
+  Try<@Nullable String> describe() {
+    return this.git.get()
+      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setTags(true)))
+      .orElseGet(NoGitDirException::failure)
+      .mapTry(DescribeCommand::call)
+      .recover(NoGitDirException.class, e -> null);
   }
 
   /**
@@ -44,7 +55,7 @@ public class GitMetadataExtension {
    * @return the branch
    */
   public @Nullable String getBranch() {
-    return this.gitRepository().mapTry(Repository::getBranch).getOrNull();
+    return this.gitRepository().mapTry(r -> r.getBranch()).getOrNull();
   }
 
   /**
@@ -82,7 +93,10 @@ public class GitMetadataExtension {
    * @return the commit short
    */
   public @Nullable String getCommitShort() {
-    return this.getObjectIdFor(HEAD).map(o -> o.abbreviate(7)).map(AbbreviatedObjectId::name).getOrNull();
+    return this.getObjectIdFor(HEAD)
+      .map(o -> o.abbreviate(7))
+      .map(AbbreviatedObjectId::name)
+      .getOrNull();
   }
 
   /**
@@ -91,9 +105,10 @@ public class GitMetadataExtension {
    * @return the latest tag
    */
   public @Nullable String getLatestTag() {
-    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB))
+    return this.git.get()
+      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB)))
+      .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
-      .onFailure(ExceptionTools::rethrow)
       .getOrNull();
   }
 
@@ -103,7 +118,7 @@ public class GitMetadataExtension {
    * @return the describe
    */
   public @Nullable String getDescribe() {
-    return Try.ofCallable(this.git.get().describe()).onFailure(ExceptionTools::rethrow).getOrNull();
+    return this.describe().getOrNull();
   }
 
   /**
@@ -112,8 +127,7 @@ public class GitMetadataExtension {
    * @return the commit distance
    */
   public int getCommitDistance() {
-    return Try.ofCallable(this.git.get().describe())
-      .onFailure(ExceptionTools::rethrow)
+    return this.describe()
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
       .getOrElse(0);
@@ -125,9 +139,17 @@ public class GitMetadataExtension {
    * @return the status
    */
   public GitStatus getStatus() {
-    return Try.ofCallable(this.git.get().status())
-      .map(Status::isClean)
-      .map(clean -> clean ? GitStatus.CLEAN : GitStatus.DIRTY) // flip, dirty is the porcelain option
-      .getOrElseThrow(ExceptionTools::rethrow);
+    return this.git.get()
+      .map(g -> Try.of(() -> g.status()))
+      .orElseGet(NoGitDirException::failure)
+      .filter(Objects::nonNull)
+      .mapTry(s -> s.call())
+      .recover(NoGitDirException.class, e -> null)
+      // flip, dirty is the porcelain option.
+      .map(
+        status ->
+          status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY
+      )
+      .getOrElseThrow(ExceptionTools::toRuntime);
   }
 }

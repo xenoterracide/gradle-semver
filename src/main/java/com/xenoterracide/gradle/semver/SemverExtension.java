@@ -3,14 +3,11 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.ExceptionTools;
-import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
-import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 /**
@@ -18,26 +15,18 @@ import org.semver4j.Semver;
  */
 public class SemverExtension {
 
-  // this is not a regex but a glob (`man glob`)
-  private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String PRE_VERSION = "0.0.0";
   private static final String SNAPSHOT = "SNAPSHOT";
 
-  private final Supplier<Git> git;
+  private final Supplier<Optional<Git>> git;
 
   /**
    * Instantiates a new Semver extension.
    *
    * @param git {@link Supplier} of {@link Git}
    */
-  public SemverExtension(@NonNull Supplier<@NonNull Git> git) {
+  public SemverExtension(@NonNull Supplier<Optional<Git>> git) {
     this.git = Objects.requireNonNull(git);
-  }
-
-  Try<@Nullable String> describe() {
-    return Try.of(() -> this.git.get().describe().setMatch(VERSION_GLOB).setTags(true))
-      .mapTry(DescribeCommand::call)
-      .onFailure(ExceptionTools::rethrow);
   }
 
   /**
@@ -59,12 +48,15 @@ public class SemverExtension {
    * @return the gradle plugin semver.
    */
   public Semver getGradlePlugin() {
-    return this.describe()
+    return this.getGit()
+      .describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
       .map(
         v ->
-          !(v.getPreRelease().isEmpty() || v.getBuild().isEmpty()) ? v.withClearedPreReleaseAndBuild().nextPatch() : v
+          !(v.getPreRelease().isEmpty() || v.getBuild().isEmpty())
+            ? v.withClearedPreReleaseAndBuild().nextPatch()
+            : v
       )
       .get();
   }
@@ -77,7 +69,8 @@ public class SemverExtension {
    * @return the maven compatible semver
    */
   public Semver getMaven() {
-    return this.describe()
+    return this.getGit()
+      .describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(Semver::coerce)
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
