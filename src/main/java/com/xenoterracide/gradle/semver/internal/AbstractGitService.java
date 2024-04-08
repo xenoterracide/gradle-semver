@@ -16,6 +16,8 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.services.BuildService;
 import org.gradle.api.services.BuildServiceParameters;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Build Service for Git. Primary goal is to allow for lazy initialization of the Git object and keeping it open for
@@ -25,6 +27,8 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   static {
     preventJGitFromCallingExecutables();
   }
+
+  private Logger log = LoggerFactory.getLogger(this.getClass());
 
   private @Nullable Git git;
 
@@ -44,6 +48,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
         .findGitDir(projectDir)
         .getGitDir();
 
+      this.log.debug("gitDir: {}", gitDir);
       this.git = gitDir != null ? Git.open(gitDir) : null;
     }
 
