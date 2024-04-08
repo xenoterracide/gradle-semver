@@ -44,7 +44,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
         .findGitDir(projectDir)
         .getGitDir();
 
-      this.git = gitDir != null ? Git.open(projectDir) : null;
+      this.git = gitDir != null ? Git.open(gitDir) : null;
     }
 
     return Optional.ofNullable(this.git);
