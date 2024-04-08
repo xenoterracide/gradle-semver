@@ -49,18 +49,19 @@ public class SemverPlugin implements Plugin<Project> {
   public void apply(Project project) {
     project
       .getExtensions()
-      .create(
+      .add(
         SEMVER,
-        SemverExtension.class,
-        Try.withResources(() -> {
-          var currentDir = project.getLayout().getProjectDirectory().getAsFile();
-          var builder = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(currentDir);
+        new SemverExtension(
+          Try.withResources(() -> {
+            var currentDir = project.getLayout().getProjectDirectory().getAsFile();
+            var builder = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(currentDir);
 
-          try (var repo = builder.build()) {
-            // doing it this way because Jgit won't cloase all resources if you create it from the built version
-            return repo.getFS() != null ? Git.open(repo.getWorkTree()) : null;
-          }
-        })
+            try (var repo = builder.build()) {
+              // doing it this way because Jgit won't cloase all resources if you create it from the built version
+              return repo.getFS() != null ? Git.open(repo.getWorkTree()) : null;
+            }
+          })
+        )
       );
   }
 }
