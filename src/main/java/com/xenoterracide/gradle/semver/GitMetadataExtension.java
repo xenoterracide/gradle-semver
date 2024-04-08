@@ -8,6 +8,7 @@ import com.google.common.collect.Iterables;
 import com.xenoterracide.tools.java.function.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.function.Supplier;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -28,14 +29,14 @@ public class GitMetadataExtension {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String HEAD = "HEAD";
 
-  private final Try.WithResources1<Git> git;
+  private final Supplier<Try.WithResources1<Git>> git;
 
-  GitMetadataExtension(Try.WithResources1<Git> git) {
+  GitMetadataExtension(Supplier<Try.WithResources1<Git>> git) {
     this.git = Objects.requireNonNull(git);
   }
 
   Try<Repository> gitRepository() {
-    return this.git.of(Git::getRepository).onFailure(e -> {});
+    return this.git.get().of(Git::getRepository).onFailure(e -> {});
   }
 
   /**
@@ -91,7 +92,8 @@ public class GitMetadataExtension {
    * @return the latest tag
    */
   public @Nullable String getLatestTag() {
-    return this.git.of(git -> git.describe().setMatch(VERSION_GLOB))
+    return this.git.get()
+      .of(git -> git.describe().setMatch(VERSION_GLOB))
       .mapTry(DescribeCommand::call)
       .onFailure(e -> {})
       .getOrNull();
@@ -103,7 +105,7 @@ public class GitMetadataExtension {
    * @return the describe
    */
   public @Nullable String getDescribe() {
-    return this.git.of(Git::describe).mapTry(DescribeCommand::call).onFailure(e -> {}).getOrNull();
+    return this.git.get().of(Git::describe).mapTry(DescribeCommand::call).onFailure(e -> {}).getOrNull();
   }
 
   /**
@@ -112,7 +114,8 @@ public class GitMetadataExtension {
    * @return the commit distance
    */
   public int getCommitDistance() {
-    return this.git.of(Git::describe)
+    return this.git.get()
+      .of(Git::describe)
       .mapTry(DescribeCommand::call)
       .onFailure(e -> {})
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
@@ -127,7 +130,8 @@ public class GitMetadataExtension {
    * @return the status
    */
   public GitStatus getStatus() {
-    return this.git.of(Git::status)
+    return this.git.get()
+      .of(Git::status)
       .mapTry(StatusCommand::call)
       .onFailure(e -> {})
       .map(Status::isClean)

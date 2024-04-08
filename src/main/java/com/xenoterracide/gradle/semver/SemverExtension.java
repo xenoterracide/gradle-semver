@@ -5,6 +5,7 @@ package com.xenoterracide.gradle.semver;
 
 import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.function.Supplier;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.jspecify.annotations.Nullable;
@@ -20,19 +21,20 @@ public class SemverExtension {
   private static final String PRE_VERSION = "0.0.0";
   private static final String SNAPSHOT = "SNAPSHOT";
 
-  private final Try.WithResources1<Git> git;
+  private final Supplier<Try.WithResources1<Git>> git;
 
   /**
    * Instantiates a new Semver extension.
    *
    * @param git the git
    */
-  public SemverExtension(Try.WithResources1<Git> git) {
+  public SemverExtension(Supplier<Try.WithResources1<Git>> git) {
     this.git = Objects.requireNonNull(git);
   }
 
   Try<@Nullable String> describe() {
-    return this.git.of(git -> git.describe().setMatch(VERSION_GLOB).setTags(true))
+    return this.git.get()
+      .of(git -> git.describe().setMatch(VERSION_GLOB).setTags(true))
       .onFailure(e -> {})
       .mapTry(DescribeCommand::call);
   }
