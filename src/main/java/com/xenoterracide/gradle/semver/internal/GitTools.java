@@ -14,6 +14,13 @@ public final class GitTools {
 
   private GitTools() {}
 
+  /**
+   * Convert an {@link ObjectId} to an octal string.
+   *
+   * @param objectId the object id
+   * @param size     the number of bytes to convert
+   * @return the octal string
+   */
   public static String toOctal(ObjectId objectId, int size) {
     var sha = ByteBuffer.allocate(20);
     objectId.copyRawTo(sha);

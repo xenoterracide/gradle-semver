@@ -3,10 +3,21 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
+/**
+ * Utility class for working with arrays.
+ */
 public final class ArrayTools {
 
   private ArrayTools() {}
 
+  /**
+   * Slice byte [].
+   *
+   * @param array the array
+   * @param start start index
+   * @param end   end index
+   * @return the new byte array
+   */
   public static byte[] slice(byte[] array, int start, int end) {
     if (start < 0) {
       throw new ArrayIndexOutOfBoundsException("start < 0");

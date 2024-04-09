@@ -15,8 +15,9 @@ import org.jspecify.annotations.NonNull;
 import org.semver4j.Semver;
 
 /**
- * The type Semver extension. Methods in this class are not lazy and invoke the {@link org.eclipse.jgit.lib.Repository}.
- * All versions returned are Gradle safe as they are all valid semantic versions.
+ * The type Semver extension. Methods in this class are not lazy and invoke the
+ * {@link org.eclipse.jgit.lib.Repository}. All versions returned are Gradle safe as they are all
+ * valid semantic versions.
  */
 public class SemverExtension {
 
@@ -38,9 +39,8 @@ public class SemverExtension {
   /**
    * Gets git metatdata exstension.
    *
-   * @implNote does not invoke {@link org.eclipse.jgit.lib.Repository}
-   *
    * @return the extension for accessing git metdata
+   * @implNote does not invoke {@link org.eclipse.jgit.lib.Repository}
    */
   public GitMetadataExtension getGit() {
     return new GitMetadataExtension(this.git);
@@ -57,9 +57,8 @@ public class SemverExtension {
   /**
    * Gets gradle plugin compatible version.
    *
-   * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
-   *
    * @return the gradle plugin semver.
+   * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
    */
   public Semver getGradlePlugin() {
     return this.coerced()
@@ -75,15 +74,22 @@ public class SemverExtension {
   /**
    * Gets maven compatible version.
    *
-   * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}.
-   * Uses the {@link #getMavenSnapshot()} algorithm, will switch to {@link #getMavenAlpha()} in the future.
-   *
    * @return the maven compatible semver
+   * @implNote Uses the {@link #getMavenSnapshot()} algorithm, may switch to
+   *   {@link #getMavenAlpha()} in the future.
    */
   public Semver getMaven() {
     return this.getMavenSnapshot();
   }
 
+  /**
+   * Maven Compatible version that uses alpha instead of snapshot. It can be locked by gradle
+   * released every build.
+   *
+   * @return maven compatible semver
+   * @implNote The current algorith removes the pre-release information and instead appeads with
+   *   {@code "SNAPSHOT"} if the commit distance is greater than 0.
+   */
   public Semver getMavenSnapshot() {
     return this.coerced()
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
@@ -115,14 +121,14 @@ public class SemverExtension {
   }
 
   /**
-   * Maven Compatible version that uses alpha instead of snapshot. It can be locked by gradle released every build.
-   *
-   * @implNote current algorithm for alphas is semver + alpha + (distance + 1000) + 4 byte octal of commit
-   * We add 1000 to the distance because a valid numeric in the prerelease cannot have a leading 0 and maven uses a
-   * stringy comparison of this number instead of an integer. This means that you shoud be fine until you reach 10000
-   * commits between releases.
+   * Maven Compatible version that uses alpha instead of snapshot. It can be locked by gradle
+   * released every build.
    *
    * @return maven compatible semver
+   * @implNote current algorithm for alphas is semver + alpha + (distance + 1000) + 4 byte octal
+   *   of commit We add 1000 to the distance because a valid numeric in the prerelease cannot have a
+   *   leading 0 and maven uses a stringy comparison of this number instead of an integer. This
+   *   means that you shoud be fine until you reach 10000 commits between releases.
    */
   public Semver getMavenAlpha() {
     return this.getGit()
