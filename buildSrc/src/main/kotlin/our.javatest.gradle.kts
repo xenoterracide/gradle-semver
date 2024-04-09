@@ -27,6 +27,7 @@ val available = tasks.register("tests available") {
 }
 
 tasks.withType<Test>().configureEach {
+  jvmArgs("-XX:+EnableDynamicAgentLoading")
   useJUnitPlatform()
   reports {
     junitXml.required.set(false)
