@@ -100,7 +100,7 @@ public class SemverExtension {
             .stream()
             .filter(p -> p.matches("^\\d+-+g\\p{XDigit}{7}$"))
             .findAny()
-            .map(p -> v.withClearedPreRelease().withPreRelease(SNAPSHOT).withBuild(p))
+            .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
             .orElse(v)
       )
       .map(v -> new MavenSemver(v.getVersion()))
