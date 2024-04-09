@@ -14,6 +14,7 @@ import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.jspecify.annotations.NonNull;
@@ -26,7 +27,6 @@ public class GitMetadataExtension {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
-  private static final String HEAD = "HEAD";
 
   private final Supplier<Optional<Git>> git;
 
@@ -84,7 +84,7 @@ public class GitMetadataExtension {
    * @return the commit
    */
   public @Nullable String getCommit() {
-    return this.getRev(HEAD);
+    return this.getRev(Constants.HEAD);
   }
 
   /**
@@ -93,7 +93,7 @@ public class GitMetadataExtension {
    * @return the commit short
    */
   public @Nullable String getCommitShort() {
-    return this.getObjectIdFor(HEAD)
+    return this.getObjectIdFor(Constants.HEAD)
       .map(o -> o.abbreviate(7))
       .map(AbbreviatedObjectId::name)
       .getOrNull();
