@@ -21,16 +21,16 @@ version = semver.maven
 ```
 
 ```kt
-logger.quiet("maven snapshot" + semver.mavenSnapshot) // e.g. 0.1.0-SNAPSHOT-1-gb001c8c
-logger.quiet("maven alpha" + semver.mavenAlpha) // e.g. 0.1.0-alpha.1001255204163142
-logger.quiet("gradlePlugin" + semver.gradlePlugin) // e.g 0.1.0-1-g3aae11e
-logger.quiet("branch" + semver.git.branch)
-logger.quiet("commit" + semver.git.commit)
-logger.quiet("commitShort" + semver.git.commitShort)
-logger.quiet("latestTag" + semver.git.latestTag)
-logger.quiet("describe" + semver.git.describe)
-logger.quiet("commitDistance" + semver.git.commitDistance)
-logger.quiet("status" + semver.git.status)
+logger.quiet("maven snapshot" + semver.mavenSnapshot)      // 0.1.0-SNAPSHOT-1-gb001c8c
+logger.quiet("maven alpha" + semver.mavenAlpha)            // 0.1.0-alpha.1001255204163142
+logger.quiet("gradlePlugin" + semver.gradlePlugin)         // 0.1.0-1-g3aae11e
+logger.quiet("branch" + semver.git.branch)                 // main
+logger.quiet("commit" + semver.git.commit)                 // 761c420fa9812584e90750ca73197402603e76cc
+logger.quiet("commitShort" + semver.git.commitShort)       // g3aae11e
+logger.quiet("latestTag" + semver.git.latestTag)           // v0.1.0
+logger.quiet("describe" + semver.git.describe)             // v0.9.7-28-g55329c4
+logger.quiet("commitDistance" + semver.git.commitDistance) // 28
+logger.quiet("status" + semver.git.status)                 // dirty
 ```
 
 The plugin exposes a `Semver` from https://github.com/semver4j/semver4j and uses `Semver.coerce`.
