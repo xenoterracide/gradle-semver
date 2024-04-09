@@ -115,11 +115,11 @@ class SemverExtensionTest {
       var pg = new SemverExtension(() -> Optional.of(git));
 
       var v000 = pg.getMavenAlpha();
-      assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-alpha.1000000000000000");
+      assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.1-alpha.1000000000000000");
       assertThat(v000)
-        .hasToString("0.0.0-alpha.1000000000000000")
+        .hasToString("0.0.1-alpha.1000000000000000")
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
-        .containsExactly(0, 0, 0, List.of("alpha", "1000000000000000"));
+        .containsExactly(0, 0, 1, List.of("alpha", "1000000000000000"));
 
       git.tag().setName("v0.1.0").call();
       var v010 = pg.getMavenAlpha();
@@ -132,7 +132,7 @@ class SemverExtensionTest {
         .allSatisfy(o -> {
           assertThat(o)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .matches("^0\\.1\\.0-alpha.1001\\p{XDigit}{12}$");
+            .matches("^0\\.1\\.1-alpha.1001\\p{XDigit}{12}$");
         });
 
       git.tag().setName("v0.1.1").call();

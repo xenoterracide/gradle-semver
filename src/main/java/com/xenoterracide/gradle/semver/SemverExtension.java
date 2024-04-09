@@ -143,7 +143,7 @@ public class SemverExtension {
 
     var semver = Objects.requireNonNull(Semver.coerce(version));
     if (distance > 0 || PRE_VERSION.equals(version)) {
-      return semver.withPreRelease(this.preRelease(distance));
+      return semver.withPreRelease(this.preRelease(distance)).withIncPatch();
     }
 
     return semver;
