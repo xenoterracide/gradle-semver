@@ -3,17 +3,14 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.ArrayTools;
 import com.xenoterracide.gradle.semver.internal.ExceptionTools;
+import com.xenoterracide.gradle.semver.internal.GitTools;
 import io.vavr.control.Try;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectId;
 import org.jspecify.annotations.NonNull;
 import org.semver4j.Semver;
 
@@ -47,15 +44,6 @@ public class SemverExtension {
    */
   public GitMetadataExtension getGit() {
     return new GitMetadataExtension(this.git);
-  }
-
-  static String toOctal(ObjectId objectId, int size) {
-    var sha = ByteBuffer.allocateDirect(20);
-    objectId.copyRawTo(sha);
-
-    var bytes = ArrayTools.slice(sha.array(), 0, size);
-
-    return new BigInteger(bytes).toString(8);
   }
 
   Try<Semver> coerced() {
@@ -113,10 +101,26 @@ public class SemverExtension {
       .get();
   }
 
+  String octalForHead() {
+    var oid = this.getGit().getObjectIdFor(Constants.HEAD).get();
+    return GitTools.toOctal(oid, 4);
+  }
+
+  String preRelease(int distance) {
+    var delimeter = ".";
+    var octalSha = distance > 0 ? this.octalForHead() : "0".repeat(12);
+    var dist = distance + 1000;
+
+    return String.join(delimeter, ALPHA, dist + octalSha);
+  }
+
   /**
    * Maven Compatible version that uses alpha instead of snapshot. It can be locked by gradle released every build.
    *
-   * @implNote current algorithm for alphas is semver + alpha + distance + octal of commit
+   * @implNote current algorithm for alphas is semver + alpha + (distance + 1000) + 4 byte octal of commit
+   * We add 1000 to the distance because a valid numeric in the prerelease cannot have a leading 0 and maven uses a
+   * stringy comparison of this number instead of an integer. This means that you shoud be fine until you reach 10000
+   * commits between releases.
    *
    * @return maven compatible semver
    */
@@ -124,16 +128,18 @@ public class SemverExtension {
     return this.getGit()
       .describe()
       .map(v -> null == v ? PRE_VERSION : v)
-      .map(v -> {
-        var distance = this.getGit().getCommitDistance();
-        var oct = toOctal(this.getGit().getObjectIdFor(Constants.HEAD).get(), 7);
-
-        var semver = Objects.requireNonNull(Semver.coerce(v));
-        if (Objects.equals(v, PRE_VERSION) || distance > 0) {
-          return semver.withPreRelease(ALPHA).withBuild(distance + oct);
-        }
-        return semver;
-      })
+      .map(this::toAlpha)
       .getOrElseThrow(ExceptionTools::rethrow);
+  }
+
+  Semver toAlpha(String version) {
+    var distance = this.getGit().getCommitDistance();
+
+    var semver = Objects.requireNonNull(Semver.coerce(version));
+    if (distance > 0 || PRE_VERSION.equals(version)) {
+      return semver.withPreRelease(this.preRelease(distance));
+    }
+
+    return semver;
   }
 }
