@@ -45,9 +45,9 @@ class SemverExtensionTest {
 
       git.commit().setMessage("second commit").call();
 
-      var v010BldV = pg.getGradlePlugin();
+      var v010BldV2 = pg.getGradlePlugin();
 
-      assertThat(v010BldV)
+      assertThat(v010BldV2)
         .isGreaterThan(v000)
         .isGreaterThan(v010)
         .extracting(Semver::getVersion, Semver::toString)
@@ -58,16 +58,29 @@ class SemverExtensionTest {
             .matches("^0\\.1\\.1-alpha\\.1\\+\\d+\\.g\\p{XDigit}{7}$");
         });
 
-      var sv = new Semver("0.1.1-alpha.1+2.g3aae11e");
+      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.1+2.g3aae11e"));
 
-      assertThat(sv).isEqualByComparingTo(v010BldV);
+      git.commit().setMessage("third commit").call();
+
+      var v010BldV3 = pg.getGradlePlugin();
+
+      assertThat(v010BldV3)
+        .isGreaterThan(v000)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .startsWith("0.1.1-alpha.2+2.g");
+        });
 
       git.tag().setName("v0.1.1").call();
 
       var v011 = pg.getGradlePlugin();
 
       assertThat(v011)
-        .isGreaterThan(v010BldV)
+        .isGreaterThan(v010BldV2)
         .isGreaterThan(v010)
         .isGreaterThan(v000)
         .hasToString("0.1.1")
@@ -80,9 +93,10 @@ class SemverExtensionTest {
         )
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
 
-      assertThat(VersionNumber.parse(v010BldV.toString()))
+      assertThat(VersionNumber.parse(v010BldV2.toString()))
         .isGreaterThan(VersionNumber.parse(v000.toString()))
         .isGreaterThan(VersionNumber.parse(v010.toString()))
+        .isLessThan(VersionNumber.parse(v010BldV3.toString()))
         .isLessThan(VersionNumber.parse(v011.toString()));
     }
   }
@@ -107,16 +121,29 @@ class SemverExtensionTest {
 
       git.commit().setMessage("second commit").call();
 
-      var v010BldV = pg.getMavenSnapshot();
+      var v010BldV2 = pg.getMavenSnapshot();
 
-      assertThat(v010BldV).isGreaterThan(v000).isGreaterThan(v010).hasToString("0.1.1-SNAPSHOT");
+      assertThat(v010BldV2).isGreaterThan(v000).isGreaterThan(v010).hasToString("0.1.1-SNAPSHOT");
+
+      git.commit().setMessage("third commit").call();
+
+      var v010BldV3 = pg.getMavenSnapshot();
+
+      assertThat(v010BldV3)
+        .isGreaterThan(v000)
+        .isGreaterThan(v010)
+        .isEqualByComparingTo(v010BldV2)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).startsWith("0.1.1-SNAPSHOT");
+        });
 
       git.tag().setName("v0.1.1").call();
 
       var v011 = pg.getMavenSnapshot();
 
       assertThat(v011)
-        .isGreaterThan(v010BldV)
+        .isGreaterThan(v010BldV2)
         .isGreaterThan(v010)
         .isGreaterThan(v000)
         .hasToString("0.1.1")
@@ -129,9 +156,10 @@ class SemverExtensionTest {
         )
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
 
-      assertThat(VersionNumber.parse(v010BldV.toString()))
+      assertThat(VersionNumber.parse(v010BldV2.toString()))
         .isGreaterThan(VersionNumber.parse(v000.toString()))
         .isGreaterThan(VersionNumber.parse(v010.toString()))
+        .isEqualByComparingTo(VersionNumber.parse(v010BldV3.toString()))
         .isLessThan(VersionNumber.parse(v011.toString()));
     }
   }
@@ -153,9 +181,9 @@ class SemverExtensionTest {
       var v010 = pg.getMavenAlpha();
       git.commit().setMessage("second commit").call();
 
-      var v010BldV = pg.getMavenAlpha();
+      var v010BldV2 = pg.getMavenAlpha();
 
-      assertThat(v010BldV)
+      assertThat(v010BldV2)
         .extracting(Semver::getVersion, Semver::toString)
         .allSatisfy(o -> {
           assertThat(o)
@@ -164,12 +192,27 @@ class SemverExtensionTest {
             .matches("^0\\.1\\.1-alpha.1001\\p{XDigit}{12}$");
         });
 
+      git.commit().setMessage("third commit").call();
+
+      var v010BldV3 = pg.getMavenAlpha();
+
+      assertThat(v010BldV3)
+        .isGreaterThan(v000)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .startsWith("0.1.1-alpha.1002");
+        });
+
       git.tag().setName("v0.1.1").call();
 
       var v011 = pg.getMavenAlpha();
 
       assertThat(v011)
-        .isGreaterThan(v010BldV)
+        .isGreaterThan(v010BldV2)
         .isGreaterThan(v010)
         .isGreaterThan(v000)
         .hasToString("0.1.1")
@@ -182,9 +225,10 @@ class SemverExtensionTest {
         )
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
 
-      assertThat(VersionNumber.parse(v010BldV.toString()))
+      assertThat(VersionNumber.parse(v010BldV2.toString()))
         .isGreaterThan(VersionNumber.parse(v000.toString()))
         .isGreaterThan(VersionNumber.parse(v010.toString()))
+        .isLessThan(VersionNumber.parse(v010BldV3.toString()))
         .isLessThan(VersionNumber.parse(v011.toString()));
     }
   }

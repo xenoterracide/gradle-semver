@@ -40,6 +40,7 @@ dependencies {
   implementation(libs.guava)
   testImplementation(libs.junit.api)
   testImplementation(libs.mockito) { version { require("5.+") } }
+  testImplementation(libs.maven.artifact)
   testImplementation(gradleTestKit())
   shadow(libs.vavr)
   shadow(libs.semver)
@@ -83,7 +84,9 @@ gradlePlugin {
     create(pub) {
       id = "com.xenoterracide.gradle.semver"
       displayName = "Semver with Git"
-      description = "A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe."
+      description = """
+        A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
+      """.trimIndent()
       tags = setOf("semver", "versioning", "git")
       implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
     }
