@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.eclipse.jgit.api.Git;
 import org.gradle.util.VersionNumber;
@@ -161,6 +162,12 @@ class SemverExtensionTest {
         .isGreaterThan(VersionNumber.parse(v010.toString()))
         .isEqualByComparingTo(VersionNumber.parse(v010BldV3.toString()))
         .isLessThan(VersionNumber.parse(v011.toString()));
+
+      assertThat(new ComparableVersion(v010BldV2.toString()))
+        .isGreaterThan(new ComparableVersion(v000.toString()))
+        .isGreaterThan(new ComparableVersion(v010.toString()))
+        .isEqualByComparingTo(new ComparableVersion(v010BldV3.toString()))
+        .isLessThan(new ComparableVersion(v011.toString()));
     }
   }
 
@@ -230,6 +237,12 @@ class SemverExtensionTest {
         .isGreaterThan(VersionNumber.parse(v010.toString()))
         .isLessThan(VersionNumber.parse(v010BldV3.toString()))
         .isLessThan(VersionNumber.parse(v011.toString()));
+
+      assertThat(new ComparableVersion(v010BldV2.toString()))
+        .isGreaterThan(new ComparableVersion(v000.toString()))
+        .isGreaterThan(new ComparableVersion(v010.toString()))
+        .isLessThan(new ComparableVersion(v010BldV3.toString()))
+        .isLessThan(new ComparableVersion(v011.toString()));
     }
   }
 
