@@ -53,9 +53,13 @@ class SemverExtensionTest {
         .allSatisfy(o -> {
           assertThat(o)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .startsWith("0.1.1-alpha+1.g")
-            .matches("^0\\.1\\.1-alpha\\+\\d+\\.g\\p{XDigit}{7}$");
+            .startsWith("0.1.1-alpha.1+1.g")
+            .matches("^0\\.1\\.1-alpha\\.1\\+\\d+\\.g\\p{XDigit}{7}$");
         });
+
+      var sv = new Semver("0.1.1-alpha.1+2.g3aae11e");
+
+      assertThat(sv).isEqualByComparingTo(v010BldV);
 
       git.tag().setName("v0.1.1").call();
 
@@ -145,6 +149,7 @@ class SemverExtensionTest {
         .allSatisfy(o -> {
           assertThat(o)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .startsWith("0.1.1-alpha.1001")
             .matches("^0\\.1\\.1-alpha.1001\\p{XDigit}{12}$");
         });
 

@@ -73,7 +73,7 @@ public class SemverExtension {
           return v
             .withClearedPreReleaseAndBuild()
             .withIncPatch()
-            .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA))
+            .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, buildInfo.get(0)))
             .withBuild(String.join(SEMVER_DELIMITER, buildInfo));
         }
         return v;
