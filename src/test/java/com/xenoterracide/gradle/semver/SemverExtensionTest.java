@@ -38,17 +38,23 @@ class SemverExtensionTest {
         .containsExactly(0, 0, 0, List.of());
 
       git.tag().setName("v0.1.0").call();
+
       var v010 = pg.getGradlePlugin();
+      assertThat(v010).isGreaterThan(v000);
+
       git.commit().setMessage("second commit").call();
 
       var v010BldV = pg.getGradlePlugin();
 
       assertThat(v010BldV)
+        .isGreaterThan(v000)
+        .isGreaterThan(v010)
         .extracting(Semver::getVersion, Semver::toString)
         .allSatisfy(o -> {
           assertThat(o)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .matches("^0\\.1\\.0-1-g\\p{XDigit}{7}$");
+            .startsWith("0.1.1-alpha+1.g")
+            .matches("^0\\.1\\.1-alpha\\+\\d+\\.g\\p{XDigit}{7}$");
         });
 
       git.tag().setName("v0.1.1").call();
@@ -56,14 +62,18 @@ class SemverExtensionTest {
       var v011 = pg.getGradlePlugin();
 
       assertThat(v011)
-        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
-        .containsExactly(0, 1, 1, Collections.emptyList());
-
-      assertThat(v011).hasToString("0.1.1");
-
-      assertThat(v010).isGreaterThan(v000);
-      assertThat(v010BldV).isGreaterThan(v000).isGreaterThan(v010);
-      assertThat(v011).isGreaterThan(v010BldV).isGreaterThan(v010).isGreaterThan(v000);
+        .isGreaterThan(v010BldV)
+        .isGreaterThan(v010)
+        .isGreaterThan(v000)
+        .hasToString("0.1.1")
+        .extracting(
+          Semver::getMajor,
+          Semver::getMinor,
+          Semver::getPatch,
+          Semver::getPreRelease,
+          Semver::getBuild
+        )
+        .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
     }
   }
 
@@ -81,30 +91,33 @@ class SemverExtensionTest {
         .containsExactly(0, 0, 0, List.of("SNAPSHOT"));
 
       git.tag().setName("v0.1.0").call();
+
       var v010 = pg.getMavenSnapshot();
+      assertThat(v010).isGreaterThan(v000);
+
       git.commit().setMessage("second commit").call();
 
       var v010BldV = pg.getMavenSnapshot();
 
-      /*
-      assertThat(v010BldV)
-        .extracting(Semver::getVersion, Semver::toString)
-        .allSatisfy(v -> assertThat(v).isEqualTo("0.1.1-SNAPSHOT"));
-
-       */
+      assertThat(v010BldV).isGreaterThan(v000).isGreaterThan(v010).hasToString("0.1.1-SNAPSHOT");
 
       git.tag().setName("v0.1.1").call();
 
       var v011 = pg.getMavenSnapshot();
 
       assertThat(v011)
-        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
-        .containsExactly(0, 1, 1, Collections.emptyList());
-
-      assertThat(v011).hasToString("0.1.1");
-      assertThat(v010).isGreaterThan(v000);
-      assertThat(v010BldV).isGreaterThan(v000).isGreaterThan(v010);
-      assertThat(v011).isGreaterThan(v010BldV).isGreaterThan(v010).isGreaterThan(v000);
+        .isGreaterThan(v010BldV)
+        .isGreaterThan(v010)
+        .isGreaterThan(v000)
+        .hasToString("0.1.1")
+        .extracting(
+          Semver::getMajor,
+          Semver::getMinor,
+          Semver::getPatch,
+          Semver::getPreRelease,
+          Semver::getBuild
+        )
+        .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
     }
   }
 
@@ -140,14 +153,18 @@ class SemverExtensionTest {
       var v011 = pg.getMavenAlpha();
 
       assertThat(v011)
-        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease)
-        .containsExactly(0, 1, 1, Collections.emptyList());
-
-      assertThat(v011).hasToString("0.1.1");
-
-      assertThat(v010).isGreaterThan(v000);
-      assertThat(v010BldV).isGreaterThan(v000).isGreaterThan(v010);
-      assertThat(v011).isGreaterThan(v010BldV).isGreaterThan(v010).isGreaterThan(v000);
+        .isGreaterThan(v010BldV)
+        .isGreaterThan(v010)
+        .isGreaterThan(v000)
+        .hasToString("0.1.1")
+        .extracting(
+          Semver::getMajor,
+          Semver::getMinor,
+          Semver::getPatch,
+          Semver::getPreRelease,
+          Semver::getBuild
+        )
+        .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
     }
   }
 
