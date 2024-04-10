@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.eclipse.jgit.api.Git;
+import org.gradle.util.VersionNumber;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.semver4j.Semver;
@@ -78,6 +79,11 @@ class SemverExtensionTest {
           Semver::getBuild
         )
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
+
+      assertThat(VersionNumber.parse(v010BldV.toString()))
+        .isGreaterThan(VersionNumber.parse(v000.toString()))
+        .isGreaterThan(VersionNumber.parse(v010.toString()))
+        .isLessThan(VersionNumber.parse(v011.toString()));
     }
   }
 
@@ -122,6 +128,11 @@ class SemverExtensionTest {
           Semver::getBuild
         )
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
+
+      assertThat(VersionNumber.parse(v010BldV.toString()))
+        .isGreaterThan(VersionNumber.parse(v000.toString()))
+        .isGreaterThan(VersionNumber.parse(v010.toString()))
+        .isLessThan(VersionNumber.parse(v011.toString()));
     }
   }
 
@@ -170,6 +181,11 @@ class SemverExtensionTest {
           Semver::getBuild
         )
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
+
+      assertThat(VersionNumber.parse(v010BldV.toString()))
+        .isGreaterThan(VersionNumber.parse(v000.toString()))
+        .isGreaterThan(VersionNumber.parse(v010.toString()))
+        .isLessThan(VersionNumber.parse(v011.toString()));
     }
   }
 
