@@ -76,6 +76,20 @@ class SemverExtensionTest {
             .startsWith("0.1.1-alpha.2+2.g");
         });
 
+      git.tag().setName("v0.1.1-rc.1").call();
+
+      var v011Rc1 = pg.getGradlePlugin();
+
+      assertThat(v011Rc1)
+        .isGreaterThan(v000)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .isGreaterThan(v010BldV3)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).startsWith("0.1.1-rc.1");
+        });
+
       git.tag().setName("v0.1.1").call();
 
       var v011 = pg.getGradlePlugin();
@@ -137,6 +151,20 @@ class SemverExtensionTest {
         .extracting(Semver::getVersion, Semver::toString)
         .allSatisfy(o -> {
           assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).startsWith("0.1.1-SNAPSHOT");
+        });
+
+      git.tag().setName("v0.1.1-rc.1").call();
+
+      var v011Rc1 = pg.getMavenSnapshot();
+
+      assertThat(v011Rc1)
+        .isGreaterThan(v000)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .isGreaterThan(v010BldV3)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).startsWith("0.1.1-rc.1");
         });
 
       git.tag().setName("v0.1.1").call();
@@ -212,6 +240,20 @@ class SemverExtensionTest {
           assertThat(o)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .startsWith("0.1.1-alpha.1002");
+        });
+
+      git.tag().setName("v0.1.1-rc.1").call();
+
+      var v011Rc1 = pg.getMavenAlpha();
+
+      assertThat(v011Rc1)
+        .isGreaterThan(v000)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .isGreaterThan(v010BldV3)
+        .extracting(Semver::getVersion, Semver::toString)
+        .allSatisfy(o -> {
+          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).startsWith("0.1.1-rc.1");
         });
 
       git.tag().setName("v0.1.1").call();

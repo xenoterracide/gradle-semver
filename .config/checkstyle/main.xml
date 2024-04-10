@@ -198,6 +198,10 @@
     <module name="ExecutableStatementCount">
       <property name="max" value="20" />
     </module>
+    <module name="ExecutableStatementCount">
+      <property name="max" value="10" />
+      <property name="tokens" value="LAMBDA" />
+    </module>
     <module name="LambdaBodyLength">
       <property name="max" value="20" />
     </module>

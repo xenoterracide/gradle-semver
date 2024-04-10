@@ -51,6 +51,14 @@ version.minor // e.g. 0
 
 See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html) for more methods.
 
+### Warning
+
+Prerelease sub versions are not yet implemented
+
+e.g. if you tag `v0.1.1-rc.1` and then add a commit you will still get a version semantically equivalent
+to `0.1.1-rc.1` as the version. This will be fixed in future versions, and will probably look something
+like `0.1.1-rc.2.alpha.1`.
+
 ## Goals
 
 Provide Semantic versioning for Maven publishing with Gradle.
