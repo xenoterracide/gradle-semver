@@ -150,7 +150,7 @@ public class SemverExtension {
    * @implNote current algorithm for alphas is semver + alpha + (distance + 1000) + 4 byte octal
    *   of commit We add 1000 to the distance because a valid numeric in the prerelease cannot have a
    *   leading 0 and maven uses a stringy comparison of this number instead of an integer. This
-   *   means that you shoud be fine until you reach 10000 commits between releases.
+   *   means that you shoud be fine until you reach 9000 commits between releases.
    */
   public Semver getMavenAlpha() {
     return this.getGit()
