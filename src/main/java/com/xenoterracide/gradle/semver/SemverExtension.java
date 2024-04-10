@@ -64,6 +64,20 @@ public class SemverExtension {
       .filter(Objects::nonNull);
   }
 
+  static Semver movePrereleaseToBuild(Semver version) {
+    if (version.getPreRelease().stream().anyMatch(GIT_DESCRIBE_PATTERN.asMatchPredicate())) {
+      var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
+        String.join(GIT_DESCRIBE_DELIMITER, version.getPreRelease())
+      );
+      return version
+        .withClearedPreReleaseAndBuild()
+        .withIncPatch()
+        .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, buildInfo.get(0)))
+        .withBuild(String.join(SEMVER_DELIMITER, buildInfo));
+    }
+    return version;
+  }
+
   /**
    * Gets gradle plugin compatible version.
    * {@snippet :
@@ -74,21 +88,7 @@ public class SemverExtension {
    * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
    */
   public Semver getGradlePlugin() {
-    return this.coerced()
-      .map(v -> {
-        if (v.getPreRelease().stream().anyMatch(GIT_DESCRIBE_PATTERN.asMatchPredicate())) {
-          var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
-            String.join(GIT_DESCRIBE_DELIMITER, v.getPreRelease())
-          );
-          return v
-            .withClearedPreReleaseAndBuild()
-            .withIncPatch()
-            .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, buildInfo.get(0)))
-            .withBuild(String.join(SEMVER_DELIMITER, buildInfo));
-        }
-        return v;
-      })
-      .get();
+    return this.coerced().map(SemverExtension::movePrereleaseToBuild).get();
   }
 
   /**
