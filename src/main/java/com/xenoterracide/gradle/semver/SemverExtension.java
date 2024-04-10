@@ -16,12 +16,14 @@ import org.jspecify.annotations.NonNull;
 import org.semver4j.Semver;
 
 /**
- * The type Semver extension. Methods in this class are not lazy and invoke the
- * {@link org.eclipse.jgit.lib.Repository}. All versions returned are Gradle safe as they are all
- * valid semantic versions.
+ * The Semver extension.
  *
  * @implNote pre-release versions between branches which have the same git commit distance are not
  *   guaranteed to sort correctly and would do so only by coincidence.
+ *
+ * @implNote Methods in this class are not lazy and invoke the
+ *   {@link org.eclipse.jgit.lib.Repository}. All versions returned are Gradle safe as they are all
+ *   valid semantic versions.
  */
 public class SemverExtension {
 
