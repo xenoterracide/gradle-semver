@@ -21,25 +21,25 @@ version = semver.maven
 ```
 
 ```kt
-// given the last tag was v0.1.0 you'll get something like
-logger.quiet("maven snapshot" + semver.mavenSnapshot)      // 0.1.1-SNAPSHOT
-logger.quiet("maven alpha" + semver.mavenAlpha)            // 0.1.1-alpha.1001255204163142
-logger.quiet("gradlePlugin" + semver.gradlePlugin)         // 0.1.1-alpha.1+1.g3aae11e
+// given the last tag was v0.1.0 and you have a commit distance == 1 you'll get something like
+logger.quiet("maven snapshot " + semver.mavenSnapshot)      // 0.1.1-SNAPSHOT
+logger.quiet("maven alpha " + semver.mavenAlpha)            // 0.1.1-alpha.1001255204163142
+logger.quiet("gradlePlugin " + semver.gradlePlugin)         // 0.1.1-alpha.1+1.g3aae11e
 
 // other available outputs
 logger.quiet("branch" + semver.git.branch)                 // main
-logger.quiet("commit" + semver.git.commit)                 // 761c420fa9812584e90750ca73197402603e76cc
-logger.quiet("commitShort" + semver.git.commitShort)       // g3aae11e
-logger.quiet("latestTag" + semver.git.latestTag)           // v0.1.0
-logger.quiet("describe" + semver.git.describe)             // v0.9.7-28-g55329c4
-logger.quiet("commitDistance" + semver.git.commitDistance) // 28
-logger.quiet("status" + semver.git.status)                 // dirty
+logger.quiet("commit " + semver.git.commit)                 // 761c420fa9812584e90750ca73197402603e76cc
+logger.quiet("commitShort " + semver.git.commitShort)       // g3aae11e
+logger.quiet("latestTag " + semver.git.latestTag)           // v0.1.0
+logger.quiet("describe " + semver.git.describe)             // v0.9.7-28-g55329c4
+logger.quiet("commitDistance " + semver.git.commitDistance) // 28
+logger.quiet("status " + semver.git.status)                 // dirty
 ```
 
 The plugin exposes a `Semver`. See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html).
 
-`Semver` may be subclassed to provide a more appropriate `toString()` method which you should use instead of
-`getVersion()` to provide to gradle and maven. For example `toString()` replaces `+` with `-` for maven.
+`Semver` may be subclassed to provide a more appropriate `toString()` method which you should use instead
+of `getVersion()` to provide to gradle and maven. For example `toString()` replaces `+` with `-` for maven.
 
 ```kt
 version = semver.maven
