@@ -59,6 +59,9 @@ public class SemverExtension {
 
   /**
    * Gets gradle plugin compatible version.
+   * {@snippet :
+   * logger.quiet("gradlePlugin" + semver.gradlePlugin)  // 0.1.1-alpha.1+1.g3aae11e
+   *}
    *
    * @return the gradle plugin semver.
    * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
@@ -93,8 +96,10 @@ public class SemverExtension {
   }
 
   /**
-   * Maven Compatible version that uses alpha instead of snapshot. It can be locked by gradle
-   * released every build.
+   * Traditional maven snapshot version.
+   * {@snippet :
+   * logger.quiet("maven snapshot"+semver.mavenSnapshot) // 0.1.1-SNAPSHOT
+   *}
    *
    * @return maven compatible semver
    * @implNote The current algorith removes the pre-release information and instead appeads with
@@ -132,6 +137,9 @@ public class SemverExtension {
   /**
    * Maven Compatible version that uses alpha instead of snapshot. It can be locked by gradle
    * released every build.
+   * {@snippet :
+   * logger.quiet("maven alpha " + semver.mavenAlpha) // 0.1.1-alpha.1001255204163142
+   *}
    *
    * @return maven compatible semver
    * @implNote current algorithm for alphas is semver + alpha + (distance + 1000) + 4 byte octal
