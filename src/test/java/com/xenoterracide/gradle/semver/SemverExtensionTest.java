@@ -78,7 +78,7 @@ class SemverExtensionTest {
 
       git.tag().setName("v0.1.1-rc.1").call();
 
-      var v011Rc1 = pg.getMavenSnapshot();
+      var v011Rc1 = pg.getGradlePlugin();
 
       assertThat(v011Rc1)
         .isGreaterThan(v000)

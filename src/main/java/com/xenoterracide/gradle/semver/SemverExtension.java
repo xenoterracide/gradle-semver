@@ -10,6 +10,7 @@ import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.NonNull;
@@ -32,6 +33,7 @@ public class SemverExtension {
   private static final String ALPHA = "alpha";
   private static final String SEMVER_DELIMITER = ".";
   private static final String GIT_DESCRIBE_DELIMITER = "-";
+  private static final Pattern GIT_DESCRIBE_PATTERN = Pattern.compile("^\\d+-+g\\p{XDigit}{7}$");
 
   private final Supplier<Optional<Git>> git;
 
@@ -74,7 +76,7 @@ public class SemverExtension {
   public Semver getGradlePlugin() {
     return this.coerced()
       .map(v -> {
-        if (!v.getPreRelease().isEmpty() || !v.getBuild().isEmpty()) {
+        if (v.getPreRelease().stream().anyMatch(GIT_DESCRIBE_PATTERN.asMatchPredicate())) {
           var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
             String.join(GIT_DESCRIBE_DELIMITER, v.getPreRelease())
           );
@@ -118,7 +120,7 @@ public class SemverExtension {
           v
             .getPreRelease()
             .stream()
-            .filter(p -> p.matches("^\\d+-+g\\p{XDigit}{7}$"))
+            .filter(GIT_DESCRIBE_PATTERN.asMatchPredicate())
             .findAny()
             .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
             .orElse(v)
