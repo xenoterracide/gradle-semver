@@ -48,6 +48,6 @@ class SemverPluginTest {
     project.getPluginManager().apply(SemverPlugin.class);
     var semver = project.getExtensions().getByType(SemverExtension.class);
 
-    assertThat(semver.getMaven().toString()).startsWith("0.1.3-SNAPSHOT-1-g");
+    assertThat(semver.getMaven().toString()).startsWith("0.1.4-SNAPSHOT");
   }
 }

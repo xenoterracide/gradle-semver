@@ -3,6 +3,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.google.common.base.Splitter;
 import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import com.xenoterracide.gradle.semver.internal.GitTools;
 import io.vavr.control.Try;
@@ -24,6 +25,8 @@ public class SemverExtension {
   private static final String PRE_VERSION = "0.0.0";
   private static final String SNAPSHOT = "SNAPSHOT";
   private static final String ALPHA = "alpha";
+  private static final String SEMVER_DELIMITER = ".";
+  private static final String GIT_DESCRIBE_DELIMITER = "-";
 
   private final Supplier<Optional<Git>> git;
 
@@ -62,12 +65,19 @@ public class SemverExtension {
    */
   public Semver getGradlePlugin() {
     return this.coerced()
-      .map(
-        v ->
-          !(v.getPreRelease().isEmpty() || v.getBuild().isEmpty())
-            ? v.withClearedPreReleaseAndBuild().nextPatch()
-            : v
-      )
+      .map(v -> {
+        if (!v.getPreRelease().isEmpty() || !v.getBuild().isEmpty()) {
+          var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
+            String.join(GIT_DESCRIBE_DELIMITER, v.getPreRelease())
+          );
+          return v
+            .withClearedPreReleaseAndBuild()
+            .withIncPatch()
+            .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, buildInfo.get(0)))
+            .withBuild(String.join(SEMVER_DELIMITER, buildInfo));
+        }
+        return v;
+      })
       .get();
   }
 
@@ -100,7 +110,7 @@ public class SemverExtension {
             .stream()
             .filter(p -> p.matches("^\\d+-+g\\p{XDigit}{7}$"))
             .findAny()
-            .map(p -> v.withClearedPreRelease().withPreRelease(SNAPSHOT).withBuild(p))
+            .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
             .orElse(v)
       )
       .map(v -> new MavenSemver(v.getVersion()))
@@ -113,11 +123,10 @@ public class SemverExtension {
   }
 
   String preRelease(int distance) {
-    var delimeter = ".";
     var octalSha = distance > 0 ? this.octalForHead() : "0".repeat(12);
     var dist = distance + 1000;
 
-    return String.join(delimeter, ALPHA, dist + octalSha);
+    return String.join(SEMVER_DELIMITER, ALPHA, dist + octalSha);
   }
 
   /**
@@ -135,6 +144,7 @@ public class SemverExtension {
       .describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(this::toAlpha)
+      .map(v -> new MavenSemver(v.getVersion()))
       .getOrElseThrow(ExceptionTools::rethrow);
   }
 
@@ -143,7 +153,7 @@ public class SemverExtension {
 
     var semver = Objects.requireNonNull(Semver.coerce(version));
     if (distance > 0 || PRE_VERSION.equals(version)) {
-      return semver.withPreRelease(this.preRelease(distance));
+      return semver.withPreRelease(this.preRelease(distance)).withIncPatch();
     }
 
     return semver;

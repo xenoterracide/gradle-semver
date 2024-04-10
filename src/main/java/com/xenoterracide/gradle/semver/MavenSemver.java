@@ -13,7 +13,7 @@ class MavenSemver extends Semver {
   }
 
   @Override
-  public String getVersion() {
+  public String toString() {
     return super.getVersion().replace("+", "-");
   }
 }
