@@ -49,6 +49,7 @@ junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api" }
 maven-artifact = "org.apache.maven:maven-artifact:3.+"
 mockito = { module = "org.mockito:mockito-core" }
+plugin-checkerframework = "org.checkerframework:checkerframework-gradle-plugin:0.+"
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:3.+"
 plugin-semver = "com.xenoterracide:gradle-semver:0.+"
 plugin-spotbugs = "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.+"
