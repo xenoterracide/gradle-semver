@@ -128,6 +128,7 @@ public class GitMetadataExtension {
    */
   public int getCommitDistance() {
     return this.describe()
+      .filter(Objects::nonNull)
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
       .getOrElse(0);

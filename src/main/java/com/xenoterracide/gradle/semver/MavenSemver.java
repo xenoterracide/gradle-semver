@@ -3,12 +3,11 @@
 
 package com.xenoterracide.gradle.semver;
 
-import org.jetbrains.annotations.NotNull;
 import org.semver4j.Semver;
 
 class MavenSemver extends Semver {
 
-  MavenSemver(@NotNull String version) {
+  MavenSemver(String version) {
     super(version);
   }
 
