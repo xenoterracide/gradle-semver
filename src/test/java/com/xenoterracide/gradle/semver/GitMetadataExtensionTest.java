@@ -35,11 +35,11 @@ class GitMetadataExtensionTest {
   @Test
   void noGit() {
     var pg = new GitMetadataExtension(() -> Optional.empty());
-    assertThat(pg.getCommitDistance()).isSameAs(0);
+    assertThat(pg.distance()).isSameAs(0);
     assertThat(pg.getBranch()).isNull();
     assertThat(pg.getCommit()).isNull();
     assertThat(pg.getDescribe()).isNull();
-    assertThat(pg.getLatestTag()).isNull();
+    assertThat(pg.tag()).isNull();
     assertThat(pg.getCommitShort()).isNull();
     assertThat(pg.getStatus()).isSameAs(GitStatus.NO_REPO);
   }
@@ -115,14 +115,14 @@ class GitMetadataExtensionTest {
       git.commit().setMessage("initial commit").call();
 
       var pg = new GitMetadataExtension(() -> Optional.of(git));
-      assertThat(pg.getLatestTag()).isNull();
+      assertThat(pg.tag()).isNull();
 
       git.tag().setName("v0.1.0").call();
-      assertThat(pg.getLatestTag()).matches("v0.1.0");
+      assertThat(pg.tag()).matches("v0.1.0");
 
       git.commit().setMessage("second commit").call();
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getLatestTag()).matches("v0.1.1");
+      assertThat(pg.tag()).matches("v0.1.1");
     }
   }
 
@@ -139,7 +139,7 @@ class GitMetadataExtensionTest {
       assertThat(pg.getDescribe()).matches("v0\\.1\\.0-1-g[0-9a-f]{7}");
 
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getLatestTag()).isEqualTo("v0.1.1");
+      assertThat(pg.tag()).isEqualTo("v0.1.1");
     }
   }
 
@@ -150,16 +150,16 @@ class GitMetadataExtensionTest {
       git.tag().setName("v0.1.0").call();
 
       var pg = new GitMetadataExtension(() -> Optional.of(git));
-      assertThat(pg.getCommitDistance()).isEqualTo(0);
+      assertThat(pg.distance()).isEqualTo(0);
 
       git.commit().setMessage("second commit").call();
-      assertThat(pg.getCommitDistance()).isEqualTo(1);
+      assertThat(pg.distance()).isEqualTo(1);
 
       git.commit().setMessage("third commit").call();
-      assertThat(pg.getCommitDistance()).isEqualTo(2);
+      assertThat(pg.distance()).isEqualTo(2);
 
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getCommitDistance()).isEqualTo(0);
+      assertThat(pg.distance()).isEqualTo(0);
     }
   }
 

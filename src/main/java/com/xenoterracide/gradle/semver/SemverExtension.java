@@ -3,7 +3,6 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.google.common.base.Splitter;
 import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import com.xenoterracide.gradle.semver.internal.GitTools;
 import io.vavr.control.Try;
@@ -57,25 +56,7 @@ public class SemverExtension {
   }
 
   Try<Semver> coerced() {
-    return this.getGit()
-      .describe()
-      .map(v -> null == v ? PRE_VERSION : v)
-      .map(Semver::coerce)
-      .filter(Objects::nonNull);
-  }
-
-  static Semver movePrereleaseToBuild(Semver version) {
-    if (version.getPreRelease().stream().anyMatch(GIT_DESCRIBE_PATTERN.asMatchPredicate())) {
-      var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
-        String.join(GIT_DESCRIBE_DELIMITER, version.getPreRelease())
-      );
-      return version
-        .withClearedPreReleaseAndBuild()
-        .withIncPatch()
-        .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, buildInfo.get(0)))
-        .withBuild(String.join(SEMVER_DELIMITER, buildInfo));
-    }
-    return version;
+    return this.getGit().describe().map(v -> null == v ? PRE_VERSION : v).map(Semver::coerce).filter(Objects::nonNull);
   }
 
   /**
@@ -88,7 +69,7 @@ public class SemverExtension {
    * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
    */
   public Semver getGradlePlugin() {
-    return this.coerced().map(SemverExtension::movePrereleaseToBuild).get();
+    return this.coerced().map(SemverBuilder::movePrereleaseToBuild).get();
   }
 
   /**
@@ -125,7 +106,7 @@ public class SemverExtension {
             .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
             .orElse(v)
       )
-      .map(v -> new MavenSemver(v.getVersion()))
+      .map(v -> new Semver(v.getVersion()))
       .get();
   }
 
@@ -159,12 +140,12 @@ public class SemverExtension {
       .describe()
       .map(v -> null == v ? PRE_VERSION : v)
       .map(this::toAlpha)
-      .map(v -> new MavenSemver(v.getVersion()))
+      .map(v -> new Semver(v.getVersion()))
       .getOrElseThrow(ExceptionTools::rethrow);
   }
 
   Semver toAlpha(String version) {
-    var distance = this.getGit().getCommitDistance();
+    var distance = this.getGit().distance();
 
     var semver = Objects.requireNonNull(Semver.coerce(version));
     if (distance > 0 || PRE_VERSION.equals(version)) {

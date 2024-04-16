@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * The type Git metadata extension.
  */
-public class GitMetadataExtension {
+public class GitMetadataExtension implements GitMetadata {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
@@ -88,13 +88,24 @@ public class GitMetadataExtension {
   }
 
   /**
-   * Gets commit short.
+   * Short version of a commit SHA.
    *
-   * @return the commit short
+   * @return SHA. Length is always 8, regardless of whether it is unique.
    */
   public @Nullable String getCommitShort() {
-    return this.getObjectIdFor(Constants.HEAD)
-      .map(o -> o.abbreviate(7))
+    return this.getObjectIdFor(Constants.HEAD).map(o -> o.abbreviate(8)).map(AbbreviatedObjectId::name).getOrNull();
+  }
+
+  /**
+   * Short version of a commit SHA.
+   *
+   * @return SHA. Length starts at 8 but may grow as repository does
+   */
+  @Override
+  public @Nullable String uniqueShort() {
+    return this.gitRepository()
+      .mapTry(r -> r.newObjectReader())
+      .mapTry(objectReader -> objectReader.abbreviate(this.getObjectIdFor(Constants.HEAD).get(), 8))
       .map(AbbreviatedObjectId::name)
       .getOrNull();
   }
@@ -104,7 +115,8 @@ public class GitMetadataExtension {
    *
    * @return the latest tag
    */
-  public @Nullable String getLatestTag() {
+  @Override
+  public @Nullable String tag() {
     return this.git.get()
       .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB)))
       .orElseGet(NoGitDirException::failure)
@@ -126,7 +138,8 @@ public class GitMetadataExtension {
    *
    * @return the commit distance
    */
-  public int getCommitDistance() {
+  @Override
+  public int distance() {
     return this.describe()
       .filter(Objects::nonNull)
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
@@ -147,10 +160,7 @@ public class GitMetadataExtension {
       .mapTry(s -> s.call())
       .recover(NoGitDirException.class, e -> null)
       // flip, dirty is the porcelain option.
-      .map(
-        status ->
-          status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY
-      )
+      .map(status -> status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY)
       .getOrElseThrow(ExceptionTools::toRuntime);
   }
 }
