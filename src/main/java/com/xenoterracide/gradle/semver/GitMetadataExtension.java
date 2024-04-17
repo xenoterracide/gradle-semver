@@ -7,11 +7,15 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import io.vavr.control.Try;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
@@ -47,6 +51,10 @@ public class GitMetadataExtension implements GitMetadata {
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
       .recover(NoGitDirException.class, e -> null);
+  }
+
+  Try<LogCommand> gitLog() {
+    return this.git.get().map(g -> Try.of(() -> g.log())).orElseGet(NoGitDirException::failure);
   }
 
   /**
@@ -133,6 +141,15 @@ public class GitMetadataExtension implements GitMetadata {
     return this.describe().getOrNull();
   }
 
+  private int distanceFromNoCommit() {
+    return this.gitLog()
+      .mapTry(log -> log.all())
+      .mapTry(all -> all.call())
+      .map(iter -> StreamSupport.stream(iter.spliterator(), false).count())
+      .map(Long::intValue)
+      .get();
+  }
+
   /**
    * Gets commit distance.
    *
@@ -144,6 +161,8 @@ public class GitMetadataExtension implements GitMetadata {
       .filter(Objects::nonNull)
       .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
       .map(Integer::parseInt)
+      .recover(RefNotFoundException.class, 0)
+      .recover(NoSuchElementException.class, e -> this.distanceFromNoCommit())
       .getOrElse(0);
   }
 

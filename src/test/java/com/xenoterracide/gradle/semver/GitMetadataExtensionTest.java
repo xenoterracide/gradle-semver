@@ -149,13 +149,13 @@ class GitMetadataExtensionTest {
       var pg = new GitMetadataExtension(() -> Optional.of(git));
       assertThat(pg.distance()).isEqualTo(0);
 
-      git.commit().setMessage("one commit").call();
+      git.commit().setMessage("first commit").call();
 
-      assertThat(pg.distance()).isEqualTo(0);
+      assertThat(pg.distance()).isEqualTo(1);
 
       git.commit().setMessage("second commit").call();
 
-      assertThat(pg.distance()).isEqualTo(1);
+      assertThat(pg.distance()).isEqualTo(2);
 
       git.tag().setName("v0.1.0").call();
 

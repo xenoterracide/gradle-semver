@@ -42,23 +42,6 @@ class SemverBuilderTest {
 
   /*
 
-
-  @Test
-  void rcTag() {
-    assertThat(new SemverBuilder(new GitMetadataInfo(0, "abcdef10", "v1.0.0-rc.1")).build())
-    .isEqualTo(
-      new Semver("1.0.0").withPreRelease("rc.1.0").withBuild("abcdef10")
-    );
-  }
-
-  @Test
-  void rcTagPlus1() {
-    assertThat(new SemverBuilder(new GitMetadataInfo(1, "abcdef10", "v1.0.0-rc.1")).build())
-    .isEqualTo(
-      new Semver("1.0.0").withPreRelease("rc.1.1").withBuild("abcdef10")
-    );
-  }
-
   @Test
   void alphaTag() {
     assertThat(new SemverBuilder(new GitMetadataInfo(0, "abcdef10", "v1.0.0-alpha.1")).build())
@@ -120,6 +103,27 @@ class SemverBuilderTest {
           new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef10", "v1.0.0-rc.1"),
           "1.0.0-rc.1",
           "1.0.0-rc.1",
+          "1.0.0",
+          "1.0.0-alpha.1"
+        ),
+        arguments(
+          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", "v1.0.0-rc.1"),
+          "1.0.0-rc.1.1+abcdef10",
+          "1.0.0-rc.1.1",
+          "1.0.0-rc.2",
+          "1.0.0-rc.1"
+        ),
+        arguments(
+          new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef10", "v1.0.0"),
+          "1.0.0",
+          "1.0.0",
+          "1.0.1",
+          "1.0.0-rc.1"
+        ),
+        arguments(
+          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", "v1.0.0"),
+          "1.0.0-alpha.0.1+abcdef10",
+          "1.0.0-alpha.0.1",
           "1.0.0",
           "1.0.0-alpha.1"
         )
