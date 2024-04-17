@@ -53,12 +53,18 @@ final class SemverBuilder {
 
   private SemverBuilder withPreRelease() {
     var distance = this.gitMetadata.distance();
-    if (!this.semver.getPreRelease().isEmpty() && !(distance == 0)) { // rc.1
-      var preRelease = Stream.concat(
-        this.semver.getPreRelease().stream(),
-        Stream.of(Integer.toString(distance))
-      ).collect(Collectors.joining(SEMVER_DELIMITER));
-      this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
+    if (distance > 0) {
+      if (this.semver.getPreRelease().isEmpty()) { // 1.0
+        this.semver = this.semver.withPreRelease(
+            String.join(SEMVER_DELIMITER, ALPHA, ZERO, Integer.toString(distance))
+          );
+      } else { // rc.1
+        var preRelease = Stream.concat(
+          this.semver.getPreRelease().stream(),
+          Stream.of(Integer.toString(distance))
+        ).collect(Collectors.joining(SEMVER_DELIMITER));
+        this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
+      }
     }
     if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
       this.semver = this.semver.withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Integer.toString(distance)));

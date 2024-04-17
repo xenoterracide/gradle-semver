@@ -125,7 +125,7 @@ class SemverBuilderTest {
           "1.0.0-alpha.0.1+abcdef10",
           "1.0.0-alpha.0.1",
           "1.0.0",
-          "1.0.0-alpha.1"
+          "1.0.0-alpha.0"
         )
       );
     }
