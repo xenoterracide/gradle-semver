@@ -146,16 +146,25 @@ class GitMetadataExtensionTest {
   @Test
   void getCommitDistance() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-      git.tag().setName("v0.1.0").call();
-
       var pg = new GitMetadataExtension(() -> Optional.of(git));
       assertThat(pg.distance()).isEqualTo(0);
 
+      git.commit().setMessage("one commit").call();
+
+      assertThat(pg.distance()).isEqualTo(0);
+
       git.commit().setMessage("second commit").call();
+
       assertThat(pg.distance()).isEqualTo(1);
 
-      git.commit().setMessage("third commit").call();
+      git.tag().setName("v0.1.0").call();
+
+      assertThat(pg.distance()).isEqualTo(0);
+
+      git.commit().setMessage("one commit").call();
+      assertThat(pg.distance()).isEqualTo(1);
+
+      git.commit().setMessage("two commit").call();
       assertThat(pg.distance()).isEqualTo(2);
 
       git.tag().setName("v0.1.1").call();
