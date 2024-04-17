@@ -112,17 +112,26 @@ class GitMetadataExtensionTest {
   @Test
   void getLastTag() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-
       var pg = new GitMetadataExtension(() -> Optional.of(git));
       assertThat(pg.tag()).isNull();
 
-      git.tag().setName("v0.1.0").call();
-      assertThat(pg.tag()).matches("v0.1.0");
+      git.commit().setMessage("first commit").call();
+
+      assertThat(pg.tag()).isNull();
 
       git.commit().setMessage("second commit").call();
+
+      assertThat(pg.tag()).isNull();
+
+      git.tag().setName("v0.1.0").call();
+      assertThat(pg.tag()).isEqualTo("v0.1.0");
+
+      git.commit().setMessage("second commit").call();
+
+      assertThat(pg.tag()).isEqualTo("v0.1.0");
+
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.tag()).matches("v0.1.1");
+      assertThat(pg.tag()).isEqualTo("v0.1.1");
     }
   }
 

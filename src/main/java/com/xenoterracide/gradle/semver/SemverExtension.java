@@ -78,7 +78,7 @@ public class SemverExtension {
    * logger.quiet("gradlePlugin" + semver.gradlePlugin)  // 0.1.1-alpha.1+1.g3aae11e
    *}
    *
-   * @implNote will probably delegate to {@link #gitDescribed()} in the future.
+   * @implNote will probably delegate to {@link #getGitDescribed()} in the future.
    * @return the gradle plugin semver.
    */
   public Semver getGradlePlugin() {
@@ -116,7 +116,7 @@ public class SemverExtension {
    * Gets maven compatible version.
    *
    * @implNote currently delegates to {@link #getMavenSnapshot()} will probably delegate to
-   *   {@link #gitDescribed()} in the future.
+   *   {@link #getGitDescribed()} in the future.
    * @return the maven compatible semver
    */
   public Semver getMaven() {
@@ -131,7 +131,7 @@ public class SemverExtension {
    *
    * @return semver
    */
-  public Semver gitDescribed() {
+  public Semver getGitDescribed() {
     return new SemverBuilder(this.getGit()).build();
   }
 }

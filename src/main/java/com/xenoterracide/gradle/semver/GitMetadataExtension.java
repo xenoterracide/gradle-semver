@@ -31,6 +31,7 @@ public class GitMetadataExtension implements GitMetadata {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
+  private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
 
   private final Supplier<Optional<Git>> git;
 
@@ -116,7 +117,7 @@ public class GitMetadataExtension implements GitMetadata {
   @Override
   public @Nullable String tag() {
     return this.git.get()
-      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB)))
+      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0)))
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
       .getOrNull();
@@ -144,7 +145,7 @@ public class GitMetadataExtension implements GitMetadata {
   public int distance() {
     return this.describe()
       .filter(Objects::nonNull)
-      .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
+      .map(d -> Iterables.get(DESCRIBE_SPLITTER.split(d), 1))
       .map(Integer::parseInt)
       .recover(RefNotFoundException.class, 0)
       .recover(NoSuchElementException.class, e -> this.distanceFromNoCommit())
