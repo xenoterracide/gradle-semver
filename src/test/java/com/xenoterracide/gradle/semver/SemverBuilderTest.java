@@ -54,31 +54,31 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", null),
-          "0.0.0-alpha.0.1+abcdef10",
-          "0.0.0-alpha.0.1",
-          "0.0.0-alpha.0.2",
+          "0.0.1-alpha.0.1+abcdef10",
+          "0.0.1-alpha.0.1",
+          "0.0.1-alpha.0.2",
           null
         ),
         arguments(
           new GitMetadataInfo(1, GitStatus.DIRTY, "abcdef10", null),
-          "0.0.0-alpha.0.1+abcdef10.dirty",
-          "0.0.0-alpha.0.1",
-          "0.0.0-alpha.0.2",
-          "0.0.0-alpha.0.0"
+          "0.0.1-alpha.0.1+abcdef10.dirty",
+          "0.0.1-alpha.0.1",
+          "0.0.1-alpha.0.2",
+          "0.0.1-alpha.0.0"
         ),
         arguments(
           new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", null),
-          "0.0.0-alpha.0.1+abcdef10",
-          "0.0.0-alpha.0.1",
-          "0.0.0-alpha.1.0",
-          "0.0.0-alpha.0.0"
+          "0.0.1-alpha.0.1+abcdef10",
+          "0.0.1-alpha.0.1",
+          "0.0.1-alpha.1.0",
+          "0.0.1-alpha.0.0"
         ),
         arguments(
           new GitMetadataInfo(10, GitStatus.CLEAN, "abcdef10", null),
-          "0.0.0-alpha.0.10+abcdef10",
-          "0.0.0-alpha.0.10",
-          "0.0.0-alpha.0.11",
-          "0.0.0-alpha.0.1"
+          "0.0.1-alpha.0.10+abcdef10",
+          "0.0.1-alpha.0.10",
+          "0.0.1-alpha.0.11",
+          "0.0.1-alpha.0.1"
         ),
         arguments(
           new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef10", "v1.0.0-rc.1"),
@@ -103,10 +103,10 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", "v1.0.0"),
-          "1.0.0-alpha.0.1+abcdef10",
-          "1.0.0-alpha.0.1",
-          "1.0.0",
-          "1.0.0-alpha.0"
+          "1.0.1-alpha.0.1+abcdef10",
+          "1.0.1-alpha.0.1",
+          "1.0.1",
+          "1.0.1-alpha.0"
         )
       );
     }

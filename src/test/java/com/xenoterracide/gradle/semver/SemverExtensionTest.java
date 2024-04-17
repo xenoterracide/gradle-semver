@@ -116,12 +116,7 @@ class SemverExtensionTest {
       var pg = new SemverExtension(() -> Optional.of(git));
 
       var v000 = pg.getGitDescribed();
-      assertThat(v000)
-        .extracting(Semver::getVersion)
-        .asInstanceOf(InstanceOfAssertFactories.STRING)
-        .startsWith("0.0.0-alpha.0.1+")
-        .hasSize(24)
-        .matches(VERSION_PATTERN);
+      assertThat(v000).asString().startsWith("0.0.1-alpha.0.1+").hasSize(24).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
@@ -135,13 +130,10 @@ class SemverExtensionTest {
       assertThat(v010BldV2)
         .isGreaterThan(v000)
         .isGreaterThan(v010)
-        .extracting(Semver::getVersion, Semver::toString)
-        .allSatisfy(o -> {
-          assertThat(o)
-            .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .startsWith("0.1.1-alpha.1+1.g")
-            .matches(VERSION_PATTERN);
-        });
+        .asString()
+        .startsWith("0.1.1-alpha.1+")
+        .hasSize(24)
+        .matches(VERSION_PATTERN);
 
       assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.1+2.g3aae11e"));
 
