@@ -104,8 +104,8 @@ class GitMetadataExtensionTest {
       var head = pg.getCommitShort();
       assertThat(main).isNotNull();
       assertThat(main).hasSize(40);
-      assertThat(head).hasSize(7);
-      assertThat(main.substring(0, 7)).isEqualTo(head);
+      assertThat(head).hasSize(8);
+      assertThat(main.substring(0, 8)).isEqualTo(head);
     }
   }
 
