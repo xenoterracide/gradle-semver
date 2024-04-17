@@ -41,7 +41,7 @@ class GitMetadataExtensionTest {
     assertThat(pg.getDescribe()).isNull();
     assertThat(pg.tag()).isNull();
     assertThat(pg.getCommitShort()).isNull();
-    assertThat(pg.getStatus()).isSameAs(GitStatus.NO_REPO);
+    assertThat(pg.status()).isSameAs(GitStatus.NO_REPO);
   }
 
   @Test
@@ -171,11 +171,11 @@ class GitMetadataExtensionTest {
 
       var pg = new GitMetadataExtension(() -> Optional.of(git));
 
-      assertThat(pg.getStatus()).isEqualTo(GitStatus.CLEAN);
+      assertThat(pg.status()).isEqualTo(GitStatus.CLEAN);
 
       Files.createFile(projectDir.toPath().resolve("test.txt"));
 
-      assertThat(pg.getStatus()).isEqualTo(GitStatus.DIRTY);
+      assertThat(pg.status()).isEqualTo(GitStatus.DIRTY);
     }
   }
 }

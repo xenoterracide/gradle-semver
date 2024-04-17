@@ -53,7 +53,7 @@ final class SemverBuilder {
 
   private SemverBuilder withPreRelease() {
     var distance = this.gitMetadata.distance();
-    if (!this.semver.getPreRelease().isEmpty()) { // rc.1
+    if (!this.semver.getPreRelease().isEmpty() && !(distance == 0)) { // rc.1
       var preRelease = Stream.concat(
         this.semver.getPreRelease().stream(),
         Stream.of(Integer.toString(distance))
@@ -67,8 +67,15 @@ final class SemverBuilder {
   }
 
   private SemverBuilder withBuild() {
-    var sha = Optional.ofNullable(this.gitMetadata.uniqueShort());
-    this.semver = sha.map(s -> this.semver.withBuild(s)).orElse(this.semver);
+    var distance = this.gitMetadata.distance();
+    if (distance > 0) {
+      var sha = Optional.ofNullable(this.gitMetadata.uniqueShort());
+      var status = Optional.of(this.gitMetadata.status()).filter(s -> s == GitStatus.DIRTY).map(Object::toString);
+      this.semver = sha
+        .map(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)).orElse(s))
+        .map(s -> this.semver.withBuild(s))
+        .orElse(this.semver);
+    }
     return this;
   }
 

@@ -61,7 +61,8 @@ public class VersionSortTest {
         Arguments.of("0.1.1-rc.10", "0.1.1-rc.9"),
         Arguments.of("0.10.10", "0.9.10"),
         Arguments.of("0.10.10", "0.9.10-rc.1"),
-        Arguments.of("0.9.10", "0.9.1")
+        Arguments.of("0.9.10", "0.9.1"),
+        Arguments.of("1.1.1-rc.1.1+g3aae11b", "1.1.1-rc.1.0")
       );
     }
   }

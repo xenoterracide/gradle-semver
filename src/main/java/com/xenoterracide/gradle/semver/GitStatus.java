@@ -3,7 +3,7 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.google.common.base.Ascii;
+import com.google.common.base.CaseFormat;
 
 /**
  * The enum Git status.
@@ -24,6 +24,6 @@ public enum GitStatus {
 
   @Override
   public String toString() {
-    return Ascii.toLowerCase(this.name());
+    return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.name());
   }
 }

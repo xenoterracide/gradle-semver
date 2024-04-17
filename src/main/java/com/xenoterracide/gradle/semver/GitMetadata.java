@@ -13,4 +13,6 @@ public interface GitMetadata {
   String tag();
 
   int distance();
+
+  GitStatus status();
 }

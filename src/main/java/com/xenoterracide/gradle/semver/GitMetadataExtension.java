@@ -152,7 +152,8 @@ public class GitMetadataExtension implements GitMetadata {
    *
    * @return the status
    */
-  public GitStatus getStatus() {
+  @Override
+  public GitStatus status() {
     return this.git.get()
       .map(g -> Try.of(() -> g.status()))
       .orElseGet(NoGitDirException::failure)
