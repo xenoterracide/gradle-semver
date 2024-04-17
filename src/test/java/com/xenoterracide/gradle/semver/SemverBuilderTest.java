@@ -40,25 +40,6 @@ class SemverBuilderTest {
     }
   }
 
-  /*
-
-  @Test
-  void alphaTag() {
-    assertThat(new SemverBuilder(new GitMetadataInfo(0, "abcdef10", "v1.0.0-alpha.1")).build())
-    .isEqualTo(
-      new Semver("1.0.0").withPreRelease("alpha.1.0").withBuild("abcdef10")
-    );
-  }
-
-  @Test
-  void stableTag() {
-    assertThat(new SemverBuilder(new GitMetadataInfo(0, "abcdef10", "v1.0.0")).build()).isEqualTo(
-      new Semver("1.0.0").withBuild("abcdef10")
-    );
-  }
-
-   */
-
   static class VersionProvider implements ArgumentsProvider {
 
     @Override
