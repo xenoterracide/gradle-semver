@@ -3,9 +3,7 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.google.common.base.Splitter;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
@@ -13,16 +11,9 @@ import org.semver4j.Semver;
 
 final class SemverBuilder {
 
-  static final String GIT_DESCRIBE_DELIMITER = "-";
-
-  private static final Splitter DESCRIBE_SPLITTER = Splitter.on(GIT_DESCRIBE_DELIMITER);
-
+  static final String ALPHA = "alpha";
+  static final String SEMVER_DELIMITER = ".";
   private static final String PRE_VERSION = "0.0.0";
-  private static final String SNAPSHOT = "SNAPSHOT";
-  private static final String ALPHA = "alpha";
-  private static final String SEMVER_DELIMITER = ".";
-  private static final Pattern GIT_DESCRIBE_PATTERN = Pattern.compile("^\\d+-+g\\p{XDigit}{7}$");
-
   private static final String ZERO = "0";
 
   private final GitMetadata gitMetadata;
@@ -31,20 +22,6 @@ final class SemverBuilder {
   SemverBuilder(GitMetadata gitMetadata) {
     this.gitMetadata = gitMetadata;
     this.semver = new Semver(tagFrom(this.gitMetadata.tag()));
-  }
-
-  static Semver movePrereleaseToBuild(Semver version) {
-    if (version.getPreRelease().stream().anyMatch(GIT_DESCRIBE_PATTERN.asMatchPredicate())) {
-      var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
-        String.join(GIT_DESCRIBE_DELIMITER, version.getPreRelease())
-      );
-      return version
-        .withClearedPreReleaseAndBuild()
-        .withIncPatch()
-        .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, buildInfo.get(0)))
-        .withBuild(String.join(SEMVER_DELIMITER, buildInfo));
-    }
-    return version;
   }
 
   static String tagFrom(@Nullable String vString) {

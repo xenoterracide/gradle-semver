@@ -3,15 +3,16 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.ExceptionTools;
-import com.xenoterracide.gradle.semver.internal.GitTools;
+import static com.xenoterracide.gradle.semver.SemverBuilder.ALPHA;
+import static com.xenoterracide.gradle.semver.SemverBuilder.SEMVER_DELIMITER;
+
+import com.google.common.base.Splitter;
 import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.NonNull;
 import org.semver4j.Semver;
 
@@ -29,10 +30,8 @@ public class SemverExtension {
 
   private static final String PRE_VERSION = "0.0.0";
   private static final String SNAPSHOT = "SNAPSHOT";
-  private static final String ALPHA = "alpha";
-  private static final String SEMVER_DELIMITER = ".";
-  private static final String GIT_DESCRIBE_DELIMITER = "-";
   private static final Pattern GIT_DESCRIBE_PATTERN = Pattern.compile("^\\d+-+g\\p{XDigit}{7}$");
+  private static final String GIT_DESCRIBE_DELIMITER = "-";
 
   private final Supplier<Optional<Git>> git;
 
@@ -59,28 +58,31 @@ public class SemverExtension {
     return this.getGit().describe().map(v -> null == v ? PRE_VERSION : v).map(Semver::coerce).filter(Objects::nonNull);
   }
 
+  static Semver movePrereleaseToBuild(Semver version) {
+    if (version.getPreRelease().stream().anyMatch(GIT_DESCRIBE_PATTERN.asMatchPredicate())) {
+      var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
+        String.join(GIT_DESCRIBE_DELIMITER, version.getPreRelease())
+      );
+      return version
+        .withClearedPreReleaseAndBuild()
+        .withIncPatch()
+        .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, buildInfo.get(0)))
+        .withBuild(String.join(SEMVER_DELIMITER, buildInfo));
+    }
+    return version;
+  }
+
   /**
    * Gets gradle plugin compatible version.
    * {@snippet :
    * logger.quiet("gradlePlugin" + semver.gradlePlugin)  // 0.1.1-alpha.1+1.g3aae11e
    *}
    *
+   * @implNote will probably delegate to {@link #gitDescribed()} in the future.
    * @return the gradle plugin semver.
-   * @implNote Actually invokes {@link org.eclipse.jgit.lib.Repository}
    */
   public Semver getGradlePlugin() {
-    return this.coerced().map(SemverBuilder::movePrereleaseToBuild).get();
-  }
-
-  /**
-   * Gets maven compatible version.
-   *
-   * @return the maven compatible semver
-   * @implNote Uses the {@link #getMavenSnapshot()} algorithm, may switch to
-   *   {@link #getMavenAlpha()} in the future.
-   */
-  public Semver getMaven() {
-    return this.getMavenSnapshot();
+    return this.coerced().map(SemverExtension::movePrereleaseToBuild).get();
   }
 
   /**
@@ -110,48 +112,26 @@ public class SemverExtension {
       .get();
   }
 
-  String octalForHead() {
-    var oid = this.getGit().getObjectIdFor(Constants.HEAD).get();
-    return GitTools.toOctal(oid, 4);
-  }
-
-  String preRelease(int distance) {
-    var octalSha = distance > 0 ? this.octalForHead() : "0".repeat(12);
-    var dist = distance + 1000;
-
-    return String.join(SEMVER_DELIMITER, ALPHA, dist + octalSha);
+  /**
+   * Gets maven compatible version.
+   *
+   * @implNote currently delegates to {@link #getMavenSnapshot()} will probably delegate to
+   *   {@link #gitDescribed()} in the future.
+   * @return the maven compatible semver
+   */
+  public Semver getMaven() {
+    return this.getMavenSnapshot();
   }
 
   /**
-   * Maven Compatible version that uses alpha instead of snapshot. It can be locked by gradle
-   * released every build.
-   * {@snippet :
-   * logger.quiet("maven alpha " + semver.mavenAlpha) // 0.1.1-alpha.1001255204163142
-   *}
+   * Semantic version based on git describe. Both Maven and Gradle Compatible.
    *
-   * @return maven compatible semver
-   * @implNote current algorithm for alphas is semver + alpha + (distance + 1000) + 4 byte octal
-   *   of commit We add 1000 to the distance because a valid numeric in the prerelease cannot have a
-   *   leading 0 and maven uses a stringy comparison of this number instead of an integer. This
-   *   means that you shoud be fine until you reach 9000 commits between releases.
+   * @implNote gradle compatability is somewhat assumed as gradle doesn't provide a valid way to
+   *   unit test this assumption.
+   *
+   * @return semver
    */
-  public Semver getMavenAlpha() {
-    return this.getGit()
-      .describe()
-      .map(v -> null == v ? PRE_VERSION : v)
-      .map(this::toAlpha)
-      .map(v -> new Semver(v.getVersion()))
-      .getOrElseThrow(ExceptionTools::rethrow);
-  }
-
-  Semver toAlpha(String version) {
-    var distance = this.getGit().distance();
-
-    var semver = Objects.requireNonNull(Semver.coerce(version));
-    if (distance > 0 || PRE_VERSION.equals(version)) {
-      return semver.withPreRelease(this.preRelease(distance)).withIncPatch();
-    }
-
-    return semver;
+  public Semver gitDescribed() {
+    return new SemverBuilder(this.getGit()).build();
   }
 }

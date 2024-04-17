@@ -104,11 +104,6 @@ public class GitMetadataExtension implements GitMetadata {
     return this.getObjectIdFor(Constants.HEAD).map(o -> o.abbreviate(8)).map(AbbreviatedObjectId::name).getOrNull();
   }
 
-  /**
-   * Short version of a commit SHA.
-   *
-   * @return SHA. Length starts at 8 but may grow as repository does
-   */
   @Override
   public @Nullable String uniqueShort() {
     return this.gitRepository()
@@ -118,11 +113,6 @@ public class GitMetadataExtension implements GitMetadata {
       .getOrNull();
   }
 
-  /**
-   * Gets latest tag.
-   *
-   * @return the latest tag
-   */
   @Override
   public @Nullable String tag() {
     return this.git.get()
@@ -150,11 +140,6 @@ public class GitMetadataExtension implements GitMetadata {
       .get();
   }
 
-  /**
-   * Gets commit distance.
-   *
-   * @return the commit distance
-   */
   @Override
   public int distance() {
     return this.describe()
@@ -166,11 +151,6 @@ public class GitMetadataExtension implements GitMetadata {
       .getOrElse(0);
   }
 
-  /**
-   * Gets status.
-   *
-   * @return the status
-   */
   @Override
   public GitStatus status() {
     return this.git.get()
