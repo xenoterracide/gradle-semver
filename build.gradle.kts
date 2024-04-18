@@ -13,7 +13,7 @@ plugins {
   alias(libs.plugins.semver)
 }
 
-version = semver.gradlePlugin
+version = semver.gitDescribed
 group = "com.xenoterracide"
 
 var printVersion = tasks.register("printVersion") {
