@@ -29,6 +29,11 @@ val available = tasks.register("tests available") {
 tasks.withType<Test>().configureEach {
   jvmArgs("-XX:+EnableDynamicAgentLoading")
   useJUnitPlatform()
+  systemProperties(
+    "junit.jupiter.execution.parallel.enabled" to "true",
+    "junit.jupiter.execution.parallel.mode.default" to "concurrent",
+    "junit.jupiter.execution.parallel.mode.classes.default" to "concurrent",
+  )
   reports {
     junitXml.required.set(false)
     html.required.set(false)
