@@ -125,7 +125,14 @@ public class SemverExtension {
 
   /**
    * Semantic version based on git describe. Both Maven and Gradle Compatible.
-   *
+   * <ul>
+   *   <li>{@code 0.0.0-alpha.0.0}</li>
+   *   <li>{@code 0.0.1-alpha.0.1+abcdef10.dirty}</li>
+   *   <li>{@code 1.0.0-rc.1}</li>
+   *   <li>{@code 1.0.0-rc.1.1+abcdef10}</li>
+   *   <li>{@code 1.0.0}</li>
+   *   <li>{@code 1.0.1-alpha.0.1+abcdef10}</li>
+   * </ul>
    * @implNote gradle compatability is somewhat assumed as gradle doesn't provide a valid way to
    *   unit test this assumption.
    *
