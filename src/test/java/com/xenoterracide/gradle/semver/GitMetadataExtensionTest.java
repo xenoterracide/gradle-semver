@@ -35,13 +35,13 @@ class GitMetadataExtensionTest {
   @Test
   void noGit() {
     var pg = new GitMetadataExtension(() -> Optional.empty());
-    assertThat(pg.getCommitDistance()).isSameAs(0);
+    assertThat(pg.distance()).isSameAs(0);
     assertThat(pg.getBranch()).isNull();
     assertThat(pg.getCommit()).isNull();
     assertThat(pg.getDescribe()).isNull();
-    assertThat(pg.getLatestTag()).isNull();
+    assertThat(pg.tag()).isNull();
     assertThat(pg.getCommitShort()).isNull();
-    assertThat(pg.getStatus()).isSameAs(GitStatus.NO_REPO);
+    assertThat(pg.status()).isSameAs(GitStatus.NO_REPO);
   }
 
   @Test
@@ -104,25 +104,34 @@ class GitMetadataExtensionTest {
       var head = pg.getCommitShort();
       assertThat(main).isNotNull();
       assertThat(main).hasSize(40);
-      assertThat(head).hasSize(7);
-      assertThat(main.substring(0, 7)).isEqualTo(head);
+      assertThat(head).hasSize(8);
+      assertThat(main.substring(0, 8)).isEqualTo(head);
     }
   }
 
   @Test
   void getLastTag() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-
       var pg = new GitMetadataExtension(() -> Optional.of(git));
-      assertThat(pg.getLatestTag()).isNull();
+      assertThat(pg.tag()).isNull();
 
-      git.tag().setName("v0.1.0").call();
-      assertThat(pg.getLatestTag()).matches("v0.1.0");
+      git.commit().setMessage("first commit").call();
+
+      assertThat(pg.tag()).isNull();
 
       git.commit().setMessage("second commit").call();
+
+      assertThat(pg.tag()).isNull();
+
+      git.tag().setName("v0.1.0").call();
+      assertThat(pg.tag()).isEqualTo("v0.1.0");
+
+      git.commit().setMessage("second commit").call();
+
+      assertThat(pg.tag()).isEqualTo("v0.1.0");
+
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getLatestTag()).matches("v0.1.1");
+      assertThat(pg.tag()).isEqualTo("v0.1.1");
     }
   }
 
@@ -139,27 +148,36 @@ class GitMetadataExtensionTest {
       assertThat(pg.getDescribe()).matches("v0\\.1\\.0-1-g[0-9a-f]{7}");
 
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getLatestTag()).isEqualTo("v0.1.1");
+      assertThat(pg.tag()).isEqualTo("v0.1.1");
     }
   }
 
   @Test
   void getCommitDistance() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-      git.tag().setName("v0.1.0").call();
-
       var pg = new GitMetadataExtension(() -> Optional.of(git));
-      assertThat(pg.getCommitDistance()).isEqualTo(0);
+      assertThat(pg.distance()).isEqualTo(0);
+
+      git.commit().setMessage("first commit").call();
+
+      assertThat(pg.distance()).isEqualTo(1);
 
       git.commit().setMessage("second commit").call();
-      assertThat(pg.getCommitDistance()).isEqualTo(1);
 
-      git.commit().setMessage("third commit").call();
-      assertThat(pg.getCommitDistance()).isEqualTo(2);
+      assertThat(pg.distance()).isEqualTo(2);
+
+      git.tag().setName("v0.1.0").call();
+
+      assertThat(pg.distance()).isEqualTo(0);
+
+      git.commit().setMessage("one commit").call();
+      assertThat(pg.distance()).isEqualTo(1);
+
+      git.commit().setMessage("two commit").call();
+      assertThat(pg.distance()).isEqualTo(2);
 
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.getCommitDistance()).isEqualTo(0);
+      assertThat(pg.distance()).isEqualTo(0);
     }
   }
 
@@ -171,11 +189,11 @@ class GitMetadataExtensionTest {
 
       var pg = new GitMetadataExtension(() -> Optional.of(git));
 
-      assertThat(pg.getStatus()).isEqualTo(GitStatus.CLEAN);
+      assertThat(pg.status()).isEqualTo(GitStatus.CLEAN);
 
       Files.createFile(projectDir.toPath().resolve("test.txt"));
 
-      assertThat(pg.getStatus()).isEqualTo(GitStatus.DIRTY);
+      assertThat(pg.status()).isEqualTo(GitStatus.DIRTY);
     }
   }
 }

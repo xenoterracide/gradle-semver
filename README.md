@@ -8,7 +8,7 @@ SPDX-License-Identifier: CC-BY-4.0
 A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
 
 _Plugin ID_: `"com.xenoterracide.gradle.semver"`
-_Version_: `0.9.+`
+_Version_: `0.11.+`
 
 ## Usage
 
@@ -20,16 +20,20 @@ plugins {
 version = semver.maven
 ```
 
+This plugin expects that you will `git tag` in the format of `v0.1.1` and with only one number on prerelease versions,
+e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
+
 ```kt
 // given the last tag was v0.1.0 and you have a commit distance == 1 you'll get something like
 logger.quiet("maven snapshot " + semver.mavenSnapshot)      // 0.1.1-SNAPSHOT
-logger.quiet("maven alpha " + semver.mavenAlpha)            // 0.1.1-alpha.1001255204163142
+logger.quiet("git described " + semver.gitDescribed)        // 0.1.1-alpha.0.1+3aae11e
 logger.quiet("gradlePlugin " + semver.gradlePlugin)         // 0.1.1-alpha.1+1.g3aae11e
 
 // other available outputs
-logger.quiet("branch" + semver.git.branch)                 // main
+logger.quiet("branch" + semver.git.branch)                  // main
 logger.quiet("commit " + semver.git.commit)                 // 761c420fa9812584e90750ca73197402603e76cc
 logger.quiet("commitShort " + semver.git.commitShort)       // g3aae11e
+logger.quiet("commitShort " + semver.git.uniqueShort)       // g3aae11e
 logger.quiet("latestTag " + semver.git.latestTag)           // v0.1.0
 logger.quiet("describe " + semver.git.describe)             // v0.9.7-28-g55329c4
 logger.quiet("commitDistance " + semver.git.commitDistance) // 28
@@ -50,14 +54,6 @@ version.minor // e.g. 0
 ```
 
 See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html) for more methods.
-
-### Warning
-
-Prerelease sub versions are not yet implemented
-
-e.g. if you tag `v0.1.1-rc.1` and then add a commit you will still get a version semantically equivalent
-to `0.1.1-rc.1` as the version. This will be fixed in future versions, and will probably look something
-like `0.1.1-rc.2.alpha.1`.
 
 ## Goals
 
@@ -86,6 +82,12 @@ Run `npm ci && ./gradlew dependencies` to install dependencies.
 ### Committing
 
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+### Releasing
+
+```sh
+npm run release --semver="0.10.0"
+```
 
 ## License
 

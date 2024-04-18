@@ -7,11 +7,15 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import io.vavr.control.Try;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
@@ -23,10 +27,11 @@ import org.jspecify.annotations.Nullable;
 /**
  * The type Git metadata extension.
  */
-public class GitMetadataExtension {
+public class GitMetadataExtension implements GitMetadata {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
+  private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
 
   private final Supplier<Optional<Git>> git;
 
@@ -47,6 +52,10 @@ public class GitMetadataExtension {
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
       .recover(NoGitDirException.class, e -> null);
+  }
+
+  Try<LogCommand> gitLog() {
+    return this.git.get().map(g -> Try.of(() -> g.log())).orElseGet(NoGitDirException::failure);
   }
 
   /**
@@ -88,25 +97,27 @@ public class GitMetadataExtension {
   }
 
   /**
-   * Gets commit short.
+   * Short version of a commit SHA.
    *
-   * @return the commit short
+   * @return SHA. Length is always 8, regardless of whether it is unique.
    */
   public @Nullable String getCommitShort() {
-    return this.getObjectIdFor(Constants.HEAD)
-      .map(o -> o.abbreviate(7))
+    return this.getObjectIdFor(Constants.HEAD).map(o -> o.abbreviate(8)).map(AbbreviatedObjectId::name).getOrNull();
+  }
+
+  @Override
+  public @Nullable String uniqueShort() {
+    return this.gitRepository()
+      .mapTry(r -> r.newObjectReader())
+      .mapTry(objectReader -> objectReader.abbreviate(this.getObjectIdFor(Constants.HEAD).get(), 8))
       .map(AbbreviatedObjectId::name)
       .getOrNull();
   }
 
-  /**
-   * Gets latest tag.
-   *
-   * @return the latest tag
-   */
-  public @Nullable String getLatestTag() {
+  @Override
+  public @Nullable String tag() {
     return this.git.get()
-      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB)))
+      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0)))
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
       .getOrNull();
@@ -121,25 +132,28 @@ public class GitMetadataExtension {
     return this.describe().getOrNull();
   }
 
-  /**
-   * Gets commit distance.
-   *
-   * @return the commit distance
-   */
-  public int getCommitDistance() {
+  private int distanceFromNoCommit() {
+    return this.gitLog()
+      .mapTry(log -> log.all())
+      .mapTry(all -> all.call())
+      .map(iter -> StreamSupport.stream(iter.spliterator(), false).count())
+      .map(Long::intValue)
+      .get();
+  }
+
+  @Override
+  public int distance() {
     return this.describe()
       .filter(Objects::nonNull)
-      .map(d -> Iterables.get(Splitter.on('-').split(d), 1))
+      .map(d -> Iterables.get(DESCRIBE_SPLITTER.split(d), 1))
       .map(Integer::parseInt)
+      .recover(RefNotFoundException.class, 0)
+      .recover(NoSuchElementException.class, e -> this.distanceFromNoCommit())
       .getOrElse(0);
   }
 
-  /**
-   * Gets status.
-   *
-   * @return the status
-   */
-  public GitStatus getStatus() {
+  @Override
+  public GitStatus status() {
     return this.git.get()
       .map(g -> Try.of(() -> g.status()))
       .orElseGet(NoGitDirException::failure)
@@ -147,10 +161,7 @@ public class GitMetadataExtension {
       .mapTry(s -> s.call())
       .recover(NoGitDirException.class, e -> null)
       // flip, dirty is the porcelain option.
-      .map(
-        status ->
-          status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY
-      )
+      .map(status -> status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY)
       .getOrElseThrow(ExceptionTools::toRuntime);
   }
 }
