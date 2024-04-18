@@ -131,11 +131,11 @@ class SemverExtensionTest {
         .isGreaterThan(v000)
         .isGreaterThan(v010)
         .asString()
-        .startsWith("0.1.1-alpha.1+")
+        .startsWith("0.1.1-alpha.0.1+")
         .hasSize(24)
         .matches(VERSION_PATTERN);
 
-      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.1+2.g3aae11e"));
+      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.g3aae11e"));
 
       git.commit().setMessage("third commit").call();
 
@@ -145,10 +145,9 @@ class SemverExtensionTest {
         .isGreaterThan(v000)
         .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
-        .extracting(Semver::getVersion, Semver::toString)
-        .allSatisfy(o -> {
-          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).startsWith("0.1.1-alpha" + ".2+2.g");
-        });
+        .asString()
+        .startsWith("0.1.1-alpha.0.2+")
+        .matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.1-rc.1").call();
 
@@ -159,10 +158,8 @@ class SemverExtensionTest {
         .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
         .isGreaterThan(v010BldV3)
-        .extracting(Semver::getVersion, Semver::toString)
-        .allSatisfy(o -> {
-          assertThat(o).asInstanceOf(InstanceOfAssertFactories.STRING).startsWith("0.1.1-rc.1");
-        });
+        .asString()
+        .isEqualTo("0.1.1-rc.1");
 
       git.tag().setName("v0.1.1").call();
 
