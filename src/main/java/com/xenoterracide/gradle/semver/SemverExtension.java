@@ -133,6 +133,7 @@ public class SemverExtension {
    *   <li>{@code 1.0.0}</li>
    *   <li>{@code 1.0.1-alpha.0.1+abcdef10}</li>
    * </ul>
+   *
    * @implNote gradle compatability is somewhat assumed as gradle doesn't provide a valid way to
    *   unit test this assumption.
    *
