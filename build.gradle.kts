@@ -39,7 +39,6 @@ dependencies {
   implementation(libs.vavr)
   implementation(libs.guava)
   testImplementation(libs.junit.api)
-  testImplementation(libs.mockito) { version { require("5.+") } }
   testImplementation(libs.maven.artifact)
   testImplementation(gradleTestKit())
   shadow(libs.vavr)
