@@ -3,11 +3,14 @@
 
 package com.xenoterracide.gradle.semver;
 
+import static com.xenoterracide.gradle.semver.CommitTools.commit;
+import static com.xenoterracide.gradle.semver.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -156,28 +159,23 @@ class GitMetadataExtensionTest {
   void getCommitDistance() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       var pg = new GitMetadataExtension(() -> Optional.of(git));
-      assertThat(pg.distance()).isEqualTo(0);
+      Supplier<Integer> distance = pg::distance;
+      assertThat(distance.get()).isEqualTo(0);
 
-      git.commit().setMessage("first commit").call();
+      assertThat(supplies(commit(git), distance)).isEqualTo(1);
 
-      assertThat(pg.distance()).isEqualTo(1);
-
-      git.commit().setMessage("second commit").call();
-
-      assertThat(pg.distance()).isEqualTo(2);
+      assertThat(supplies(commit(git), distance)).isEqualTo(2);
 
       git.tag().setName("v0.1.0").call();
 
-      assertThat(pg.distance()).isEqualTo(0);
+      assertThat(distance.get()).isEqualTo(0);
 
-      git.commit().setMessage("one commit").call();
-      assertThat(pg.distance()).isEqualTo(1);
+      assertThat(supplies(commit(git), distance)).isEqualTo(1);
 
-      git.commit().setMessage("two commit").call();
-      assertThat(pg.distance()).isEqualTo(2);
+      assertThat(supplies(commit(git), distance)).isEqualTo(2);
 
       git.tag().setName("v0.1.1").call();
-      assertThat(pg.distance()).isEqualTo(0);
+      assertThat(distance.get()).isEqualTo(0);
     }
   }
 

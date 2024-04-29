@@ -3,9 +3,10 @@
 
 package com.xenoterracide.gradle.semver;
 
+import static com.xenoterracide.gradle.semver.CommitTools.commit;
+import static com.xenoterracide.gradle.semver.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.annotations.Var;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -28,12 +29,6 @@ class SemverExtensionTest {
 
   @TempDir
   File projectDir;
-
-  static Semver commit(Git git, int number, Supplier<Semver> versionSupplier) throws Exception {
-    var commitFormat = "commit %d";
-    git.commit().setMessage(String.format(commitFormat, number)).call();
-    return versionSupplier.get();
-  }
 
   @Test
   void getGradlePlugin() throws Exception {
@@ -120,18 +115,16 @@ class SemverExtensionTest {
   @Test
   void getGitDescribed() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      @Var
-      var commitNumber = 0;
       var pg = new SemverExtension(() -> Optional.of(git));
       Supplier<Semver> vs = pg::getGitDescribed;
 
-      var v001Alpha01 = commit(git, ++commitNumber, vs);
+      var v001Alpha01 = supplies(commit(git), vs);
 
       assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(24).matches(VERSION_PATTERN);
 
-      var v001Alpha02 = commit(git, ++commitNumber, vs);
+      var v001Alpha02 = supplies(commit(git), vs);
 
-      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.2+").hasSize(24).matches(VERSION_PATTERN);
+      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(24).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
@@ -139,7 +132,7 @@ class SemverExtensionTest {
 
       assertThat(v010).isGreaterThan(v001Alpha01);
 
-      var v010BldV2 = commit(git, ++commitNumber, vs);
+      var v010BldV2 = supplies(commit(git), vs);
 
       assertThat(v010BldV2)
         .isGreaterThan(v001Alpha01)
@@ -151,9 +144,7 @@ class SemverExtensionTest {
 
       assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.g3aae11e"));
 
-      commit(git, ++commitNumber, vs);
-
-      var v010BldV3 = vs.get();
+      var v010BldV3 = supplies(commit(git), vs);
 
       assertThat(v010BldV3)
         .isGreaterThan(v001Alpha01)
