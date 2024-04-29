@@ -131,8 +131,7 @@ class SemverExtensionTest {
 
       var v001Alpha02 = commit(git, ++commitNumber, vs);
 
-      // assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.2+").hasSize(24).matches
-      // (VERSION_PATTERN);
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.2+").hasSize(24).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
