@@ -31,7 +31,7 @@ final class SemverBuilder {
   private SemverBuilder withPreRelease() {
     var distance = this.gitMetadata.distance();
     if (distance > 0) {
-      if (this.semver.getPreRelease().isEmpty()) { // 1.0
+      if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
         this.semver = this.semver.withIncPatch()
           .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Integer.toString(distance)));
       } else { // rc.1
