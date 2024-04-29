@@ -5,10 +5,12 @@ package com.xenoterracide.gradle.semver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.errorprone.annotations.Var;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -26,6 +28,12 @@ class SemverExtensionTest {
 
   @TempDir
   File projectDir;
+
+  static Semver commit(Git git, int number, Supplier<Semver> versionSupplier) throws Exception {
+    var commitFormat = "commit %d";
+    git.commit().setMessage(String.format(commitFormat, number)).call();
+    return versionSupplier.get();
+  }
 
   @Test
   void getGradlePlugin() throws Exception {
@@ -112,23 +120,30 @@ class SemverExtensionTest {
   @Test
   void getGitDescribed() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
+      @Var
+      var commitNumber = 0;
       var pg = new SemverExtension(() -> Optional.of(git));
+      Supplier<Semver> vs = pg::getGitDescribed;
 
-      var v000 = pg.getGitDescribed();
-      assertThat(v000).asString().startsWith("0.0.1-alpha.0.1+").hasSize(24).matches(VERSION_PATTERN);
+      var v001Alpha01 = commit(git, ++commitNumber, vs);
+
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(24).matches(VERSION_PATTERN);
+
+      var v001Alpha02 = commit(git, ++commitNumber, vs);
+
+      // assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.2+").hasSize(24).matches
+      // (VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
-      var v010 = pg.getGitDescribed();
-      assertThat(v010).isGreaterThan(v000);
+      var v010 = vs.get();
 
-      git.commit().setMessage("second commit").call();
+      assertThat(v010).isGreaterThan(v001Alpha01);
 
-      var v010BldV2 = pg.getGitDescribed();
+      var v010BldV2 = commit(git, ++commitNumber, vs);
 
       assertThat(v010BldV2)
-        .isGreaterThan(v000)
+        .isGreaterThan(v001Alpha01)
         .isGreaterThan(v010)
         .asString()
         .startsWith("0.1.1-alpha.0.1+")
@@ -137,12 +152,12 @@ class SemverExtensionTest {
 
       assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.g3aae11e"));
 
-      git.commit().setMessage("third commit").call();
+      commit(git, ++commitNumber, vs);
 
-      var v010BldV3 = pg.getGitDescribed();
+      var v010BldV3 = vs.get();
 
       assertThat(v010BldV3)
-        .isGreaterThan(v000)
+        .isGreaterThan(v001Alpha01)
         .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
         .asString()
@@ -151,10 +166,10 @@ class SemverExtensionTest {
 
       git.tag().setName("v0.1.1-rc.1").call();
 
-      var v011Rc1 = pg.getGitDescribed();
+      var v011Rc1 = vs.get();
 
       assertThat(v011Rc1)
-        .isGreaterThan(v000)
+        .isGreaterThan(v001Alpha01)
         .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
         .isGreaterThan(v010BldV3)
@@ -168,13 +183,13 @@ class SemverExtensionTest {
       assertThat(v011)
         .isGreaterThan(v010BldV2)
         .isGreaterThan(v010)
-        .isGreaterThan(v000)
+        .isGreaterThan(v001Alpha01)
         .hasToString("0.1.1")
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease, Semver::getBuild)
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
 
       assertThat(VersionNumber.parse(v010BldV2.toString()))
-        .isGreaterThan(VersionNumber.parse(v000.toString()))
+        .isGreaterThan(VersionNumber.parse(v001Alpha01.toString()))
         .isGreaterThan(VersionNumber.parse(v010.toString()))
         .isLessThan(VersionNumber.parse(v010BldV3.toString()))
         .isLessThan(VersionNumber.parse(v011.toString()));
