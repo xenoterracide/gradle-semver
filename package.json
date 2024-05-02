@@ -14,10 +14,8 @@
     "prettier-plugin-toml": "^2.0.1"
   },
   "scripts": {
-    "up": "npm run dependencies:update",
-    "merge": "gh pr create; gh pr view && ./gradlew buildHealth build && gh run watch --exit-status && gh pr merge --squash --delete-branch --auto",
-    "watch": "./gradlew classes --continuous",
-    "dependencies:update": "./gradlew dependencies --write-locks --quiet 2>&1 | cat > /dev/null",
+    "merge": "gh pr create --fill-first; gh pr view && ./gradlew buildHealth build && gh run watch --exit-status && gh pr merge --squash --delete-branch --auto",
+    "watch": "./gradlew testClasses demoServerClasses --continuous",
     "dependencies:for": "./gradlew dependencies --configuration",
     "release": "git push --tags && gh release create v$npm_config_semver --generate-notes build/libs/*.jar --verify-tag",
     "release:dry-run": "npm run release:prepare && git tag -d v$npm_config_semver",

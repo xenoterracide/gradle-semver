@@ -10,11 +10,17 @@ on:
     - cron: "0 3 * * 3" # 3am every Wednesday
   push:
     branches:
-      - fix/auto-update
+      - build/auto-update
 jobs:
   update-java:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    env:
+      ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
+      ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,7 +37,7 @@ jobs:
       - run: find . -name '*gradle.lockfile' -delete
       - run: ./gradlew wrapper --write-locks
       - run: ./gradlew wrapper # somehow the final bat was not generated before
-      - run: ./gradlew dependencies build shadowJar buildHealth --write-locks --scan
+      - run: ./gradlew dependencies shadowJar build buildHealth --write-locks --scan
       - run: ./gradlew build --scan
       - uses: peter-evans/create-pull-request@v6
         with:

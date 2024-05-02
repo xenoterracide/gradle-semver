@@ -1,4 +1,4 @@
-name: Full Unoptimized Build
+name: Full
 on:
   push:
     branches: [main]
@@ -9,6 +9,12 @@ jobs:
   full:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      packages: read
+    env:
+      ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
+      ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,4 +26,4 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: true
-      - run: ./gradlew build buildHealth --no-build-cache --no-configuration-cache
+      - run: make ci-full

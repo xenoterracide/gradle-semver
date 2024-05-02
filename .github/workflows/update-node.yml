@@ -10,7 +10,7 @@ on:
     - cron: "0 4 * * 3" # 4am every Wednesday
   push:
     branches:
-      - fix/auto-update
+      - build/auto-update
 jobs:
   update-node:
     runs-on: ubuntu-latest
