@@ -53,7 +53,6 @@ rollback:
 	$(call check_defined, tags)
 	git tag --delete $(tags)
 	git push origin --delete $(tags)
-	gh release delete --yes $(tags) || exit 0
 
 ci-build:
 	./gradlew build buildHealth --build-cache
