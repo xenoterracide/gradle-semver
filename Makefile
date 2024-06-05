@@ -53,7 +53,7 @@ gh-release: build/libs/*.jar
 rollback:
 	git tag --delete $(HEAD_TAGS)
 	git push origin --delete $(HEAD_TAGS)
-	gh release delete $(HEAD_TAGS) || exit 0
+	gh release delete --yes $(HEAD_TAGS) || exit 0
 
 ci-build:
 	./gradlew build buildHealth --build-cache
