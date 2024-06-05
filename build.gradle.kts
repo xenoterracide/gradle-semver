@@ -13,11 +13,11 @@ plugins {
   alias(libs.plugins.semver)
 }
 
-version = semver.gitDescribed
 group = "com.xenoterracide"
 
 var printVersion = tasks.register("printVersion") {
-  println("version: $version")
+  val version = providers.provider { semver.gitDescribed }
+  doLast { println(version.get()) }
 }
 
 tasks.compileJava {
@@ -88,6 +88,7 @@ gradlePlugin {
       """.trimIndent()
       tags = setOf("semver", "versioning", "git")
       implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
+      version = semver.gitDescribed
     }
   }
 }

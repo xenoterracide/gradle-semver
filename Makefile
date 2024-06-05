@@ -1,4 +1,5 @@
 HEAD := $(shell git rev-parse --verify HEAD)
+HEAD_TAGS := $(shell git tag --points-at HEAD)
 GRADLE_DIR := $(wildcard ./.gradle/)
 BUILD_DIRS := $(wildcard ./build/ */build/ ./module/*/build/)
 CONFIGURATION_CACHE := $(wildcard $(GRADLE_DIR)configuration-cache/)
@@ -32,8 +33,27 @@ clean:
 .PHONY: cleaner
 cleaner: clean-build clean-gradle
 
-clean-cc: $(CONFIGURATION_CACHE)
-	- rm -rf $(CONFIGURATION_CACHE)
+.PHONY: release
+release: pre-release gh-release
+
+pre-release:
+	$(call check_defined, semver)
+	$(info Attempting to release $(semver))
+	./gradlew build --quiet
+	git tag -m $(semver) -a v$(semver)
+	./gradlew assemble shadowJar --quiet
+	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
+
+gh-release: build/libs/*.jar
+	$(call check_defined, semver)
+	git push --tags
+	gh release create v$(semver) --generate-notes build/libs/*.jar --verify-tag
+
+.PHONY: rollback
+rollback:
+	git tag --delete $(HEAD_TAGS)
+	git push origin --delete $(HEAD_TAGS)
+	gh release delete $(HEAD_TAGS) || exit 0
 
 ci-build:
 	./gradlew build buildHealth --build-cache
@@ -45,6 +65,9 @@ ci-update-java: clean-lockfiles up-wrapper up up-all-deps
 
 clean-build:
 	- rm -rf $(BUILD_DIRS)
+
+clean-cc: $(CONFIGURATION_CACHE)
+	- rm -rf $(CONFIGURATION_CACHE)
 
 clean-gradle:
 	- rm -rf $(GRADLE_DIR)
