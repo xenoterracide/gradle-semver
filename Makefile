@@ -47,13 +47,13 @@ pre-release:
 gh-release: build/libs/*.jar
 	$(call check_defined, semver)
 	git push --tags
-	gh release create v$(semver) --generate-notes build/libs/*.jar --verify-tag
 
 .PHONY: rollback
 rollback:
-	git tag --delete $(HEAD_TAGS)
-	git push origin --delete $(HEAD_TAGS)
-	gh release delete --yes $(HEAD_TAGS) || exit 0
+	$(call check_defined, tags)
+	git tag --delete $(tags)
+	git push origin --delete $(tags)
+	gh release delete --yes $(tags) || exit 0
 
 ci-build:
 	./gradlew build buildHealth --build-cache
