@@ -1,8 +1,8 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:4.3.0=classpath
-org.gradle.kotlin:gradle-kotlin-dsl-plugins:4.3.0=classpath
+org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:4.3.1=classpath
+org.gradle.kotlin:gradle-kotlin-dsl-plugins:4.3.1=classpath
 org.jetbrains.intellij.deps:trove4j:1.0.20200330=classpath
 org.jetbrains.kotlin:kotlin-android-extensions:1.9.22=classpath
 org.jetbrains.kotlin:kotlin-assignment:1.9.22=classpath
