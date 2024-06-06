@@ -23,5 +23,5 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
-      - run: ./gradlew dependencies --configuration runtimeClasspath
+      - run: ./gradlew build buildHealth --scan
       - uses: gradle/actions/dependency-submission@v3
