@@ -17,7 +17,7 @@ plugins {
   id("com.xenoterracide.gradle.semver")
 }
 
-version = semver.maven
+version = semver.gitDescribed
 ```
 
 This plugin expects that you will `git tag` in the format of `v0.1.1` and with only one number on prerelease versions,
