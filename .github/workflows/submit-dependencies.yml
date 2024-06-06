@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - ci/submit-dependencies
 jobs:
   build:
     runs-on: ubuntu-latest
