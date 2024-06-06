@@ -8,6 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: write
     env:
       ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
       ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
