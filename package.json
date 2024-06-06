@@ -14,14 +14,8 @@
     "prettier-plugin-toml": "^2.0.1"
   },
   "scripts": {
-    "merge": "gh pr create --fill-first; gh pr view && ./gradlew buildHealth build && gh run watch --exit-status && gh pr merge --squash --delete-branch --auto",
-    "watch": "./gradlew testClasses demoServerClasses --continuous",
-    "dependencies:for": "./gradlew dependencies --configuration",
-    "release": "git push --tags && gh release create v$npm_config_semver --generate-notes build/libs/*.jar --verify-tag",
-    "release:dry-run": "npm run release:prepare && git tag -d v$npm_config_semver",
-    "prerelease:prepare": "echo $npm_config_semver",
-    "release:prepare": "git tag -m $npm_config_semver -a v$npm_config_semver && ./gradlew build && ./gradlew clean assemble shadowJar",
-    "prerelease": "npm run release:prepare",
+    "merge": "make merge",
+    "release": "make release semver=$npm_config_semver || make rollback tag=v$npm_config_semver",
     "postinstall": "git config core.hooksPath .config/git/hooks",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
