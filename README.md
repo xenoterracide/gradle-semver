@@ -55,6 +55,18 @@ version.minor // e.g. 0
 
 See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html) for more methods.
 
+## Known Issues
+
+- [GitHub does not checkout annotated tags properly](https://github.com/actions/checkout/issues/882)
+
+You can use this snippet or another workaround documented on the issue
+
+```yml
+- uses: actions/checkout@v4
+  with:
+    ref: ${{ github.ref }}
+```
+
 ## Goals
 
 Provide Semantic versioning for Maven publishing with Gradle.
