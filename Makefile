@@ -45,7 +45,6 @@ pre-release:
 	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
 
 gh-release: build/libs/*.jar
-	$(call check_defined, semver)
 	git push --tags
 
 .PHONY: rollback
