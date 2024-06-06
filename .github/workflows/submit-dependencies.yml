@@ -5,7 +5,7 @@ on:
       - main
       - ci/submit-dependencies
 jobs:
-  build:
+  submit-dependencies:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
