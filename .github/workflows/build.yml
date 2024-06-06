@@ -22,3 +22,4 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: make ci-build
+      - uses: gradle/actions/dependency-submission@v3
