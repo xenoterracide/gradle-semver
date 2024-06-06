@@ -39,4 +39,6 @@ jobs:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
       - run: gh release create ${{ github.ref_name }} --generate-notes build/libs/*.jar --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}
       - uses: gradle/actions/dependency-submission@v3
