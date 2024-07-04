@@ -16,10 +16,11 @@ updates:
           - "patch"
           - "minor"
     schedule:
-      interval: "weekly"
-      day: "sunday"
+      interval: "daily"
       timezone: "US/Eastern"
   - package-ecosystem: "npm"
     directory: "/" # Location of package manifests
+    commit-message:
+      prefix: "chore(deps)"
     schedule:
       interval: "weekly"
