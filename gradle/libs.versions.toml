@@ -6,7 +6,7 @@ spring = "3.+"
 [libraries]
 java-tools = "com.xenoterracide:tools:0.0.0-SNAPSHOT"
 api-guardian = { module = "org.apiguardian:apiguardian-api" }
-assertj = "org.assertj:assertj-core:3+"
+assertj = "org.assertj:assertj-core:3.+"
 autoservice = "com.google.auto.service:auto-service:1.+"
 checker-annotations = { module = "org.checkerframework:checker-qual", version.ref = "checker" }
 checker-core = { module = "org.checkerframework:checker", version.ref = "checker" }
@@ -23,7 +23,7 @@ h2 = { module = "com.h2database:h2" }
 hibernate-envers = { module = "org.hibernate.orm:hibernate-envers" }
 hibernate-orm-core = { module = "org.hibernate.orm:hibernate-core" }
 hibernate-jpa-modelgen = { module = "org.hibernate.orm:hibernate-jpamodelgen" }
-immutables-bom = "org.immutables:bom:2+"
+immutables-bom = "org.immutables:bom:2.+"
 immutables-annotate = { module = "org.immutables:annotate" }
 immutables-annotations = { module = "org.immutables:value-annotations" }
 immutables-builder = { module = "org.immutables:builder" }
