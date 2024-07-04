@@ -31,7 +31,8 @@ jobs:
       - uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - run: env | cut -d '=' -f 1 | sort -u
+      - run: env | grep GITHUB
+      - run: git commit --ammend
       - run: gh pr merge --auto --squash --merge "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
