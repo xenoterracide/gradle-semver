@@ -6,7 +6,7 @@ on:
       - build/auto-update-java
 jobs:
   update-java:
-    if: github.actor == 'dependabot[bot]'
+    # if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
