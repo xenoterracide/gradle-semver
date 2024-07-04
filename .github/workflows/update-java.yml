@@ -1,7 +1,6 @@
 name: Update Java
 on:
   pull_request:
-  push:
     branches:
       - build/auto-update-java
 jobs:
