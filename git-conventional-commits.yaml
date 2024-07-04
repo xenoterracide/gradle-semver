@@ -18,6 +18,7 @@ convention:
   releaseTagGlobPattern: v[0-9]*.[0-9]*.[0-9]*
 changelog:
   commitTypes:
+    - deps
     - feat
     - fix
     - perf
@@ -25,6 +26,7 @@ changelog:
   includeInvalidCommits: true
   commitIgnoreRegexPattern: "^WIP "
   headlines:
+    deps: Dependency Updates
     feat: Features
     fix: Bug Fixes
     perf: Performance Improvements
