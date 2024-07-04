@@ -33,7 +33,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - run: env | cut -d '=' -f 1 | sort -u
       - run: gh pr merge --auto --squash --merge "$PR_URL"
-        if: contains(steps.metadata.outputs.dependency-names, 'my-dependency') && steps.metadata.outputs.update-type == 'version-update:semver-patch'
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
