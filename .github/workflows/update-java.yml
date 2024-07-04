@@ -1,8 +1,6 @@
 name: Update Java
 on:
   pull_request:
-    branches:
-      - build/auto-update-java
 jobs:
   update-java:
     # if: github.actor == 'dependabot[bot]'
