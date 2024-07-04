@@ -27,3 +27,6 @@ jobs:
         with:
           cache-read-only: true
       - run: make ci-full
+      - uses: gradle/actions/dependency-submission@v3
+        with:
+          dependency-graph: generate-and-upload
