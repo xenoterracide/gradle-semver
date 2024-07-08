@@ -97,7 +97,7 @@ starter-validation = { module = "org.springframework.boot:spring-boot-starter-va
 starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
 testcontainers = "org.testcontainers:junit-jupiter:1.+"
-uuid-creator = "com.github.f4b6a3:uuid-creator:5.+"
+uuid-creator = "com.github.f4b6a3:uuid-creator:6.+"
 vavr = "io.vavr:vavr:0.+"
 
 [bundles]
