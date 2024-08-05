@@ -16,8 +16,6 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.semver4j.Semver;
 
-// not really our test, just test our assumptions about upstream parsing
-@Disabled
 public class VersionSortTest {
 
   @ParameterizedTest
