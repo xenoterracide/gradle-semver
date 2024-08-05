@@ -1,20 +1,30 @@
 name: Update Java
 on:
-  pull_request:
+  schedule:
+    #        ┌───────────── minute (0 - 59)
+    #        │ ┌───────────── hour (0 - 23)
+    #        │ │ ┌───────────── day of the month (1 - 31)
+    #        │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #        │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #        * * * * *
+    - cron: "0 3 * * 3" # 3am every Wednesday
+  push:
+    branches:
+      - build/auto-update
 jobs:
   update-java:
-    if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      pull-requests: write
-      contents: write
+      contents: read
       packages: read
     env:
       ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
       ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -26,12 +36,15 @@ jobs:
       - run: ./gradlew --version
       - run: find . -name '*gradle.lockfile' -delete
       - run: ./gradlew wrapper --write-locks
+      - run: ./gradlew wrapper # somehow the final bat was not generated before
       - run: ./gradlew dependencies shadowJar build buildHealth --write-locks --scan
       - run: ./gradlew build --scan
-      - uses: dependabot/fetch-metadata@v2
+      - uses: peter-evans/create-pull-request@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - run: env | grep GITHUB
-      - run: git add -u
-      - run: git commit --amend --no-edit
-      - run: git push --force-with-lease
+          title: "chore(deps): java"
+          branch: topic/update-java
+          token: ${{ secrets.GH_MERGE_PAT }}
+      - run: gh pr merge --auto --squash ${{ env.PULL_REQUEST_NUMBER }}
+        if: ${{ env.PULL_REQUEST_NUMBER != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_MERGE_PAT }}
