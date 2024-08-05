@@ -29,5 +29,11 @@ public class SemverPlugin implements Plugin<Project> {
       });
 
     project.getExtensions().add(SEMVER, svcPrvdr.map(AbstractGitService::extension).get());
+    project
+      .getTasks()
+      .register("version", task -> {
+        task.setDescription("Prints the current project version.");
+        task.doLast(t -> System.out.println(project.getVersion()));
+      });
   }
 }
