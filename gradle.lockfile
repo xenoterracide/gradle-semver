@@ -1,7 +1,6 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-aopalliance:aopalliance:1.0=annotationProcessor,errorprone,testAnnotationProcessor
 ch.qos.logback:logback-classic:1.3.14=spotless996156776
 ch.qos.logback:logback-core:1.3.14=spotless996156776
 com.github.ben-manes.caffeine:caffeine:3.0.5=annotationProcessor,errorprone,testAnnotationProcessor
@@ -14,14 +13,14 @@ com.google.auto.value:auto-value-annotations:1.9=annotationProcessor,errorprone,
 com.google.auto:auto-common:1.2.2=annotationProcessor,errorprone,testAnnotationProcessor
 com.google.code.findbugs:jsr305:3.0.2=annotationProcessor,checkstyle,compileClasspath,errorprone,spotbugs,testAnnotationProcessor,testCompileClasspath
 com.google.code.gson:gson:2.11.0=spotbugs
-com.google.errorprone:error_prone_annotation:2.29.2=annotationProcessor,errorprone,testAnnotationProcessor
+com.google.errorprone:error_prone_annotation:2.30.0=annotationProcessor,errorprone,testAnnotationProcessor
 com.google.errorprone:error_prone_annotations:2.26.1=testCompileClasspath
 com.google.errorprone:error_prone_annotations:2.27.0=spotbugs
-com.google.errorprone:error_prone_annotations:2.29.2=annotationProcessor,compileClasspath,errorprone,testAnnotationProcessor
+com.google.errorprone:error_prone_annotations:2.30.0=annotationProcessor,compileClasspath,errorprone,testAnnotationProcessor
 com.google.errorprone:error_prone_annotations:2.7.1=checkstyle
-com.google.errorprone:error_prone_check_api:2.29.2=annotationProcessor,errorprone,testAnnotationProcessor
-com.google.errorprone:error_prone_core:2.29.2=annotationProcessor,errorprone,testAnnotationProcessor
-com.google.errorprone:error_prone_type_annotations:2.29.2=annotationProcessor,errorprone,testAnnotationProcessor
+com.google.errorprone:error_prone_check_api:2.30.0=annotationProcessor,errorprone,testAnnotationProcessor
+com.google.errorprone:error_prone_core:2.30.0=annotationProcessor,errorprone,testAnnotationProcessor
+com.google.errorprone:error_prone_type_annotations:2.30.0=annotationProcessor,errorprone,testAnnotationProcessor
 com.google.errorprone:javac:9+181-r4173-1=errorproneJavac
 com.google.guava:failureaccess:1.0.1=annotationProcessor,checkstyle,errorprone,testAnnotationProcessor
 com.google.guava:failureaccess:1.0.2=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
@@ -30,7 +29,6 @@ com.google.guava:guava:31.0.1-jre=checkstyle
 com.google.guava:guava:32.1.1-jre=annotationProcessor,errorprone,testAnnotationProcessor
 com.google.guava:guava:33.2.1-jre=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava=checkstyle,compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-com.google.inject:guice:5.1.0=annotationProcessor,errorprone,testAnnotationProcessor
 com.google.j2objc:j2objc-annotations:1.3=checkstyle
 com.google.j2objc:j2objc-annotations:3.0.0=compileClasspath,testCompileClasspath
 com.google.protobuf:protobuf-java:3.19.6=annotationProcessor,errorprone,testAnnotationProcessor
