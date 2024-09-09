@@ -32,7 +32,7 @@ jobs:
             ${{ runner.os }}-
       - run: npm install
       - run: npm update
-      - uses: peter-evans/create-pull-request@v6
+      - uses: peter-evans/create-pull-request@v7
         with:
           title: "chore(deps): update node"
           branch: topic/update-node

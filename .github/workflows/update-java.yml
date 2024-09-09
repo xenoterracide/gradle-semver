@@ -39,7 +39,7 @@ jobs:
       - run: ./gradlew wrapper # somehow the final bat was not generated before
       - run: ./gradlew dependencies shadowJar build buildHealth --write-locks --scan
       - run: ./gradlew build --scan
-      - uses: peter-evans/create-pull-request@v6
+      - uses: peter-evans/create-pull-request@v7
         with:
           title: "chore(deps): java"
           branch: topic/update-java
