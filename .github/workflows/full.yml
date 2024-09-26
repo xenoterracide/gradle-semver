@@ -25,10 +25,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
       - run: make ci-full
-      - uses: gradle/actions/dependency-submission@v3
+      - uses: gradle/actions/dependency-submission@v4
         with:
           dependency-graph: generate-and-upload
