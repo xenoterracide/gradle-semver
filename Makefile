@@ -39,6 +39,26 @@ clean:
 .PHONY: cleaner
 cleaner: clean-build clean-gradle
 
+.PHONY: release
+release: pre-release gh-release
+
+pre-release:
+	$(call check_defined, semver)
+	$(info Attempting to release $(semver))
+	./gradlew build --quiet
+	git tag -m $(semver) -a v$(semver)
+	./gradlew assemble shadowJar --quiet
+	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
+
+gh-release: build/libs/*.jar
+	git push --tags
+
+.PHONY: rollback
+rollback:
+	$(call check_defined, tags)
+	git tag --delete $(tags)
+	git push origin --delete $(tags)
+
 clean-cc: $(CONFIGURATION_CACHE)
 	- rm -rf $(CONFIGURATION_CACHE)
 
