@@ -39,12 +39,13 @@ jobs:
       - run: ./gradlew wrapper # somehow the final bat was not generated before
       - run: ./gradlew dependencies shadowJar build buildHealth --write-locks --scan
       - run: ./gradlew build --scan
-      - uses: peter-evans/create-pull-request@v6
+      - uses: peter-evans/create-pull-request@v7
+        id: create_pr
         with:
           title: "chore(deps): java"
           branch: topic/update-java
           token: ${{ secrets.GH_MERGE_PAT }}
-      - run: gh pr merge --auto --squash ${{ env.PULL_REQUEST_NUMBER }}
-        if: ${{ env.PULL_REQUEST_NUMBER != '' }}
+      - run: gh pr merge --auto --squash ${{ steps.create_pr.outputs.pull-request-number }}
+        if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
         env:
           GH_TOKEN: ${{ secrets.GH_MERGE_PAT }}
