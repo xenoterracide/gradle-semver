@@ -38,11 +38,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   Optional<Git> lazyGit() throws IOException {
     if (this.git == null) {
       var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
-      var gitDir = new FileRepositoryBuilder()
-        .readEnvironment()
-        .setMustExist(false)
-        .findGitDir(projectDir)
-        .getGitDir();
+      var gitDir = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(projectDir).getGitDir();
 
       this.git = gitDir != null ? Git.open(gitDir) : null;
     }
@@ -71,7 +67,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   static void preventJGitFromCallingExecutables() {
     SystemReader reader = SystemReader.getInstance();
     SystemReader.setInstance(
-      new DelegatingSystemReader(reader) {
+      new SystemReader.Delegate(reader) {
         @Override
         public String getenv(String variable) {
           if ("PATH".equals(variable)) {
