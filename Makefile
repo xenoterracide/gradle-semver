@@ -1,5 +1,6 @@
+# © Copyright 2024 Caleb Cushing
+# SPDX-License-Identifier: MIT
 HEAD := $(shell git rev-parse --verify HEAD)
-HEAD_TAGS := $(shell git tag --points-at HEAD)
 GRADLE_DIR := $(wildcard ./.gradle/)
 BUILD_DIRS := $(wildcard ./build/ */build/ ./module/*/build/)
 CONFIGURATION_CACHE := $(wildcard $(GRADLE_DIR)configuration-cache/)
@@ -15,13 +16,18 @@ define gh_head_run_id
 	gh run list --workflow $(1) --commit $(HEAD) --json databaseId --jq '.[0].["databaseId"]'
 endef
 
-.PHONY: build
-build:
-	./gradlew spotlessApply build
-
 .PHONY: up
 up:
-	./gradlew dependencies --write-locks --quiet 2>&1 > /dev/null
+# success if no output
+	./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0
+
+.PHONY: format
+format:
+	./gradlew spotlessApply --console=plain
+
+.PHONY: build
+build:
+	./gradlew spotlessApply build --console=plain
 
 .PHONY: merge
 merge: create-pr build watch-full merge-squash
@@ -33,39 +39,19 @@ clean:
 .PHONY: cleaner
 cleaner: clean-build clean-gradle
 
-.PHONY: release
-release: pre-release gh-release
-
-pre-release:
-	$(call check_defined, semver)
-	$(info Attempting to release $(semver))
-	./gradlew build --quiet
-	git tag -m $(semver) -a v$(semver)
-	./gradlew assemble shadowJar --quiet
-	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
-
-gh-release: build/libs/*.jar
-	git push --tags
-
-.PHONY: rollback
-rollback:
-	$(call check_defined, tags)
-	git tag --delete $(tags)
-	git push origin --delete $(tags)
+clean-cc: $(CONFIGURATION_CACHE)
+	- rm -rf $(CONFIGURATION_CACHE)
 
 ci-build:
-	./gradlew build buildHealth --build-cache
+	./gradlew build --build-cache --scan
 
 ci-full:
-	./gradlew buildHealth build --no-build-cache --no-configuration-cache
+	./gradlew build --no-build-cache --no-configuration-cache --scan
 
 ci-update-java: clean-lockfiles up-wrapper up up-all-deps
 
 clean-build:
 	- rm -rf $(BUILD_DIRS)
-
-clean-cc: $(CONFIGURATION_CACHE)
-	- rm -rf $(CONFIGURATION_CACHE)
 
 clean-gradle:
 	- rm -rf $(GRADLE_DIR)
@@ -77,10 +63,10 @@ up-wrapper:
 	./gradlew wrapper --write-locks && ./gradlew wrapper
 
 up-all-deps:
-	./gradlew build buildHealth --write-locks --scan
+	./gradlew build --write-locks --scan --console=plain | grep -e FAILED -e https
 
 create-pr:
-	gh pr create || exit 0
+	gh pr create --body "" || exit 0
 
 merge-squash:
 	gh pr merge --squash --delete-branch --auto

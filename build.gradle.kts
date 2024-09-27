@@ -57,6 +57,10 @@ tasks.withType<ShadowJar>().configureEach {
   }
 }
 
+tasks.check {
+  dependsOn(tasks.buildHealth)
+}
+
 dependencyAnalysis {
   issues {
     all {
