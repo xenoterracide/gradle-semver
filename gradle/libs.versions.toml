@@ -40,7 +40,7 @@ jakarta-servlet = { module = "jakarta.servlet:jakarta.servlet-api" }
 jakarta-validation = { module = "jakarta.validation:jakarta.validation-api" }
 jetbrains-annotations = "org.jetbrains:annotations:+"
 jgit = "org.eclipse.jgit:org.eclipse.jgit:6.+"
-jspecify = "org.jspecify:jspecify:0.+"
+jspecify = "org.jspecify:jspecify:1.+"
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-bom = "org.junit:junit-bom:5.+"
 junit-parameters = { module = "org.junit.jupiter:junit-jupiter-params" }
