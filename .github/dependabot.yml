@@ -3,16 +3,9 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     commit-message:
-      prefix: "deps"
-    groups:
-      gradle-updates:
-        update-types:
-          - "major"
-          - "patch"
-          - "minor"
+      prefix: "feat(deps)"
     schedule:
-      interval: "daily"
-      timezone: "US/Eastern"
+      interval: "weekly"
   - package-ecosystem: "npm"
     directory: "/"
     commit-message:
@@ -21,5 +14,7 @@ updates:
       interval: "weekly"
   - package-ecosystem: "github-actions"
     directory: "/"
+    commit-message:
+      prefix: "ci(deps)"
     schedule:
       interval: "weekly"
