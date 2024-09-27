@@ -32,12 +32,13 @@ jobs:
             ${{ runner.os }}-
       - run: npm install
       - run: npm update
-      - uses: peter-evans/create-pull-request@v6
+      - uses: peter-evans/create-pull-request@v7
+        id: create_pr
         with:
           title: "chore(deps): update node"
           branch: topic/update-node
           token: ${{ secrets.GH_MERGE_PAT }}
-      - run: gh pr merge --auto --squash ${{ env.PULL_REQUEST_NUMBER }}
-        if: ${{ env.PULL_REQUEST_NUMBER != '' }}
+      - run: gh pr merge --auto --squash ${{ steps.create_pr.outputs.pull-request-number }}
+        if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
         env:
           GH_TOKEN: ${{ secrets.GH_MERGE_PAT }}
