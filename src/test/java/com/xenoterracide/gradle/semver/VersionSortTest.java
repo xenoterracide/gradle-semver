@@ -17,7 +17,8 @@ import org.semver4j.Semver;
 public class VersionSortTest {
 
   static String withBuild(String version, String... build) {
-    return version + "+" + String.join(".", build);
+    var branch = !build[0].startsWith("g") ? "b-" : "";
+    return version + "+" + branch + String.join(".", build);
   }
 
   @ParameterizedTest
@@ -37,9 +38,9 @@ public class VersionSortTest {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-      var version = "0.1.1-alpha.0.1";
+      var version = "0.1.1-alpha.0.";
       var sha = "g3aae11c";
-      return Stream.of(Arguments.of(withBuild(version, sha), withBuild(version, "topic-foo", sha)));
+      return Stream.of(Arguments.of(withBuild(version + "1", sha), withBuild(version + "1", "topic-foo", sha)));
     }
   }
 

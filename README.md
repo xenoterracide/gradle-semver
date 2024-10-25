@@ -107,4 +107,4 @@ npm run release --semver="0.10.0"
 - Gradle Kotlin and Config Files: [MIT](https://choosealicense.com/licenses/mit/)
 - Documentation including Javadoc: [CC BY 4.0](https://choosealicense.com/licenses/cc-by-4.0/)
 
-© Copyright 2024 Caleb Cushing. All rights reserved.
+© Copyright 2024 Caleb Cushing.
