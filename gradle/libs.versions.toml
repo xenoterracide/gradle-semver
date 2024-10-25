@@ -49,7 +49,11 @@ junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api" }
 maven-artifact = "org.apache.maven:maven-artifact:3.+"
 mockito = { module = "org.mockito:mockito-core" }
+plugin-convention-coverage = "com.xenoterracide.gradle.convention:coverage:0.+"
+plugin-convention-publish = "com.xenoterracide.gradle.convention:publish:0.+"
+plugin-dependency-analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:2.+"
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:4.+"
+plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.+"
 plugin-semver = "com.xenoterracide:gradle-semver:0.+"
 plugin-spotbugs = "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.+"
 plugin-spotless = "com.diffplug.spotless:spotless-plugin-gradle:6.+"
@@ -110,7 +114,7 @@ test-runtime = ["junit-engine", "junit-launcher"]
 spring-test = ["spring-test", "spring-boot-test-core", "spring-boot-autoconfigure", "spring-boot-test-autoconfigure"]
 
 [plugins]
-dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "2.+" }
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis" }
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version = "1.+" }
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.+" }
 semver = { id = "com.xenoterracide.gradle.semver", version = "0.+" }
