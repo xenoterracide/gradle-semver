@@ -4,10 +4,11 @@ import com.xenoterracide.gradle.convention.publish.GithubPublicRepositoryConfigu
 
 
 plugins {
+  id("com.autonomousapps.dependency-analysis")
   id("com.gradle.plugin-publish")
   id("com.xenoterracide.gradle.convention.coverage")
   id("com.xenoterracide.gradle.convention.publish")
-  id("com.autonomousapps.dependency-analysis")
+  id("com.xenoterracide.gradle.semver")
 }
 
 repositoryHost(GithubPublicRepositoryConfiguration())

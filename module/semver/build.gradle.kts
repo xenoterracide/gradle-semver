@@ -43,3 +43,18 @@ tasks.withType<ShadowJar>().configureEach {
     exclude { it.moduleName == "semver4j" }
   }
 }
+
+gradlePlugin {
+  plugins {
+    register("pub") {
+      id = "com.xenoterracide.gradle.semver"
+      displayName = "Semver with Git"
+      implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
+      description = """
+        A semantic versioning plugin that derives the version from git
+ tags and commits and is configuration cache safe.
+      """.trimIndent()
+      tags = setOf("semver", "versioning", "git", "version")
+    }
+  }
+}
