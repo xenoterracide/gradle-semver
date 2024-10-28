@@ -19,7 +19,7 @@ dependencyLocking {
 
 version = providers.environmentVariable("IS_PUBLISHING")
   .map { semver.gitDescribed }
-  .orElse(Semver("0.0.0")).get().toString()
+  .orElse(Semver("0.0.0")).get()
 
 tasks.check {
   dependsOn(tasks.buildHealth)
