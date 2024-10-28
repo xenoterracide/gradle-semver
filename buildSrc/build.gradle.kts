@@ -18,5 +18,4 @@ dependencies {
   implementation(libs.plugin.spotbugs)
   implementation(libs.plugin.errorprone)
   implementation(libs.plugin.dependency.analysis)
-  implementation(libs.plugin.semver)
 }

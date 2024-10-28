@@ -10,8 +10,6 @@ plugins {
   alias(libs.plugins.shadow)
 }
 
-group = "com.xenoterracide"
-
 tasks.compileJava {
   options.release = 11
 }
@@ -46,8 +44,7 @@ tasks.withType<ShadowJar>().configureEach {
 
 gradlePlugin {
   plugins {
-    register("pub") {
-      id = "com.xenoterracide.gradle.semver"
+    register("com.xenoterracide.gradle.semver") {
       displayName = "Semver with Git"
       implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
       description = """
@@ -55,6 +52,28 @@ gradlePlugin {
  tags and commits and is configuration cache safe.
       """.trimIndent()
       tags = setOf("semver", "versioning", "git", "version")
+      id = name
+    }
+  }
+}
+
+publishing {
+  publications {
+    register<MavenPublication>("relocation") {
+      pom {
+        groupId = "com.xenoterracide"
+        artifactId = project.name
+        version = rootProject.version.toString()
+
+        distributionManagement {
+          relocation {
+            groupId = rootProject.group.toString()
+            artifactId = project.name
+            version = rootProject.version.toString()
+            message = "groupId has been changed to follow my conventions"
+          }
+        }
+      }
     }
   }
 }
