@@ -116,7 +116,7 @@ class SemverExtensionTest {
   void getGitDescribed() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       var pg = new SemverExtension(() -> Optional.of(git));
-      Supplier<Semver> vs = pg::getGitDescribed;
+      Supplier<Semver> vs = pg::getVersion;
 
       var v001Alpha01 = supplies(commit(git), vs);
 
@@ -168,7 +168,7 @@ class SemverExtensionTest {
 
       git.tag().setName("v0.1.1").call();
 
-      var v011 = pg.getGitDescribed();
+      var v011 = pg.getVersion();
 
       assertThat(v011)
         .isGreaterThan(v010BldV2)

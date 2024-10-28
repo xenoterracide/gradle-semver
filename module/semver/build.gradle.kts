@@ -14,10 +14,6 @@ tasks.compileJava {
   options.release = 11
 }
 
-dependencyLocking {
-  lockAllConfigurations()
-}
-
 dependencies {
   compileOnlyApi(libs.jspecify)
   api(libs.jgit)

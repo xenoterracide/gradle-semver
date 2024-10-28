@@ -12,8 +12,6 @@ import org.gradle.api.Project;
  */
 public class SemverPlugin implements Plugin<Project> {
 
-  private static final String SEMVER = "semver";
-
   /**
    * Instantiates a new Semver plugin.
    */
@@ -28,12 +26,15 @@ public class SemverPlugin implements Plugin<Project> {
         spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
       });
 
-    project.getExtensions().add(SEMVER, svcPrvdr.map(AbstractGitService::extension).get());
+    var extensions = project.getExtensions();
+    extensions.add("semver", project.provider(svcPrvdr.map(AbstractGitService::extension).get()::getVersion));
+    extensions.add("git", svcPrvdr.map(AbstractGitService::extension).get().getGit());
+
     project
       .getTasks()
       .register("version", task -> {
         task.setDescription("Prints the current project version.");
-        task.doLast(t -> System.out.println(project.getVersion()));
+        task.doLast(t -> System.out.println(task.getProject().getVersion()));
       });
   }
 }

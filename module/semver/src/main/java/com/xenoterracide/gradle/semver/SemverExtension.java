@@ -19,12 +19,11 @@ import org.semver4j.Semver;
 /**
  * The Semver extension.
  *
- * @implNote pre-release versions between branches which have the same git commit distance are not
- *   guaranteed to sort correctly and would do so only by coincidence.
- *
+ * @implNote pre-release versions between branches which have the same git commit distance
+ *         are not guaranteed to sort correctly and would do so only by coincidence.
  * @implNote Methods in this class are not lazy and invoke the
- *   {@link org.eclipse.jgit.lib.Repository}. All versions returned are Gradle safe as they are all
- *   valid semantic versions.
+ *         {@link org.eclipse.jgit.lib.Repository}. All versions returned are Gradle safe as they
+ *         are all valid semantic versions.
  */
 public class SemverExtension {
 
@@ -44,20 +43,6 @@ public class SemverExtension {
     this.git = git;
   }
 
-  /**
-   * Gets git metatdata exstension.
-   *
-   * @return the extension for accessing git metdata
-   * @implNote does not invoke {@link org.eclipse.jgit.lib.Repository}
-   */
-  public GitMetadataExtension getGit() {
-    return new GitMetadataExtension(this.git);
-  }
-
-  Try<Semver> coerced() {
-    return this.getGit().describe().map(v -> null == v ? PRE_VERSION : v).map(Semver::coerce).filter(Objects::nonNull);
-  }
-
   static Semver movePrereleaseToBuild(Semver version) {
     if (version.getPreRelease().stream().anyMatch(GIT_DESCRIBE_PATTERN.asMatchPredicate())) {
       var buildInfo = Splitter.on(GIT_DESCRIBE_DELIMITER).splitToList(
@@ -73,70 +58,48 @@ public class SemverExtension {
   }
 
   /**
-   * Gets gradle plugin compatible version.
-   * {@snippet :
-   * logger.quiet("gradlePlugin" + semver.gradlePlugin)  // 0.1.1-alpha.1+1.g3aae11e
-   *}
+   * Gets git metatdata exstension.
    *
-   * @implNote will probably delegate to {@link #getGitDescribed()} in the future.
-   * @return the gradle plugin semver.
+   * @return the extension for accessing git metdata
+   * @implNote does not invoke {@link org.eclipse.jgit.lib.Repository}
    */
-  public Semver getGradlePlugin() {
-    return this.coerced().map(SemverExtension::movePrereleaseToBuild).get();
+  GitMetadataExtension getGit() {
+    return new GitMetadataExtension(this.git);
+  }
+
+  Try<Semver> coerced() {
+    return this.getGit().describe().map(v -> null == v ? PRE_VERSION : v).map(Semver::coerce).filter(Objects::nonNull);
   }
 
   /**
-   * Traditional maven snapshot version.
-   * {@snippet :
-   * logger.quiet("maven snapshot"+semver.mavenSnapshot) // 0.1.1-SNAPSHOT
-   *}
-   *
-   * @return maven compatible semver
-   * @implNote The current algorith removes the pre-release information and instead appeads with
-   *   {@code "SNAPSHOT"} if the commit distance is greater than 0.
-   */
-  public Semver getMavenSnapshot() {
-    return this.coerced()
-      .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
-      .map(v ->
-        v
-          .getPreRelease()
-          .stream()
-          .filter(GIT_DESCRIBE_PATTERN.asMatchPredicate())
-          .findAny()
-          .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
-          .orElse(v)
-      )
-      .map(v -> new Semver(v.getVersion()))
-      .get();
-  }
-
-  /**
-   * Gets maven compatible version.
-   *
-   * @implNote currently delegates to {@link #getMavenSnapshot()} will probably delegate to
-   *   {@link #getGitDescribed()} in the future.
-   * @return the maven compatible semver
-   */
-  public Semver getMaven() {
-    return this.getMavenSnapshot();
-  }
-
-  /**
-   * Semantic version based on git describe. Both Maven and Gradle Compatible.
+   * Semantic version based on git describe. Both Maven and Gradle Compatible. Uses smarter,
+   * lockable behavior than a {@code SNAPSHOT} release. You can release every commit without fear
+   * that someone can't ensure they don't break their API.
    * <ul>
    *   <li>{@code 0.0.0-alpha.0.0}</li>
-   *   <li>{@code 0.0.1-alpha.0.1+abcdef10.dirty}</li>
    *   <li>{@code 1.0.0-rc.1}</li>
-   *   <li>{@code 1.0.0-rc.1.1+abcdef10}</li>
+   *   <li>{@code 1.0.0-rc.1.1+gabcdef10}</li>
    *   <li>{@code 1.0.0}</li>
-   *   <li>{@code 1.0.1-alpha.0.1+abcdef10}</li>
+   *   <li>{@code 1.0.1-alpha.0.1+gabcdef10}</li>
+   *   <li>{@code 0.0.1-alpha.0.1+b-topic-foo.gabcdef10.dirty}</li>
+   *   <li>{@code 0.0.1-alpha.0.1+gabcdef10.dirty}</li>
    * </ul>
+   * <p>
+   *     Given a git branch named {@code topic/foo}.<br>
+   *     When the most recent commit to this branch is {@code gabcdef10} and it is 2 commits
+   *     away from the most recent tag, which is {@code 1.2.0-rc.1}, and the workspace is not
+   *     dirty.<br>
+   *     Then the version would be {@code 1.2.0-rc.1.2+b-topic-foo.gabcdef10}.
+   * </p>
    *
-   * @implNote gradle compatability is somewhat assumed as gradle doesn't provide a valid way to
-   *   unit test this assumption.
-   *
-   * @return semver
+   * @return a semantic version based on git describe
+   * @implNote when dealing with branches the last number before the build information
+   *         should be based on the most recent ancenstor of the default branch. Meaning that in
+   *         {@code 2.0.0-rc.2.1+gabcdef10} the {@code .1} will always come from the most recent
+   *         ancenstor of the default branch, that branch is 1 commit away from the most recent
+   *         tag. The {@code gabcdef10} would come from the actual branch you're on which could be
+   *         any number of commits away from the last tag. This is done so that consumers don't
+   *         accidentally pull in a branch version when working off our smarter snapshots.
    */
   public Semver getGitDescribed() {
     return new SemverBuilder(this.getGit()).build();
