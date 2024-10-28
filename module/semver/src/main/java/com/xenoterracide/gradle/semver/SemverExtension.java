@@ -98,15 +98,14 @@ public class SemverExtension {
   public Semver getMavenSnapshot() {
     return this.coerced()
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
-      .map(
-        v ->
-          v
-            .getPreRelease()
-            .stream()
-            .filter(GIT_DESCRIBE_PATTERN.asMatchPredicate())
-            .findAny()
-            .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
-            .orElse(v)
+      .map(v ->
+        v
+          .getPreRelease()
+          .stream()
+          .filter(GIT_DESCRIBE_PATTERN.asMatchPredicate())
+          .findAny()
+          .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
+          .orElse(v)
       )
       .map(v -> new Semver(v.getVersion()))
       .get();
