@@ -1,8 +1,9 @@
 // © Copyright 2024 Caleb Cushing
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.git.internal;
 
+import com.xenoterracide.gradle.git.GitStatus;
 import org.jspecify.annotations.Nullable;
 
 /**

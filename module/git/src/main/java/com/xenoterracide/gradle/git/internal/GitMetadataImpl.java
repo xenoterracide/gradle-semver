@@ -1,10 +1,11 @@
 // © Copyright 2018-2024 Caleb Cushing
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.git.internal;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.semver.internal.ExceptionTools;
 import io.vavr.control.Try;
 import java.util.NoSuchElementException;
@@ -27,7 +28,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * The type Git metadata extension.
  */
-public class GitMetadataExtension implements GitMetadata {
+public class GitMetadataImpl implements GitMetadata {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
@@ -35,7 +36,7 @@ public class GitMetadataExtension implements GitMetadata {
 
   private final Supplier<Optional<Git>> git;
 
-  GitMetadataExtension(Supplier<Optional<Git>> git) {
+  GitMetadataImpl(Supplier<Optional<Git>> git) {
     this.git = git;
   }
 

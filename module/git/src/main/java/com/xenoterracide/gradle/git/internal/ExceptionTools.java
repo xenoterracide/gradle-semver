@@ -1,7 +1,7 @@
 // © Copyright 2024 Caleb Cushing
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver.internal;
+package com.xenoterracide.gradle.git.internal;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -34,16 +34,15 @@ public final class ExceptionTools {
    *   // Try is from vavr.io
    *   Try.of(() -> { throw new IOException(); })
    *     .getOrElseThrow(ExceptionTools::toRuntime);
-   * }
+   *}
    *
    * @param e the exception to convert.
    * @return {@link RuntimeException} the converted exception.
-   * @implNote
-   *     <ul>
-   *       <li>{@link IOException} to {@link UncheckedIOException}.</li>
-   *       <li>{@link RuntimeException} is returned as is.</li>
-   *       <li>Other exceptions are wrapped in a {@link RuntimeException}.</li>
-   *     </ul>
+   * @implNote <ul>
+   *   <li>{@link IOException} to {@link UncheckedIOException}.</li>
+   *   <li>{@link RuntimeException} is returned as is.</li>
+   *   <li>Other exceptions are wrapped in a {@link RuntimeException}.</li>
+   *   </ul>
    * @see <a href="https://docs.vavr.io/#_try">vavr.io Try</a>
    */
   // CHECKSTYLE.OFF: ReturnCount
