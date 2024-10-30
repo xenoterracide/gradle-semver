@@ -9,45 +9,45 @@ import org.gradle.api.provider.ProviderFactory;
 
 class GitMetadataExtensionImpl implements GitMetadataExtension {
 
-  private final ProviderFactory project;
+  private final ProviderFactory providerFactory;
 
   @Inject
-  GitMetadataExtensionImpl(ProviderFactory project) {
-    this.project = project;
+  GitMetadataExtensionImpl(ProviderFactory providerFactory) {
+    this.providerFactory = providerFactory;
   }
 
   @Override
   public Provider<String> getHeadBranch() {
-    return null;
+    return this.providerFactory.of(HeadBranchValueSource.class, c -> {});
   }
 
   @Override
   public Provider<String> getSourceRemote() {
-    return null;
+    return this.providerFactory.provider(() -> "origin");
   }
 
   @Override
   public Provider<String> getUniqueShort() {
-    return null;
+    return this.providerFactory.provider(() -> "1234567");
   }
 
   @Override
   public Provider<String> getLatestTag() {
-    return null;
+    return this.providerFactory.provider(() -> "v1.0.0");
   }
 
   @Override
   public Provider<Integer> getCommitDistance() {
-    return null;
+    return this.providerFactory.provider(() -> 1);
   }
 
   @Override
   public Provider<Integer> getCommitDistanceOfAncestorInHeadBranch() {
-    return null;
+    return this.providerFactory.provider(() -> 1);
   }
 
   @Override
   public Provider<GitStatus> getStatus() {
-    return null;
+    return this.providerFactory.provider(() -> GitStatus.CLEAN);
   }
 }

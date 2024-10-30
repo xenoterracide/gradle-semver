@@ -9,7 +9,5 @@ import org.gradle.api.Project;
 public class GitPlugin implements Plugin<Project> {
 
   @Override
-  public void apply(Project target) {
-    target.getExtensions().add("git", new GitMetadataExtensionImpl(target));
-  }
+  public void apply(Project target) {}
 }
