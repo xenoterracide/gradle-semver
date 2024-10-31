@@ -11,9 +11,9 @@ import org.gradle.api.provider.ValueSourceParameters;
  */
 public interface GitConfigurationExtension extends ValueSourceParameters {
   /**
-   * The `HEAD Branch` is also known as the default branch and is defined by your remote. To see
-   * this for the {@code origin} remote you can run {@code git remote show origin} and you will see
-   * a field called {@code HEAD branch}.
+   * The `HEAD Branch` is also known as the default branch and is defined by your remote. To see this for the
+   * {@code origin} remote you can run {@code git remote show origin} and you will see a field called
+   * {@code HEAD branch}.
    *
    * @return the branch name.
    */
@@ -34,8 +34,8 @@ public interface GitConfigurationExtension extends ValueSourceParameters {
    * </ol>
    *  If that is not set then it will return the first remote that is found.
    *
-   * @implNote if git does not have any remotes configured then any property derived from this
-   *   will return null irregardles.
+   * @implNote if git does not have any remotes configured then any property derived from this will return null
+   *   irregardles.
    */
   Property<String> getSourceRemote();
 }

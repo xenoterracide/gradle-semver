@@ -9,5 +9,12 @@ import org.gradle.api.Project;
 public class GitPlugin implements Plugin<Project> {
 
   @Override
-  public void apply(Project target) {}
+  public void apply(Project project) {
+    project
+      .getGradle()
+      .getSharedServices()
+      .registerIfAbsent(GitSupplierService.class.getCanonicalName(), GitSupplierService.class, spec -> {
+        spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
+      });
+  }
 }

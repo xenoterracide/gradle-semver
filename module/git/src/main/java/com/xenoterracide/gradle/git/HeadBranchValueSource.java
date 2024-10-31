@@ -3,15 +3,13 @@
 
 package com.xenoterracide.gradle.git;
 
-import static com.xenoterracide.gradle.git.GradleTools.finalizeOnRead;
-
 import com.xenoterracide.gradle.git.internal.GitUtils;
 import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.eclipse.jgit.api.Git;
-import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.provider.ValueSource;
 import org.gradle.process.ExecOperations;
 import org.jetbrains.annotations.Nullable;
@@ -26,22 +24,16 @@ import org.slf4j.LoggerFactory;
  *   <li>check git netork</li>
  * </ol>
  */
-abstract class HeadBranchValueSource implements ValueSource<String, GitConfigurationExtension> {
+public abstract class HeadBranchValueSource implements ValueSource<String, GitConfigurationExtension> {
 
   private final ExecOperations execOperations;
   private final GitSupplierService gitS;
-  private final ProviderFactory providerFactory;
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   @Inject
-  protected HeadBranchValueSource(
-    ExecOperations execOperations,
-    GitSupplierService gitS,
-    ProviderFactory providerFactory
-  ) {
+  public HeadBranchValueSource(ExecOperations execOperations, GitSupplierService gitS) {
     this.execOperations = execOperations;
     this.gitS = gitS;
-    this.providerFactory = providerFactory;
   }
 
   @Override
@@ -56,16 +48,12 @@ abstract class HeadBranchValueSource implements ValueSource<String, GitConfigura
         .orElse(false);
 
     if (hasRemotes) {
-      return finalizeOnRead(this.getParameters().getHeadBranch())
-        .orElse(
-          this.providerFactory.provider(() -> {
-              return Try.withResources(ByteArrayOutputStream::new)
-                .of(this::gitRemoteShow)
-                .onFailure(e -> this.log.warn("Failed to get head branch", e))
-                .getOrNull();
-            })
-        )
-        .getOrNull();
+      return Optional.ofNullable(this.getParameters().getHeadBranch().getOrNull()).orElseGet(() -> {
+        return Try.withResources(ByteArrayOutputStream::new)
+          .of(this::gitRemoteShow)
+          .onFailure(e -> this.log.warn("Failed to get head branch", e))
+          .getOrNull();
+      });
     }
     return null;
   }
