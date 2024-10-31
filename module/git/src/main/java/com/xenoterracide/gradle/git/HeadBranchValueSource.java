@@ -77,6 +77,6 @@ abstract class HeadBranchValueSource implements ValueSource<String, GitConfigura
         execSpec.setStandardOutput(baos);
       }).getExitValue();
 
-    return Objects.requireNonNull(GitUtils.getHeadBranch(baos), "unable to locate in " + "output");
+    return Objects.requireNonNull(GitUtils.getHeadBranch(baos), "unable to locate HEAD branch in output");
   }
 }
