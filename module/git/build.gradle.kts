@@ -21,6 +21,7 @@ dependencies {
   implementation(libs.guava)
   implementation(libs.commons.io)
   testImplementation(libs.junit.api)
+  testImplementation(libs.mockito)
   testImplementation(gradleTestKit())
 }
 

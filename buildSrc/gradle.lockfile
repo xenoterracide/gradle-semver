@@ -2,8 +2,8 @@
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
 com.autonomousapps:antlr:4.10.1.6=buildScriptClasspath,runtimeClasspath
-com.autonomousapps:asm-relocated:9.6.0.1=buildScriptClasspath,runtimeClasspath
-com.autonomousapps:dependency-analysis-gradle-plugin:2.3.0=buildScriptClasspath,compileClasspath,runtimeClasspath
+com.autonomousapps:asm-relocated:9.7.1.0=buildScriptClasspath,runtimeClasspath
+com.autonomousapps:dependency-analysis-gradle-plugin:2.4.0=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.autonomousapps:graph-support:0.3=buildScriptClasspath,runtimeClasspath
 com.diffplug.durian:durian-collect:1.2.0=buildScriptClasspath,runtimeClasspath
 com.diffplug.durian:durian-core:1.2.0=buildScriptClasspath,runtimeClasspath
@@ -13,7 +13,7 @@ com.diffplug.spotless:spotless-lib-extra:2.45.0=buildScriptClasspath,compileClas
 com.diffplug.spotless:spotless-lib:2.45.0=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.diffplug.spotless:spotless-plugin-gradle:6.25.0=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.github.ben-manes.caffeine:caffeine:3.1.8=buildScriptClasspath,runtimeClasspath
-com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.25=buildScriptClasspath,compileClasspath,runtimeClasspath
+com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.26=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.google.code.findbugs:jsr305:3.0.2=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.google.errorprone:error_prone_annotations:2.26.1=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.google.guava:failureaccess:1.0.2=buildScriptClasspath,compileClasspath,runtimeClasspath

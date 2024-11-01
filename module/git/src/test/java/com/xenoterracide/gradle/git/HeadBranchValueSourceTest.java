@@ -4,6 +4,7 @@
 package com.xenoterracide.gradle.git;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.net.URISyntaxException;
 import org.eclipse.jgit.api.Git;
@@ -11,6 +12,7 @@ import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.URIish;
 import org.gradle.api.Project;
+import org.gradle.api.internal.provider.MissingValueException;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +23,40 @@ class HeadBranchValueSourceTest {
   Git git;
 
   @Test
-  void obtainWithHeadBranchSet() {
+  void obtainWithHeadBranchSetNoRemotes() {
     var hbvsp = project
       .getProviders()
-      .of(HeadBranchValueSource.class, c -> c.getParameters().getHeadBranch().set("other"));
+      .of(HeadBranchValueSource.class, c -> {
+        c.getParameters().getHeadBranch().set("other");
+        c.getParameters().getProjectDir().set(project.getProjectDir());
+      });
+
+    assertThatExceptionOfType(MissingValueException.class).isThrownBy(() -> hbvsp.get());
+  }
+
+  @Test
+  void obtainWithHeadBranch() throws URISyntaxException, GitAPIException {
+    this.addRemote();
+    var hbvsp = project
+      .getProviders()
+      .of(HeadBranchValueSource.class, c -> {
+        c.getParameters().getHeadBranch().set("other");
+        c.getParameters().getProjectDir().set(project.getProjectDir());
+      });
 
     assertThat(hbvsp.get()).isEqualTo("other");
+  }
+
+  @Test
+  void obtainFromRemote() throws URISyntaxException, GitAPIException {
+    this.addRemote();
+    var hbvsp = project
+      .getProviders()
+      .of(HeadBranchValueSource.class, c -> {
+        c.getParameters().getProjectDir().set(project.getProjectDir());
+      });
+
+    assertThat(hbvsp.get()).isEqualTo("main");
   }
 
   @BeforeEach

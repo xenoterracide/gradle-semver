@@ -3,13 +3,14 @@
 
 package com.xenoterracide.gradle.git;
 
+import java.io.File;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.ValueSourceParameters;
 
 /**
  * Information that may need explicit configuration.
  */
-public interface GitConfigurationExtension extends ValueSourceParameters {
+public interface HeadBranchValueSourceParameters extends ValueSourceParameters {
   /**
    * The `HEAD Branch` is also known as the default branch and is defined by your remote. To see this for the
    * {@code origin} remote you can run {@code git remote show origin} and you will see a field called
@@ -38,4 +39,6 @@ public interface GitConfigurationExtension extends ValueSourceParameters {
    *   irregardles.
    */
   Property<String> getSourceRemote();
+
+  Property<File> getProjectDir();
 }

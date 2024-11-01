@@ -48,7 +48,7 @@ junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api" }
 maven-artifact = "org.apache.maven:maven-artifact:3.+"
-mockito = { module = "org.mockito:mockito-core" }
+mockito = { module = "org.mockito:mockito-core", version = "5.+" }
 plugin-convention-coverage = "com.xenoterracide.gradle.convention:coverage:0.+"
 plugin-convention-publish = "com.xenoterracide.gradle.convention:publish:0.+"
 plugin-dependency-analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:2.+"

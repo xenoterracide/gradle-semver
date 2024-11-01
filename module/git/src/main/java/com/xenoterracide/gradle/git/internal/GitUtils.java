@@ -17,15 +17,14 @@ public class GitUtils {
   }
 
   /**
-   * Takes an {@link ByteArrayOutputStream} and returns the HEAD branch using
-   * {@link #getHeadBranch(String)}. Likely to be switched to a standard
-   * {@link java.io.ByteArrayOutputStream} when java 17 is the minimum version.
+   * Takes an {@link ByteArrayOutputStream} and returns the HEAD branch using {@link #parseHeadBranch(String)}. Likely
+   * to be switched to a standard {@link java.io.ByteArrayOutputStream} when java 17 is the minimum version.
    *
    * @param baos
    * @return
    */
   public static @Nullable String getHeadBranch(ByteArrayOutputStream baos) {
-    return getHeadBranch(baos.toString(StandardCharsets.UTF_8));
+    return parseHeadBranch(baos.toString(StandardCharsets.UTF_8));
   }
 
   /**
@@ -34,7 +33,7 @@ public class GitUtils {
    * @param remoteShow
    * @return the HEAD branch or null if not found
    */
-  public static @Nullable String getHeadBranch(String remoteShow) {
+  public static @Nullable String parseHeadBranch(String remoteShow) {
     var headBranch = "  HEAD Branch";
     return splitOn('\n', remoteShow)
       .filter(line -> line.startsWith(headBranch))
