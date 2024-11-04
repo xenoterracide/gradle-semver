@@ -3,7 +3,7 @@
 # This file is expected to be part of source control.
 com.autonomousapps:antlr:4.10.1.6=buildScriptClasspath,runtimeClasspath
 com.autonomousapps:asm-relocated:9.7.1.0=buildScriptClasspath,runtimeClasspath
-com.autonomousapps:dependency-analysis-gradle-plugin:2.4.0=buildScriptClasspath,compileClasspath,runtimeClasspath
+com.autonomousapps:dependency-analysis-gradle-plugin:2.4.2=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.autonomousapps:graph-support:0.3=buildScriptClasspath,runtimeClasspath
 com.diffplug.durian:durian-collect:1.2.0=buildScriptClasspath,runtimeClasspath
 com.diffplug.durian:durian-core:1.2.0=buildScriptClasspath,runtimeClasspath

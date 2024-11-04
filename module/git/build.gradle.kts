@@ -20,6 +20,7 @@ dependencies {
   implementation(libs.vavr)
   implementation(libs.guava)
   implementation(libs.commons.io)
+  implementation(libs.commons.lang)
   testImplementation(libs.junit.api)
   testImplementation(libs.mockito)
   testImplementation(gradleTestKit())

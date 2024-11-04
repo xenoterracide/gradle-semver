@@ -3,9 +3,12 @@
 
 package com.xenoterracide.gradle.git;
 
+import static com.xenoterracide.gradle.git.internal.GradleTools.finalizeOnRead;
+
 import com.xenoterracide.gradle.git.internal.GitUtils;
 import io.vavr.control.Try;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import kotlin.text.Charsets;
@@ -37,17 +40,21 @@ public abstract class HeadBranchValueSource implements ValueSource<String, HeadB
 
   @Override
   public @Nullable String obtain() {
-    try (var git = Git.open(this.getParameters().getProjectDir().get())) {
-      var hasRemotes = Optional.of(git)
+    try (var git = Git.open(finalizeOnRead(this.getParameters().getProjectDir()).get())) {
+      var remotes = Optional.of(git)
         .map(Git::remoteList)
         .map(cmd -> Try.of(cmd::call))
         .map(t -> t.onFailure(e -> this.log.warn("Failed to get remotes", e)))
         .map(t -> t.get())
-        .map(remotes -> !remotes.isEmpty())
-        .orElse(false);
+        .orElse(List.of());
 
-      if (hasRemotes) {
-        var hb = this.getParameters().getHeadBranch().getOrNull();
+      if (!remotes.isEmpty()) {
+        remotes
+          .stream()
+          .findFirst()
+          .ifPresent(remote -> this.getParameters().getSourceRemote().convention(remote.getName()));
+
+        var hb = finalizeOnRead(this.getParameters().getHeadBranch()).getOrNull();
         return Optional.ofNullable(hb).orElseGet(() -> {
           return Try.withResources(ByteArrayOutputStream::new)
             .of(this::gitRemoteShow)
