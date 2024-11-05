@@ -8,6 +8,7 @@ java-tools = "com.xenoterracide:tools:0.0.0-SNAPSHOT"
 api-guardian = { module = "org.apiguardian:apiguardian-api" }
 assertj = "org.assertj:assertj-core:3.+"
 autoservice = "com.google.auto.service:auto-service:1.+"
+caffeine = "com.github.ben-manes.caffeine:caffeine:3.+"
 checker-annotations = { module = "org.checkerframework:checker-qual", version.ref = "checker" }
 checker-core = { module = "org.checkerframework:checker", version.ref = "checker" }
 commons-io = "commons-io:commons-io:2.+"
@@ -19,7 +20,7 @@ errorprone-core = { module = "com.google.errorprone:error_prone_core", version.r
 errorprone-nullaway = "com.uber.nullaway:nullaway:0.+"
 google-java-format = "com.google.googlejavaformat:google-java-format:+"
 guava = "com.google.guava:guava:+"
-h2 = { module = "com.h2database:h2" }
+h2 = { module = "com.h2database:h2", version = "2.+" }
 hibernate-envers = { module = "org.hibernate.orm:hibernate-envers" }
 hibernate-orm-core = { module = "org.hibernate.orm:hibernate-core" }
 hibernate-jpa-modelgen = { module = "org.hibernate.orm:hibernate-jpamodelgen" }

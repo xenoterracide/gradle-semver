@@ -3,11 +3,17 @@
 
 package com.xenoterracide.gradle.git.internal;
 
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 
 public class GradleTools {
 
   public static <T> Property<T> finalizeOnRead(Property<T> property) {
+    property.finalizeValueOnRead();
+    return property;
+  }
+
+  public static <T> ListProperty<T> finalizeOnRead(ListProperty<T> property) {
     property.finalizeValueOnRead();
     return property;
   }

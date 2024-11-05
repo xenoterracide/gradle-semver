@@ -42,6 +42,7 @@ class HeadBranchValueSourceTest {
       .of(HeadBranchValueSource.class, c -> {
         c.getParameters().getHeadBranch().set("other");
         c.getParameters().getProjectDir().set(project.getProjectDir());
+        c.getParameters().getRemotes().add(new RemotesValueSource.Remote("origin"));
       });
 
     assertThat(hbvsp.get()).isEqualTo("other");

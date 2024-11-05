@@ -25,6 +25,10 @@ tasks.check {
   dependsOn(tasks.buildHealth)
 }
 
+tasks.dependencies {
+  dependsOn(subprojects.map { it.tasks.dependencies })
+}
+
 dependencyAnalysis {
   issues {
     all {

@@ -17,6 +17,8 @@ tasks.compileJava {
 dependencies {
   compileOnlyApi(libs.jspecify)
   api(libs.jgit)
+  implementation(libs.caffeine)
+  implementation(libs.h2)
   implementation(libs.vavr)
   implementation(libs.guava)
   implementation(libs.commons.io)
