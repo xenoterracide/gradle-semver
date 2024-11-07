@@ -7,10 +7,10 @@ on:
     #        │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
     #        │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
     #        * * * * *
-    - cron: "0 3 * * 3" # 3am every Wednesday
+    - cron: "0 3 * * 0" # 3am UTC every Sunday
   push:
     branches:
-      - build/auto-update
+      - ci/update-java
 jobs:
   update-java:
     runs-on: ubuntu-latest
@@ -32,13 +32,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: current
-          arguments: wrapper --write-locks
-      - run: ./gradlew --version
-      - run: find . -name '*gradle.lockfile' -delete
-      - run: ./gradlew wrapper --write-locks
-      - run: ./gradlew wrapper # somehow the final bat was not generated before
-      - run: ./gradlew dependencies shadowJar build buildHealth --write-locks --scan
-      - run: ./gradlew build --scan
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      - run: gradle wrapper --write-locks
+      - run: make ci-update-java
       - uses: peter-evans/create-pull-request@v7
         id: create_pr
         with:
