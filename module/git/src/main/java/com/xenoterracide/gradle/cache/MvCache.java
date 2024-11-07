@@ -10,10 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.Nullable;
@@ -23,9 +22,8 @@ import org.slf4j.LoggerFactory;
 public class MvCache<K extends Serializable, V extends Serializable> implements AutoCloseable {
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-  private final Map<K, V> memoized = new HashMap<>();
+  private final Map<K, V> memoized = new ConcurrentHashMap<>();
   private final MVStore store;
-  private @Nullable Map<K, Pair<Instant, V>> storeMap;
 
   public MvCache(MVStore store) {
     this.store = store;
@@ -56,15 +54,13 @@ public class MvCache<K extends Serializable, V extends Serializable> implements 
   }
 
   public Callable<@Nullable V> cache(Callable<@Nullable V> call, K key, Duration cacheFor) {
-    if (this.storeMap == null) this.storeMap = this.store.openMap("cache");
     return () -> this.memoized.computeIfAbsent(key, k -> this.compute(key, call, cacheFor));
   }
 
   @Nullable
   V compute(K key, Callable<V> call, Duration cacheFor) {
-    var storeMap = Objects.requireNonNull(this.storeMap, "storeMap must not be null");
-
-    var pair = storeMap.computeIfAbsent(key, k -> {
+    var map = this.store.<K, Pair<Instant, V>>openMap("cache");
+    var pair = map.computeIfAbsent(key, k -> {
       try {
         return Pair.of(Instant.now().plus(cacheFor), call.call());
       } catch (Exception e) {
