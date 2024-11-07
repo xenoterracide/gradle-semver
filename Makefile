@@ -19,7 +19,7 @@ endef
 .PHONY: up
 up:
 # success if no output
-	./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0
+	./gradlew dependencies --write-locks --refresh-dependencies --console=plain | grep -e FAILED || exit 0
 
 .PHONY: format
 format:
@@ -38,26 +38,6 @@ clean:
 
 .PHONY: cleaner
 cleaner: clean-build clean-gradle
-
-.PHONY: release
-release: pre-release gh-release
-
-pre-release:
-	$(call check_defined, semver)
-	$(info Attempting to release $(semver))
-	./gradlew build --quiet
-	git tag -m $(semver) -a v$(semver)
-	./gradlew assemble shadowJar --quiet
-	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
-
-gh-release: build/libs/*.jar
-	git push --tags
-
-.PHONY: rollback
-rollback:
-	$(call check_defined, tags)
-	git tag --delete $(tags)
-	git push origin --delete $(tags)
 
 clean-cc: $(CONFIGURATION_CACHE)
 	- rm -rf $(CONFIGURATION_CACHE)
@@ -89,7 +69,7 @@ create-pr:
 	gh pr create --body "" || exit 0
 
 merge-squash:
-	gh pr merge --squash --delete-branch --auto
+	gh pr merge --squash --delete-branch --auto --body ""
 
 run-url:
 	$(call check_defined, workflow)
