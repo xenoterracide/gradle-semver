@@ -3,12 +3,11 @@
 
 package com.xenoterracide.gradle.git;
 
+import java.util.Map;
 import org.gradle.api.provider.Provider;
 
 public interface GitMetadataExtension {
-  Provider<String> getHeadBranch();
-
-  Provider<String> getSourceRemote();
+  Provider<Map<String, Provider<String>>> getRemoteHeadBranches();
 
   Provider<String> getUniqueShort();
 

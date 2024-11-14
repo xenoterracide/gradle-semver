@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -31,14 +32,14 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       assertThat(pg.getBranch()).isEqualTo("topic/test");
     }
   }
 
   @Test
   void noGit() {
-    var pg = new GitMetadataImpl(() -> Optional.empty());
+    var pg = new GitMetadata(Optional::empty);
     assertThat(pg.distance()).isSameAs(0);
     assertThat(pg.getBranch()).isNull();
     assertThat(pg.getCommit()).isNull();
@@ -55,7 +56,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       var main = pg.getObjectIdFor("topic/test").get().getName();
       var head = pg.getObjectIdFor("HEAD").get().getName();
       assertThat(main).hasSize(40);
@@ -71,7 +72,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
       var head = pg.getRev("HEAD");
       assertThat(main).hasSize(40);
@@ -87,7 +88,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
       var head = pg.getCommit();
       assertThat(main).hasSize(40);
@@ -103,7 +104,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
       var head = pg.getCommitShort();
       assertThat(main).isNotNull();
@@ -116,7 +117,7 @@ class GitMetadataImplTest {
   @Test
   void getLastTag() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       assertThat(pg.tag()).isNull();
 
       git.commit().setMessage("first commit").call();
@@ -144,7 +145,7 @@ class GitMetadataImplTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
 
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       git.tag().setName("v0.1.0").call();
       assertThat(pg.getDescribe()).isEqualTo("v0.1.0");
 
@@ -159,7 +160,7 @@ class GitMetadataImplTest {
   @Test
   void getCommitDistance() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
       Supplier<Integer> distance = pg::distance;
       assertThat(distance.get()).isEqualTo(0);
 
@@ -186,13 +187,26 @@ class GitMetadataImplTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
+      var pg = new GitMetadata(() -> Optional.of(git));
 
       assertThat(pg.status()).isEqualTo(GitStatus.CLEAN);
 
       Files.createFile(projectDir.toPath().resolve("test.txt"));
 
       assertThat(pg.status()).isEqualTo(GitStatus.DIRTY);
+    }
+  }
+
+  @Test
+  void remotes() throws Exception {
+    try (var git = Git.init().setDirectory(projectDir).call()) {
+      git.remoteAdd().setName("origin").setUri(new URIish("https://github.com/xenoterracide/gradle-semver.git")).call();
+      git.commit().setMessage("initial commit").call();
+      git.tag().setName("v0.1.0").call();
+
+      var pg = new GitMetadata(() -> Optional.of(git));
+
+      assertThat(pg.remotes()).contains("origin");
     }
   }
 }

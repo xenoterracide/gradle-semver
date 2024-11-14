@@ -213,7 +213,6 @@ tasks.withType<JavaCompile>().configureEach {
       "PreferJavaTimeOverload",
       "ClassNamedLikeTypeParameter",
       "ConstantField",
-      "FieldCanBeLocal",
       "FieldCanBeStatic",
       "ForEachIterable",
       "MethodCanBeStatic",
@@ -228,6 +227,7 @@ tasks.withType<JavaCompile>().configureEach {
     if (!inIdea.getOrElse(false)) {
       errors.addAll(
         listOf(
+          "FieldCanBeLocal",
           "WildcardImport",
           "UnusedVariable",
           "UnusedMethod",

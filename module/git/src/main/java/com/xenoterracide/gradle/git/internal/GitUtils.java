@@ -4,27 +4,14 @@
 package com.xenoterracide.gradle.git.internal;
 
 import com.google.common.base.Splitter;
-import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.jspecify.annotations.Nullable;
 
 public class GitUtils {
 
   static Stream<String> splitOn(char delimeter, String value) {
     return StreamSupport.stream(Splitter.on(delimeter).split(value).spliterator(), false);
-  }
-
-  /**
-   * Takes an {@link ByteArrayOutputStream} and returns the HEAD branch using {@link #parseHeadBranch(String)}. Likely
-   * to be switched to a standard {@link java.io.ByteArrayOutputStream} when java 17 is the minimum version.
-   *
-   * @param baos
-   * @return
-   */
-  public static @Nullable String getHeadBranch(ByteArrayOutputStream baos) {
-    return parseHeadBranch(baos.toString(StandardCharsets.UTF_8));
   }
 
   /**
