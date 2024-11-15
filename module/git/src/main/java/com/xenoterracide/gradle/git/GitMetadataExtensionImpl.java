@@ -62,6 +62,8 @@ class GitMetadataExtensionImpl implements GitMetadataExtension {
 
   @Override
   public Provider<Integer> getCommitDistanceOfAncestorInHeadBranch() {
+    var map = this.getRemoteHeadBranches().get();
+    map.get("origin");
     return this.provideProperty(this.git::distance, Integer.class);
   }
 

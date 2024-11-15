@@ -5,7 +5,7 @@ package com.xenoterracide.gradle.git;
 
 import static com.xenoterracide.gradle.git.internal.GradleTools.finalizeOnRead;
 
-import com.xenoterracide.gradle.git.internal.GitUtils;
+import com.xenoterracide.gradle.git.internal.GitTools;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -42,12 +42,25 @@ public abstract class HeadBranchValueSource
     try (var baos = new ByteArrayOutputStream()) {
       this.execOperations.exec(execSpec -> {
           execSpec.setExecutable("git");
+          execSpec.args("rev-parse", "--abbrev-ref", "HEAD");
+          execSpec.setStandardOutput(baos);
+        }).getExitValue();
+
+      // string conversion warning is only valid 17+ not for our 11
+      return new String(baos.toByteArray(), StandardCharsets.UTF_8).trim();
+    } catch (IOException e) {
+      this.log.warn("Git had an exception", e);
+    }
+
+    try (var baos = new ByteArrayOutputStream()) {
+      this.execOperations.exec(execSpec -> {
+          execSpec.setExecutable("git");
           execSpec.args("remote", "show", finalizeOnRead(this.getParameters().getRemote()));
           execSpec.setStandardOutput(baos);
         }).getExitValue();
 
       // string conversion warning is only valid 17+ not for our 11
-      return GitUtils.parseHeadBranch(new String(baos.toByteArray(), StandardCharsets.UTF_8));
+      return GitTools.parseHeadBranch(new String(baos.toByteArray(), StandardCharsets.UTF_8));
     } catch (IOException e) {
       this.log.warn("Git had an exception", e);
     }
