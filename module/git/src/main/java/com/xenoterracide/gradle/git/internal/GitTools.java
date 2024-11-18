@@ -4,11 +4,16 @@
 package com.xenoterracide.gradle.git.internal;
 
 import com.google.common.base.Splitter;
+import io.vavr.CheckedFunction1;
 import io.vavr.control.Try;
 import java.io.File;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.SystemReader;
 import org.jspecify.annotations.Nullable;
@@ -28,10 +33,18 @@ public final class GitTools {
 
   private GitTools() {}
 
-  static Try.WithResources1<Git> openGit(File projectDir) {
+  public static CheckedFunction1<Git, Ref> getHeadBranch(Supplier<String> remote) {
+    return git -> Objects.requireNonNull(git.lsRemote().setRemote(remote.get()).callAsMap().get(Constants.HEAD));
+  }
+
+  public static Try.WithResources1<Git> openGit(Supplier<File> projectDir) {
     SystemReader.setInstance(READER);
     return Try.withResources(() -> {
-      var gitDir = new FileRepositoryBuilder().readEnvironment().setMustExist(true).findGitDir(projectDir).getGitDir();
+      var gitDir = new FileRepositoryBuilder()
+        .readEnvironment()
+        .setMustExist(true)
+        .findGitDir(projectDir.get())
+        .getGitDir();
       return Git.open(gitDir);
     });
   }
@@ -57,10 +70,4 @@ public final class GitTools {
       .findAny()
       .orElse(null);
   }
-
-  // preventJGitFromCallingExecutables is copied from
-  // https://github.com/diffplug/spotless/blob/224f8f96df3ad42cac81064a0461e6d4ee91dcaf/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/GitRatchetGradle.java#L35
-  // SPDX-License-Identifier: Apache-2.0
-  // Copyright 2020-2023 DiffPlug
-  static void preventJGitFromCallingExecutables() {}
 }

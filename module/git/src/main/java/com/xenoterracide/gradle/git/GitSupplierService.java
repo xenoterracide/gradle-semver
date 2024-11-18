@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.api.UncheckedIOException;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.services.BuildService;
@@ -39,6 +40,7 @@ public abstract class GitSupplierService implements BuildService<Params>, AutoCl
   public Optional<Git> get() {
     if (this.git == null) {
       var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
+      var gitDir = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(projectDir).getGitDir();
 
       try {
         this.git = gitDir != null ? Git.open(gitDir) : null;
