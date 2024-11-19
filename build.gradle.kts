@@ -17,9 +17,12 @@ dependencyLocking {
   lockAllConfigurations()
 }
 
-version = providers.environmentVariable("IS_PUBLISHING")
-  .map { semver.gitDescribed }
-  .orElse(Semver("0.0.0")).get()
+version =
+  providers
+    .environmentVariable("IS_PUBLISHING")
+    .map { semver.gitDescribed }
+    .orElse(Semver("0.0.0"))
+    .get()
 
 tasks.check {
   dependsOn(tasks.buildHealth)
@@ -27,6 +30,11 @@ tasks.check {
 
 dependencyAnalysis {
   issues {
+    project(":semver") {
+      onAny {
+        exclude(libs.semver)
+      }
+    }
     all {
       onAny {
         severity("fail")

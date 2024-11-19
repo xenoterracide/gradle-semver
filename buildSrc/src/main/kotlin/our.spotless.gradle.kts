@@ -22,7 +22,6 @@ spotless {
   kotlinGradle {
     target("**/*.gradle.kts")
     targetExclude("**/build/**")
-    ktlint().editorConfigOverride(mapOf("ktlint_standard_value-argument-comment" to "disabled"))
     licenseHeader(copyright + gradleLicense, "(import|buildscript|plugins|root)")
   }
 }

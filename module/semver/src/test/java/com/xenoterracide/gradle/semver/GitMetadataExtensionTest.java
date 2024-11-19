@@ -37,7 +37,7 @@ class GitMetadataExtensionTest {
 
   @Test
   void noGit() {
-    var pg = new GitMetadataExtension(() -> Optional.empty());
+    var pg = new GitMetadataExtension(Optional::empty);
     assertThat(pg.distance()).isSameAs(0);
     assertThat(pg.getBranch()).isNull();
     assertThat(pg.getCommit()).isNull();

@@ -35,7 +35,13 @@ public class GitMetadataExtension implements GitMetadata {
 
   private final Supplier<Optional<Git>> git;
 
-  GitMetadataExtension(Supplier<Optional<Git>> git) {
+  /**
+   * Instantiates a new Git metadata extension.
+   *
+   * @param git
+   *   a jgit instance supplier
+   */
+  public GitMetadataExtension(Supplier<Optional<Git>> git) {
     this.git = git;
   }
 
@@ -70,7 +76,8 @@ public class GitMetadataExtension implements GitMetadata {
   /**
    * Gets object id for.
    *
-   * @param shalike the shalike
+   * @param shalike
+   *   the shalike
    * @return the object id for
    */
   Try<ObjectId> getObjectIdFor(@NonNull String shalike) {
@@ -80,7 +87,8 @@ public class GitMetadataExtension implements GitMetadata {
   /**
    * Gets rev.
    *
-   * @param shalike the shalike
+   * @param shalike
+   *   the shalike
    * @return the rev
    */
   public @Nullable String getRev(@NonNull String shalike) {
