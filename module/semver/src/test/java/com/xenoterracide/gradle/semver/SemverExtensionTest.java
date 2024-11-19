@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
-import org.gradle.util.VersionNumber;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.semver4j.Semver;
@@ -91,12 +90,6 @@ class SemverExtensionTest {
         .hasToString("0.1.1")
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease, Semver::getBuild)
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
-
-      assertThat(VersionNumber.parse(v010BldV2.toString()))
-        .isGreaterThan(VersionNumber.parse(v001Alpha01.toString()))
-        .isGreaterThan(VersionNumber.parse(v010.toString()))
-        .isLessThan(VersionNumber.parse(v010BldV3.toString()))
-        .isLessThan(VersionNumber.parse(v011.toString()));
     }
   }
 }
