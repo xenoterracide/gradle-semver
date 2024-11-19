@@ -115,10 +115,6 @@ Run `npm ci && ./gradlew dependencies` to install dependencies.
 
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
-### Committing
-
-Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-
 ### Releasing
 
 ```sh
