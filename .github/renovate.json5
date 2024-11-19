@@ -1,0 +1,10 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  hostRules: [
+    {
+      hostType: "maven",
+      matchHost: "https://maven.pkg.github.com",
+    },
+  ],
+}

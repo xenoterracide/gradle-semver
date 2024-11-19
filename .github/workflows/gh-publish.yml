@@ -1,15 +1,19 @@
-name: build
-on: [push, workflow_call]
+name: publish-to-github-packages
+on:
+  workflow_run:
+    workflows: [build]
+    types: [completed]
+    branches: [main]
 jobs:
-  build:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     permissions:
       contents: write
-      packages: read
+      packages: write
     env:
-      ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
-      ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
+      IS_PUBLISHING: 1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,5 +27,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - run: make ci-build
-      - uses: gradle/actions/dependency-submission@v4
+      - run: ./gradlew publishAllPublicationsToGhRepository --build-cache --scan
+        env:
+          ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
+          ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}

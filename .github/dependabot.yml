@@ -1,11 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: "gradle"
-    directory: "/"
-    commit-message:
-      prefix: "feat(deps)"
-    schedule:
-      interval: "weekly"
   - package-ecosystem: "npm"
     directory: "/"
     commit-message:
