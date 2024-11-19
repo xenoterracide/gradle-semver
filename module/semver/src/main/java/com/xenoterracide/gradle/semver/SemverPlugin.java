@@ -38,7 +38,8 @@ public class SemverPlugin implements Plugin<Project> {
     var semverProvider = project.getProviders().provider(() -> new SemverBuilder(gitMeta).build());
     var semverProperty = project.getObjects().property(Semver.class);
     semverProperty.set(semverProvider);
-    semverProperty.finalizeValue();
+    semverProperty.disallowChanges();
+    semverProperty.finalizeValueOnRead();
 
     project.getExtensions().add(new TypeOf<Provider<Semver>>() {}, SEMVER, semverProperty);
   }
