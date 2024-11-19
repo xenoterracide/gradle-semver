@@ -91,6 +91,30 @@ add a way to export these to your `PATH` in your `~/.profile`
 
 Run `npm ci && ./gradlew dependencies` to install dependencies.
 
+#### Fetching Dependencies
+
+In order to get snapshots of dependencies, you must have a GitHub token in your `~/.gradle/gradle.properties` file. This
+file should look like:
+
+```properties
+ghUsername = <your username>
+ghPassword = <your token>
+```
+
+You should generate your PAT
+as [Github Documents here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#authenticating-to-github-packages).
+
+> a personal access token (classic) with at least read:packages scope to install packages associated with other private
+> repositories (which GITHUB_TOKEN can't access).
+
+Then run.
+
+Run `npm ci && ./gradlew dependencies` to install dependencies.
+
+### Committing
+
+Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
 ### Committing
 
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
