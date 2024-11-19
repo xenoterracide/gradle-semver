@@ -8,9 +8,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.gradle.api.Project;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.reflect.TypeOf;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.semver4j.Semver;
 
 class SemverPluginTest {
 
@@ -38,16 +41,7 @@ class SemverPluginTest {
   @Test
   void apply() {
     project.getPluginManager().apply(SemverPlugin.class);
-    var semver = project.getExtensions().getByType(SemverExtension.class);
-    assertThat(semver.getMaven()).hasToString("0.1.3");
-  }
-
-  @Test
-  void snapshot() throws Exception {
-    git.commit().setMessage("four").setAllowEmpty(true).call();
-    project.getPluginManager().apply(SemverPlugin.class);
-    var semver = project.getExtensions().getByType(SemverExtension.class);
-
-    assertThat(semver.getMaven().toString()).startsWith("0.1.4-SNAPSHOT");
+    var semver = project.getExtensions().getByType(new TypeOf<Provider<Semver>>() {});
+    assertThat(semver.get()).hasToString("0.1.3");
   }
 }

@@ -26,16 +26,14 @@ class SemverPluginIntegrationTest {
 
   static final String LOGGING =
     """
-    logger.quiet("maven:" + semver.maven )
-    logger.quiet("gradlePlugin:" + semver.gradlePlugin)
-    logger.quiet("gitDescribed:" + semver.gitDescribed)
-    logger.quiet("branch:" + semver.git.branch )
-    logger.quiet("commit:" + semver.git.commit)
-    logger.quiet("commitShort:" + semver.git.commitShort)
-    logger.quiet("latestTag:" + semver.git.latestTag)
-    logger.quiet("describe:" + semver.git.describe)
-    logger.quiet("commitDistance:" + semver.git.commitDistance)
-    logger.quiet("status:" + semver.git.status)
+            logger.quiet("semver:" + semver.get())
+            logger.quiet("branch:" + gitMetadata.branch )
+            logger.quiet("commit:" + gitMetadata.commit)
+            logger.quiet("commitShort:" + gitMetadata.commitShort)
+            logger.quiet("latestTag:" + gitMetadata.latestTag)
+            logger.quiet("describe:" + gitMetadata.describe)
+            logger.quiet("commitDistance:" + gitMetadata.commitDistance)
+            logger.quiet("status:" + gitMetadata.status)
     """;
   static final String GROOVY_SCRIPT =
     """
@@ -84,7 +82,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("maven:0.1.0");
+    assertThat(build.getOutput()).contains("semver:0.1.0");
   }
 
   @Test
@@ -98,7 +96,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("maven:0.0.0");
+    assertThat(build.getOutput()).contains("semver:0.0.0");
   }
 
   @ParameterizedTest
@@ -111,7 +109,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("maven:0.1.0");
+    assertThat(build.getOutput()).contains("semver:0.1.0");
   }
 
   @ParameterizedTest
@@ -126,7 +124,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("maven:0.0.0");
+    assertThat(build.getOutput()).contains("semver:0.0.0");
   }
 
   static class BuildScriptArgumentsProvider implements ArgumentsProvider {
