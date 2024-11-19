@@ -6,39 +6,42 @@ import org.semver4j.Semver
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
-    `java-base`
-    alias(libs.plugins.dependency.analysis)
-    alias(libs.plugins.semver)
+  `java-base`
+  alias(libs.plugins.dependency.analysis)
+  alias(libs.plugins.semver)
 }
 
 group = "com.xenoterracide.gradle"
 
 dependencyLocking {
-    lockAllConfigurations()
+  lockAllConfigurations()
 }
 
-version = providers.environmentVariable("IS_PUBLISHING")
+version =
+  providers
+    .environmentVariable("IS_PUBLISHING")
     .map { semver.gitDescribed }
-    .orElse(Semver("0.0.0")).get()
+    .orElse(Semver("0.0.0"))
+    .get()
 
 tasks.check {
-    dependsOn(tasks.buildHealth)
+  dependsOn(tasks.buildHealth)
 }
 
 dependencyAnalysis {
-    issues {
-        project(":semver") {
-            onAny {
-                exclude(libs.semver)
-            }
-        }
-        all {
-            onAny {
-                severity("fail")
-            }
-            onUnusedDependencies {
-                exclude(libs.junit.parameters)
-            }
-        }
+  issues {
+    project(":semver") {
+      onAny {
+        exclude(libs.semver)
+      }
     }
+    all {
+      onAny {
+        severity("fail")
+      }
+      onUnusedDependencies {
+        exclude(libs.junit.parameters)
+      }
+    }
+  }
 }
