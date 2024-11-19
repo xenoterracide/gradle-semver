@@ -35,7 +35,12 @@ public class SemverPlugin implements Plugin<Project> {
     var gitMeta = svcPrvdr.map(AbstractGitService::extension).get();
     project.getExtensions().add(GIT, gitMeta);
 
-    var semverProvider = project.getProviders().provider(() -> new SemverBuilder(gitMeta).build());
+    var semverProvider = project
+      .getProviders()
+      .provider(() -> {
+        project.getLogger().quiet("building semver");
+        return new SemverBuilder(gitMeta).build();
+      });
     var semverProperty = project.getObjects().property(Semver.class);
     semverProperty.set(semverProvider);
     semverProperty.disallowChanges();

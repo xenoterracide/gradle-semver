@@ -26,6 +26,7 @@ class SemverPluginIntegrationTest {
 
   static final String LOGGING =
     """
+                    logger.quiet("semver:" + semver.get())
             logger.quiet("semver:" + semver.get())
             logger.quiet("branch:" + gitMetadata.branch )
             logger.quiet("commit:" + gitMetadata.commit)
@@ -82,7 +83,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("maven:0.1.0");
+    assertThat(build.getOutput()).contains("semver:0.1.0");
   }
 
   @Test
@@ -96,7 +97,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("maven:0.0.0");
+    assertThat(build.getOutput()).contains("semver:0.0.0");
   }
 
   @ParameterizedTest
