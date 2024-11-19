@@ -39,6 +39,7 @@ public class GitMetadataExtension implements GitMetadata {
    * Instantiates a new Git metadata extension.
    *
    * @param git
+   *   a jgit instance supplier
    */
   public GitMetadataExtension(Supplier<Optional<Git>> git) {
     this.git = git;
