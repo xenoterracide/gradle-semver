@@ -5,6 +5,13 @@ rootProject.name = "gradle-semver"
 
 pluginManagement {
   repositories {
+    maven("https://maven.pkg.github.com/xenoterracide/gradle-semver") {
+      name = "gh"
+      mavenContent {
+        includeGroupAndSubgroups("com.xenoterracide.gradle")
+      }
+      credentials(PasswordCredentials::class)
+    }
     gradlePluginPortal()
   }
 }
@@ -35,7 +42,9 @@ dependencyResolutionManagement {
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootDir.resolve("module").listFiles()?.forEach { file ->
-  if (file.isDirectory && file?.list { _, name -> name.startsWith("build.gradle") }
+  if (file.isDirectory &&
+    file
+      ?.list { _, name -> name.startsWith("build.gradle") }
       ?.isNotEmpty() == true
   ) {
     val name = file.name
