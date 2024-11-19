@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
 import org.gradle.util.VersionNumber;
@@ -28,10 +27,9 @@ class SemverExtensionTest {
   File projectDir;
 
   @Test
-  void getGitDescribed() throws Exception {
+  void semver() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var pg = new SemverExtension(() -> Optional.of(git));
-      Supplier<Semver> vs = pg::getGitDescribed;
+      var vs = new SemverBuilder(new GitMetadataExtension(() -> Optional.of(git)));
 
       var v001Alpha01 = supplies(commit(git), vs);
 
@@ -83,7 +81,7 @@ class SemverExtensionTest {
 
       git.tag().setName("v0.1.1").call();
 
-      var v011 = pg.getGitDescribed();
+      var v011 = vs.get();
 
       assertThat(v011)
         .isGreaterThan(v010BldV2)

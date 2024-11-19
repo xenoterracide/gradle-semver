@@ -3,7 +3,7 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
-import com.xenoterracide.gradle.semver.SemverExtension;
+import com.xenoterracide.gradle.semver.GitMetadataExtension;
 import com.xenoterracide.gradle.semver.internal.AbstractGitService.Params;
 import io.vavr.control.Try;
 import java.io.IOException;
@@ -35,31 +35,6 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
   public AbstractGitService() {}
 
-  Optional<Git> lazyGit() throws IOException {
-    if (this.git == null) {
-      var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
-      var gitDir = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(projectDir).getGitDir();
-
-      this.git = gitDir != null ? Git.open(gitDir) : null;
-    }
-
-    return Optional.ofNullable(this.git);
-  }
-
-  /**
-   * Create the SemverExtension.
-   *
-   * @return The SemverExtension.
-   */
-  public SemverExtension extension() {
-    return new SemverExtension(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
-  }
-
-  @Override
-  public void close() {
-    if (this.git != null) this.git.close();
-  }
-
   // preventJGitFromCallingExecutables is copied from
   // https://github.com/diffplug/spotless/blob/224f8f96df3ad42cac81064a0461e6d4ee91dcaf/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/GitRatchetGradle.java#L35
   // SPDX-License-Identifier: Apache-2.0
@@ -78,6 +53,31 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
         }
       }
     );
+  }
+
+  Optional<Git> lazyGit() throws IOException {
+    if (this.git == null) {
+      var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
+      var gitDir = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(projectDir).getGitDir();
+
+      this.git = gitDir != null ? Git.open(gitDir) : null;
+    }
+
+    return Optional.ofNullable(this.git);
+  }
+
+  /**
+   * Create the SemverExtension.
+   *
+   * @return The SemverExtension.
+   */
+  public GitMetadataExtension extension() {
+    return new GitMetadataExtension(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
+  }
+
+  @Override
+  public void close() {
+    if (this.git != null) this.git.close();
   }
 
   /**
