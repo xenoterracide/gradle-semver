@@ -7,7 +7,7 @@ on:
     #         │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
     #         │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
     #         * * * * *
-    - cron: "0 4 * * 3" # 4am every Wednesday
+    - cron: "0 4 * * 0" # 4am UTC every Sunday
   push:
     branches:
       - build/auto-update
