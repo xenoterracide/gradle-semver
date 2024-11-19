@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
 import org.gradle.util.VersionNumber;
@@ -29,7 +30,7 @@ class SemverExtensionTest {
   @Test
   void semver() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var vs = new SemverBuilder(new GitMetadataExtension(() -> Optional.of(git)));
+      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataExtension(() -> Optional.of(git))).build();
 
       var v001Alpha01 = supplies(commit(git), vs);
 

@@ -4,13 +4,12 @@
 package com.xenoterracide.gradle.semver;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
-final class SemverBuilder implements Supplier<Semver> {
+final class SemverBuilder {
 
   static final String ALPHA = "alpha";
   static final String SEMVER_DELIMITER = ".";
@@ -65,10 +64,5 @@ final class SemverBuilder implements Supplier<Semver> {
   Semver build() {
     this.withPreRelease().withBuild();
     return this.semver;
-  }
-
-  @Override
-  public Semver get() {
-    return this.build();
   }
 }
