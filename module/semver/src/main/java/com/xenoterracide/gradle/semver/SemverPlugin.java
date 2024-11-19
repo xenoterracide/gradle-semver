@@ -46,6 +46,8 @@ public class SemverPlugin implements Plugin<Project> {
     semverProperty.disallowChanges();
     semverProperty.finalizeValueOnRead();
 
-    project.getExtensions().add(new TypeOf<Provider<Semver>>() {}, SEMVER, semverProperty);
+    project.getExtensions().add(new TypeOfSemverProvider(), SEMVER, semverProperty);
   }
+
+  private static class TypeOfSemverProvider extends TypeOf<Provider<Semver>> {}
 }
