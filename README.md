@@ -21,7 +21,7 @@ version = semver.get()
 
 ```
 
-This is the simplest way to get your semver, but I don't recommend it because gradle isn't lazy with anything related to publishing. Even when it becomes lazy I doubt it'll be as lazy as you want. So I do the following, and then only set `IS_PUBLISHING` in my publishing build in CI. This avoids constant configuration cache busting as well as ensuring that IO is kept to a minimum.
+This is the simplest way to get your semver, but I don't recommend it because [Gradle isn't lazy with anything related to publishing](https://github.com/gradle/gradle/issues/29342). Even when it becomes lazy I doubt it'll be as lazy as you want. So I do the following, and then only set `IS_PUBLISHING` in my publishing build in CI. This avoids constant configuration cache busting as well as ensuring that IO is kept to a minimum.
 
 ```kt
 import org.semver4j.Semver
