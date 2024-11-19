@@ -25,9 +25,7 @@ e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
 
 ```kt
 // given the last tag was v0.1.0 and you have a commit distance == 1 you'll get something like
-logger.quiet("maven snapshot " + semver.mavenSnapshot)      // 0.1.1-SNAPSHOT
 logger.quiet("git described " + semver.gitDescribed)        // 0.1.1-alpha.0.1+3aae11e
-logger.quiet("gradlePlugin " + semver.gradlePlugin)         // 0.1.1-alpha.1+1.g3aae11e
 
 // other available outputs
 logger.quiet("branch" + semver.git.branch)                  // main

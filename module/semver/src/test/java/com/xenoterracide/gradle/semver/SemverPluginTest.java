@@ -39,15 +39,6 @@ class SemverPluginTest {
   void apply() {
     project.getPluginManager().apply(SemverPlugin.class);
     var semver = project.getExtensions().getByType(SemverExtension.class);
-    assertThat(semver.getMaven()).hasToString("0.1.3");
-  }
-
-  @Test
-  void snapshot() throws Exception {
-    git.commit().setMessage("four").setAllowEmpty(true).call();
-    project.getPluginManager().apply(SemverPlugin.class);
-    var semver = project.getExtensions().getByType(SemverExtension.class);
-
-    assertThat(semver.getMaven().toString()).startsWith("0.1.4-SNAPSHOT");
+    assertThat(semver.getGitDescribed()).hasToString("0.1.3");
   }
 }

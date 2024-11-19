@@ -26,8 +26,6 @@ class SemverPluginIntegrationTest {
 
   static final String LOGGING =
     """
-    logger.quiet("maven:" + semver.maven )
-    logger.quiet("gradlePlugin:" + semver.gradlePlugin)
     logger.quiet("gitDescribed:" + semver.gitDescribed)
     logger.quiet("branch:" + semver.git.branch )
     logger.quiet("commit:" + semver.git.commit)
