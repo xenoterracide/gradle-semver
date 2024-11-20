@@ -14,7 +14,6 @@ import org.semver4j.Semver;
 
 /**
  * Extension for generating semantic versions from git metadata.
- * <p>
  * {@see <a href="https://semver.org/">Semantic Versioning</a>}
  * {@see <a href="https://git-scm.com/">Git</a>}
  * {@link Semver}
