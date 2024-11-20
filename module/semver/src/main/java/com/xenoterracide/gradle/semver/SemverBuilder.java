@@ -57,7 +57,7 @@ final class SemverBuilder {
         .filter(s -> s == GitStatus.DIRTY)
         .map(Object::toString);
       this.semver = sha
-        .flatMap(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)))
+        .map(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)).orElse(s))
         .map(s -> this.semver.withBuild(s))
         .orElse(this.semver);
     }

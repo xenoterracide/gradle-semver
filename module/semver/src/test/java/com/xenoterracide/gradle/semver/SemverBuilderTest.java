@@ -27,7 +27,7 @@ class SemverBuilderTest {
     String lessThan,
     @Nullable String greaterThan
   ) {
-    var semv = new SemverBuilder(gitMetadata).build();
+    var semv = new SemverBuilder(gitMetadata).withDirtyOut(true).build();
     assertThat(semv).describedAs("equal").isEqualTo(new Semver(expected));
     assertThat(semv).describedAs("comparing").isEqualByComparingTo(new Semver(comp));
     assertThat(semv).describedAs("lessThan").isLessThan(new Semver(lessThan));
@@ -53,57 +53,57 @@ class SemverBuilderTest {
           null
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", null),
-          "0.0.1-alpha.0.1+abcdef10",
+          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef11", null),
+          "0.0.1-alpha.0.1+gabcdef11",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
           null
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.DIRTY, "abcdef10", null),
-          "0.0.1-alpha.0.1+abcdef10.dirty",
+          new GitMetadataInfo(1, GitStatus.DIRTY, "abcdef12", null),
+          "0.0.1-alpha.0.1+gabcdef12.dirty",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
           "0.0.1-alpha.0.0"
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", null),
-          "0.0.1-alpha.0.1+abcdef10",
+          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef13", null),
+          "0.0.1-alpha.0.1+gabcdef13",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.1.0",
           "0.0.1-alpha.0.0"
         ),
         arguments(
-          new GitMetadataInfo(10, GitStatus.CLEAN, "abcdef10", null),
-          "0.0.1-alpha.0.10+abcdef10",
+          new GitMetadataInfo(10, GitStatus.CLEAN, "abcdef14", null),
+          "0.0.1-alpha.0.10+gabcdef14",
           "0.0.1-alpha.0.10",
           "0.0.1-alpha.0.11",
           "0.0.1-alpha.0.1"
         ),
         arguments(
-          new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef10", "v1.0.0-rc.1"),
+          new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef15", "v1.0.0-rc.1"),
           "1.0.0-rc.1",
           "1.0.0-rc.1",
           "1.0.0",
           "1.0.0-alpha.1"
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", "v1.0.0-rc.1"),
-          "1.0.0-rc.1.1+abcdef10",
+          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef16", "v1.0.0-rc.1"),
+          "1.0.0-rc.1.1+gabcdef16",
           "1.0.0-rc.1.1",
           "1.0.0-rc.2",
           "1.0.0-rc.1"
         ),
         arguments(
-          new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef10", "v1.0.0"),
+          new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef17", "v1.0.0"),
           "1.0.0",
           "1.0.0",
           "1.0.1",
           "1.0.0-rc.1"
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef10", "v1.0.0"),
-          "1.0.1-alpha.0.1+abcdef10",
+          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef18", "v1.0.0"),
+          "1.0.1-alpha.0.1+gabcdef18",
           "1.0.1-alpha.0.1",
           "1.0.1",
           "1.0.1-alpha.0"
