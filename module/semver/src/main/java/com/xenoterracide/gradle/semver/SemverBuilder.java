@@ -18,6 +18,7 @@ final class SemverBuilder {
 
   private final GitMetadata gitMetadata;
   private Semver semver;
+  private boolean dirtyOut;
 
   SemverBuilder(GitMetadata gitMetadata) {
     this.gitMetadata = gitMetadata;
@@ -51,13 +52,20 @@ final class SemverBuilder {
   private SemverBuilder withBuild() {
     var distance = this.gitMetadata.distance();
     if (distance > 0) {
-      var sha = Optional.ofNullable(this.gitMetadata.uniqueShort());
-      var status = Optional.of(this.gitMetadata.status()).filter(s -> s == GitStatus.DIRTY).map(Object::toString);
+      var sha = Optional.ofNullable(this.gitMetadata.uniqueShort()).map(s -> "g" + s);
+      var status = Optional.ofNullable(this.dirtyOut ? this.gitMetadata.status() : null)
+        .filter(s -> s == GitStatus.DIRTY)
+        .map(Object::toString);
       this.semver = sha
-        .map(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)).orElse(s))
+        .flatMap(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)))
         .map(s -> this.semver.withBuild(s))
         .orElse(this.semver);
     }
+    return this;
+  }
+
+  SemverBuilder withDirtyOut(boolean dirtyOut) {
+    this.dirtyOut = dirtyOut;
     return this;
   }
 
