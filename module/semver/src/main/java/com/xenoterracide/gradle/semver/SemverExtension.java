@@ -6,12 +6,15 @@ package com.xenoterracide.gradle.semver;
 import static com.xenoterracide.gradle.semver.internal.GradleTools.finalOnRead;
 
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.semver4j.Semver;
 
 public class SemverExtension {
 
+  private final Logger log = Logging.getLogger(this.getClass());
   private final Provider<Semver> provider;
   private final Property<Boolean> checkDirty;
 
@@ -20,7 +23,7 @@ public class SemverExtension {
       .getProviders()
       .provider(() -> {
         var semver = new SemverBuilder(gm).withDirtyOut(this.getCheckDirty().getOrElse(false)).build();
-        project.getLogger().quiet("{} semver: {}", project.getName(), semver);
+        this.log.quiet("{} semver: {}", project.getName(), semver);
         return semver;
       });
     var of = project.getObjects();
