@@ -20,7 +20,7 @@ dependencyLocking {
 version =
   providers
     .environmentVariable("IS_PUBLISHING")
-    .map { semver.get() }
+    .map { semver.provider().get() }
     .orElse(Semver("0.0.0"))
     .get()
 
