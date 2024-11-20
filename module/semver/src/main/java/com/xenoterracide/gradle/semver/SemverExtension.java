@@ -14,15 +14,12 @@ import org.semver4j.Semver;
 
 /**
  * Extension for generating semantic versions from git metadata.
- *
- * <p>
  * <ul>
  *  <li>{@see <a href="https://semver.org/">Semantic Versioning</a>}</li>
  *  <li>{@see <a href="https://git-scm.com/">Git</a>}</li>
  *  <li>{@link Semver}</li>
  *  <li>{@link org.eclipse.jgit.api.Git}</li>
  * </ul>
- * </p>
  */
 public class SemverExtension {
 
