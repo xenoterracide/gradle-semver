@@ -20,4 +20,9 @@
     <Class name="~.*Test$?.*" />
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
   </Match>
+  <Match>
+    <Class name="com.xenoterracide.gradle.semver.SemverExtension" />
+    <!-- safe to ignore because it only exposes Provider instances -->
+    <Bug pattern="EI_EXPOSE_REP" />
+  </Match>
 </FindBugsFilter>
