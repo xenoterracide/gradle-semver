@@ -6,9 +6,6 @@ package com.xenoterracide.gradle.semver;
 import com.xenoterracide.gradle.semver.internal.AbstractGitService;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.provider.Provider;
-import org.gradle.api.reflect.TypeOf;
-import org.semver4j.Semver;
 
 /**
  * Pure Java, configuration cache safe semantic versioning with git plugin for gradle.
@@ -34,20 +31,6 @@ public class SemverPlugin implements Plugin<Project> {
 
     var gitMeta = svcPrvdr.map(AbstractGitService::extension).get();
     project.getExtensions().add(GIT, gitMeta);
-
-    var semverProvider = project
-      .getProviders()
-      .provider(() -> {
-        project.getLogger().quiet("building semver");
-        return new SemverBuilder(gitMeta).build();
-      });
-    var semverProperty = project.getObjects().property(Semver.class);
-    semverProperty.set(semverProvider);
-    semverProperty.disallowChanges();
-    semverProperty.finalizeValueOnRead();
-
-    project.getExtensions().add(new TypeOfSemverProvider(), SEMVER, semverProperty);
+    project.getExtensions().add(SEMVER, new SemverExtension(gitMeta, project));
   }
-
-  private static class TypeOfSemverProvider extends TypeOf<Provider<Semver>> {}
 }

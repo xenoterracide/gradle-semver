@@ -17,17 +17,16 @@ plugins {
   id("com.xenoterracide.gradle.semver")
 }
 
-version = semver.get()
-
+version = semver.provider().get()
 ```
 
-This is the simplest way to get your semver, but I don't recommend it because gradle isn't lazy with anything related to publishing. Even when it becomes lazy I doubt it'll be as lazy as you want. So I do the following, and then only set `IS_PUBLISHING` in my publishing build in CI. This avoids constant configuration cache busting as well as ensuring that IO is kept to a minimum.
+This is the simplest way to get your semver, but I don't recommend it because [Gradle isn't lazy with anything related to publishing](https://github.com/gradle/gradle/issues/29342). Even when it becomes lazy I doubt it'll be as lazy as you want. So I do the following, and then only set `IS_PUBLISHING` in my publishing build in CI. This avoids constant configuration cache busting as well as ensuring that IO is kept to a minimum.
 
 ```kt
 import org.semver4j.Semver
 
 version = providers.environmentVariable("IS_PUBLISHING")
-  .map { semver.get() }
+  .map { semver.provider().get() }
   .orElse(Semver("0.0.0")).get()
 ```
 
@@ -36,7 +35,7 @@ e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
 
 ```kt
 // given the last tag was v0.1.0 and you have a commit distance == 1 you'll get something like
-logger.quiet("semver " + semver.get()        // 0.1.1-alpha.0.1+3aae11e
+logger.quiet("semver " + semver.provider().get()        // 0.1.1-alpha.0.1+g3aae11e
 
 // other available outputs
 logger.quiet("branch:" + gitMetadata.branch )
@@ -46,6 +45,16 @@ logger.quiet("latestTag:" + gitMetadata.latestTag)
 logger.quiet("describe:" + gitMetadata.describe)
 logger.quiet("commitDistance:" + gitMetadata.commitDistance)
 logger.quiet("status:" + gitMetadata.status)
+```
+
+if you want you can expose whether your tree is dirty or not.
+
+```kt
+semver {
+  checkDirty.set(true)
+}
+
+logger.quiet("semver " + semver.provider().get()        // 0.1.1-alpha.0.1+g3aae11e.dirty
 ```
 
 The plugin exposes a `Semver`. See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html).
