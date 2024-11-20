@@ -12,10 +12,18 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.semver4j.Semver;
 
+/**
+ * Extension for generating semantic versions from git metadata.
+ * <p>
+ * {@see <a href="https://semver.org/">Semantic Versioning</a>}
+ * {@see <a href="https://git-scm.com/">Git</a>}
+ * {@link Semver}
+ * {@link org.eclipse.jgit.api.Git}
+ */
 public class SemverExtension {
 
   private final Logger log = Logging.getLogger(this.getClass());
-  private final Provider<Semver> provider;
+  private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
 
   protected SemverExtension(GitMetadata gm, Project project) {
