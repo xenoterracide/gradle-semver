@@ -32,7 +32,7 @@ public class SemverExtension {
       .getProviders()
       .provider(() -> {
         var semver = new SemverBuilder(gm).withDirtyOut(this.getCheckDirty().getOrElse(false)).build();
-        this.log.quiet("{} semver: {}", project.getName(), semver);
+        this.log.info("semver {} {}", project.getName(), semver);
         return semver;
       });
     var of = project.getObjects();
