@@ -17,12 +17,12 @@ class GitMetadataExtensionAdapter implements GitMetadata {
 
   @Override
   public @Nullable String uniqueShort() {
-    return delegate.getUniqueShort().get();
+    return delegate.getUniqueShort().getOrNull();
   }
 
   @Override
   public @Nullable String tag() {
-    return this.delegate.getTag().get();
+    return this.delegate.getTag().getOrNull();
   }
 
   @Override
@@ -37,12 +37,12 @@ class GitMetadataExtensionAdapter implements GitMetadata {
 
   @Override
   public @Nullable String branch() {
-    return this.delegate.getBranch().get();
+    return this.delegate.getBranch().getOrNull();
   }
 
   @Override
   public @Nullable String commit() {
-    return this.delegate.getCommit().get();
+    return this.delegate.getCommit().getOrNull();
   }
 
   @Override
