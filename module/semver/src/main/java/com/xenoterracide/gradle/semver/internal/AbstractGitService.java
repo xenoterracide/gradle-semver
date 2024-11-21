@@ -3,7 +3,6 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
-import com.xenoterracide.gradle.semver.GitMetadataExtension;
 import com.xenoterracide.gradle.semver.internal.AbstractGitService.Params;
 import io.vavr.control.Try;
 import java.io.IOException;
@@ -71,8 +70,8 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
    *
    * @return The SemverExtension.
    */
-  public GitMetadataExtension extension() {
-    return new GitMetadataExtension(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
+  public GitMetadata metadata() {
+    return new GitMetadataImpl(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
   }
 
   @Override

@@ -3,6 +3,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

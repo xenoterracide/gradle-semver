@@ -6,6 +6,7 @@ package com.xenoterracide.gradle.semver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import java.util.stream.Stream;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jspecify.annotations.Nullable;

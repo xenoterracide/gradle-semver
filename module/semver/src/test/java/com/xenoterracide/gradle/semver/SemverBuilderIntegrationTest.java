@@ -7,6 +7,7 @@ import static com.xenoterracide.gradle.semver.CommitTools.commit;
 import static com.xenoterracide.gradle.semver.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
 import java.io.File;
 import java.util.Collections;
 import java.util.Optional;
@@ -29,7 +30,7 @@ class SemverBuilderIntegrationTest {
   @Test
   void semver() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataExtension(() -> Optional.of(git))).build();
+      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataImpl(() -> Optional.of(git))).build();
 
       var v001Alpha01 = supplies(commit(git), vs);
 

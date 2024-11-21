@@ -3,8 +3,8 @@
 
 package com.xenoterracide.gradle.semver;
 
-import static com.xenoterracide.gradle.semver.internal.GradleTools.finalOnRead;
-
+import com.xenoterracide.gradle.semver.internal.GitMetadata;
+import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -30,9 +30,9 @@ public class SemverExtension {
   private final Project project;
 
   protected SemverExtension(Project project) {
-    var of = project.getObjects();
-    this.provider = finalOnRead(of.property(Semver.class));
-    this.checkDirty = finalOnRead(of.property(Boolean.class));
+    var pf = new ProvidedFactory(project);
+    this.provider = pf.property(Semver.class);
+    this.checkDirty = pf.propertyBoolean();
     this.project = project;
   }
 
