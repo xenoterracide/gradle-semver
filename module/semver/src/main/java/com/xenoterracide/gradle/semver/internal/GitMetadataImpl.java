@@ -5,8 +5,8 @@ package com.xenoterracide.gradle.semver.internal;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.xenoterracide.gradle.semver.GitRemote;
 import com.xenoterracide.gradle.semver.GitStatus;
-import com.xenoterracide.gradle.semver.Remote;
 import io.vavr.CheckedFunction1;
 import io.vavr.control.Try;
 import java.util.ArrayList;
@@ -173,14 +173,14 @@ public class GitMetadataImpl implements GitMetadata {
   }
 
   @Override
-  public List<Remote> remotes() {
+  public List<GitRemote> remotes() {
     return this.tryCommand(Git::remoteList)
       .mapTry(RemoteListCommand::call)
       .map(Collection::stream)
       .map(s -> s.map(RemoteConfig::getName))
       .map(s -> s.filter(Objects::nonNull))
       .map(s -> s.map(name -> RemoteImpl.nullCheck(name, this.headBranch(name))))
-      .map(s -> s.collect(Collectors.<Remote>toList()))
+      .map(s -> s.collect(Collectors.<GitRemote>toList()))
       .getOrElse(ArrayList::new);
   }
 
@@ -195,7 +195,7 @@ public class GitMetadataImpl implements GitMetadata {
       .getOrNull();
   }
 
-  private static class RemoteImpl implements Remote {
+  private static class RemoteImpl implements GitRemote {
 
     private final String name;
     private final @Nullable String headBranch;
@@ -205,7 +205,7 @@ public class GitMetadataImpl implements GitMetadata {
       this.headBranch = headBranch;
     }
 
-    static Remote nullCheck(@Nullable String name, @Nullable String headBranch) {
+    static GitRemote nullCheck(@Nullable String name, @Nullable String headBranch) {
       return new RemoteImpl(Objects.requireNonNull(name), headBranch);
     }
 

@@ -72,7 +72,7 @@ public final class ProvidedFactory {
    */
   public <E> Provider<List<E>> providedList(Callable<List<E>> callable, Class<E> type) {
     var prop = this.objectFactory.listProperty(type);
-    prop.set(providerFactory.provider(callable));
+    prop.set(this.providerFactory.provider(callable));
     prop.disallowChanges();
     prop.disallowUnsafeRead();
     return prop;
@@ -82,8 +82,12 @@ public final class ProvidedFactory {
    * Create an {@link Provider} from a {@link Callable} and {@link Class} ensuring the callback is not called repeatedly
    * during a build.
    *
+   * @param <T>
+   *   type the provider returns
    * @param callable
    *   function to provide value
+   * @param type
+   *   the class for the type that the provider returns
    * @return string provider
    * @implNote currently this returns a {@link Property} so that the property should only be calculated once per
    *   instance of it. This implementation could change in the future to ensure only once per build. A {@link Property}
@@ -93,7 +97,7 @@ public final class ProvidedFactory {
    */
   public <T> Provider<T> provided(Callable<T> callable, Class<T> type) {
     var prop = this.objectFactory.property(type);
-    prop.set(providerFactory.provider(callable));
+    prop.set(this.providerFactory.provider(callable));
     prop.finalizeValueOnRead();
     prop.disallowChanges();
     return prop;
@@ -110,7 +114,7 @@ public final class ProvidedFactory {
   }
 
   /**
-   * Creates a {@link Property} of a given type that is {@link Property#finalizeValueOnRead()}
+   * Creates a {@link Property} of a given type that is {@link Property#finalizeValueOnRead()}.
    *
    * @param type
    *   class type of property

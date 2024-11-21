@@ -3,8 +3,8 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
+import com.xenoterracide.gradle.semver.GitRemote;
 import com.xenoterracide.gradle.semver.GitStatus;
-import com.xenoterracide.gradle.semver.Remote;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -63,5 +63,5 @@ public interface GitMetadata {
    *
    * @return the configured remotes or an empty list
    */
-  List<Remote> remotes();
+  List<GitRemote> remotes();
 }

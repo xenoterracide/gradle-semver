@@ -17,7 +17,7 @@ class GitMetadataExtensionAdapter implements GitMetadata {
 
   @Override
   public @Nullable String uniqueShort() {
-    return delegate.getUniqueShort().getOrNull();
+    return this.delegate.getUniqueShort().getOrNull();
   }
 
   @Override
@@ -46,7 +46,7 @@ class GitMetadataExtensionAdapter implements GitMetadata {
   }
 
   @Override
-  public List<Remote> remotes() {
+  public List<GitRemote> remotes() {
     return this.delegate.getRemotes().get();
   }
 }

@@ -5,9 +5,12 @@ package com.xenoterracide.gradle.semver;
 
 import org.jspecify.annotations.Nullable;
 
-public interface Remote {
+/**
+ * Git Remote information.
+ */
+public interface GitRemote {
   /**
-   * Gets the remote HEAD branch
+   * Gets the remote HEAD branch.
    *
    * @return HEAD branch
    */

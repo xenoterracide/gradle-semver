@@ -8,6 +8,9 @@ import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
 import java.util.List;
 import org.gradle.api.provider.Provider;
 
+/**
+ * Information about the state of the local git repository.
+ */
 public class GitMetadataExtension {
 
   private final Provider<String> uniqueShort;
@@ -16,7 +19,7 @@ public class GitMetadataExtension {
   private final Provider<GitStatus> status;
   private final Provider<String> branch;
   private final Provider<String> commit;
-  private final Provider<List<Remote>> remotes;
+  private final Provider<List<GitRemote>> remotes;
 
   GitMetadataExtension(ProvidedFactory pf, GitMetadata gm) {
     this.uniqueShort = pf.providedString(gm::uniqueShort);
@@ -25,7 +28,7 @@ public class GitMetadataExtension {
     this.status = pf.provided(gm::status, GitStatus.class);
     this.branch = pf.providedString(gm::branch);
     this.commit = pf.providedString(gm::commit);
-    this.remotes = pf.providedList(gm::remotes, Remote.class);
+    this.remotes = pf.providedList(gm::remotes, GitRemote.class);
   }
 
   /**
@@ -82,7 +85,12 @@ public class GitMetadataExtension {
     return this.commit;
   }
 
-  public Provider<List<Remote>> getRemotes() {
+  /**
+   * Gets the list of remotes.
+   *
+   * @return the list of remotes
+   */
+  public Provider<List<GitRemote>> getRemotes() {
     return this.remotes;
   }
 }

@@ -127,7 +127,7 @@ class SemverBuilderTest {
     }
 
     @Override
-    public List<Remote> remotes() {
+    public List<GitRemote> remotes() {
       return List.of();
     }
   }

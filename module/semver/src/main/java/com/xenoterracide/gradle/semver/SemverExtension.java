@@ -4,7 +4,6 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
-import org.eclipse.jgit.api.Git;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -18,7 +17,7 @@ import org.semver4j.Semver;
  *  <li>{@see <a href="https://semver.org/">Semantic Versioning</a>}</li>
  *  <li>{@see <a href="https://git-scm.com/">Git</a>}</li>
  *  <li>{@link Semver}</li>
- *  <li>{@link Git}</li>
+ *  <li>{@link org.eclipse.jgit.api.Git}</li>
  * </ul>
  */
 public class SemverExtension {
@@ -36,14 +35,15 @@ public class SemverExtension {
   }
 
   SemverExtension init() {
-    var semverProvider = project.provider(() -> {
-      var gm = this.project.getExtensions().getByType(GitMetadataExtension.class);
-      var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm))
-        .withDirtyOut(this.getCheckDirty().getOrElse(false))
-        .build();
-      this.log.info("semver {} {}", project.getName(), semver);
-      return semver;
-    });
+    var semverProvider =
+      this.project.provider(() -> {
+          var gm = this.project.getExtensions().getByType(GitMetadataExtension.class);
+          var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm))
+            .withDirtyOut(this.getCheckDirty().getOrElse(false))
+            .build();
+          this.log.info("semver {} {}", this.project.getName(), semver);
+          return semver;
+        });
     this.provider.set(semverProvider);
     this.provider.disallowChanges();
     return this;
