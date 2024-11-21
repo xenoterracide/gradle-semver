@@ -5,6 +5,7 @@ package com.xenoterracide.gradle.semver;
 
 import static com.xenoterracide.gradle.semver.internal.GradleTools.finalOnRead;
 
+import org.eclipse.jgit.api.Git;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -18,7 +19,7 @@ import org.semver4j.Semver;
  *  <li>{@see <a href="https://semver.org/">Semantic Versioning</a>}</li>
  *  <li>{@see <a href="https://git-scm.com/">Git</a>}</li>
  *  <li>{@link Semver}</li>
- *  <li>{@link org.eclipse.jgit.api.Git}</li>
+ *  <li>{@link Git}</li>
  * </ul>
  */
 public class SemverExtension {
@@ -26,21 +27,25 @@ public class SemverExtension {
   private final Logger log = Logging.getLogger(this.getClass());
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
+  private final Project project;
 
-  protected SemverExtension(GitMetadata gm, Project project) {
-    var semverProvider = project
-      .getProviders()
-      .provider(() -> {
-        var semver = new SemverBuilder(gm).withDirtyOut(this.getCheckDirty().getOrElse(false)).build();
-        this.log.info("semver {} {}", project.getName(), semver);
-        return semver;
-      });
+  protected SemverExtension(Project project) {
     var of = project.getObjects();
-    var semverProperty = finalOnRead(of.property(Semver.class));
-    semverProperty.set(semverProvider);
-    semverProperty.disallowChanges();
-    this.provider = semverProperty;
+    this.provider = finalOnRead(of.property(Semver.class));
     this.checkDirty = finalOnRead(of.property(Boolean.class));
+    this.project = project;
+  }
+
+  SemverExtension init() {
+    var gm = this.project.getExtensions().getByType(GitMetadata.class);
+    var semverProvider = project.provider(() -> {
+      var semver = new SemverBuilder(gm).withDirtyOut(this.getCheckDirty().getOrElse(false)).build();
+      this.log.info("semver {} {}", project.getName(), semver);
+      return semver;
+    });
+    this.provider.set(semverProvider);
+    this.provider.disallowChanges();
+    return this;
   }
 
   /**
@@ -48,7 +53,7 @@ public class SemverExtension {
    * {@code 0.1.1-alpha.0.1+.g3aae11e}. The longest example {@code 0.1.1-alpha.0.1+btopic-foo.g3aae11e.dirty}
    *
    * @return semver provider
-   * @implSpec {@code <major>.<minor>.<patch>[-<preRelease.tag.distance>][+[b<branch>.]g<sha>[.dirty]]}
+   * @implSpec {@code <major>.<minor>.<patch>[-<preRelease.tag.distance>][+[b-<branch>.]g<sha>[.dirty]]}
    * @implNote The value will not be recalculated more than once per project per build. It is suggested to only use on
    *   the root project. In the future this may be a single global calculation.
    */
