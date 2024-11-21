@@ -47,8 +47,8 @@ public final class ProvidedFactory {
   public <T> Provider<T> provided(Callable<T> callable, Class<T> type) {
     var prop = this.objectFactory.property(type);
     prop.set(providerFactory.provider(callable));
+    prop.finalizeValueOnRead();
     prop.disallowChanges();
-    prop.disallowUnsafeRead();
     return prop;
   }
 
@@ -58,7 +58,7 @@ public final class ProvidedFactory {
 
   public <T> Property<T> property(Class<T> type) {
     var prop = this.objectFactory.property(type);
-    prop.disallowUnsafeRead();
+    prop.finalizeValueOnRead();
     return prop;
   }
 }

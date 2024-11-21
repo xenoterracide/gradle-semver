@@ -30,9 +30,9 @@ class SemverPluginIntegrationTest {
     logger.quiet("branch:" + gitMetadata.branch )
     logger.quiet("commit:" + gitMetadata.commit)
     logger.quiet("commitShort:" + gitMetadata.commitShort)
-    logger.quiet("latestTag:" + gitMetadata.latestTag)
+    logger.quiet("latestTag:" + gitMetadata.tag)
     logger.quiet("describe:" + gitMetadata.describe)
-    logger.quiet("commitDistance:" + gitMetadata.commitDistance)
+    logger.quiet("commitDistance:" + gitMetadata.distance)
     logger.quiet("status:" + gitMetadata.status)
     """;
   static final String GROOVY_SCRIPT =

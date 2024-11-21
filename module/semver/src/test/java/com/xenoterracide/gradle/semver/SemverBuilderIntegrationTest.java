@@ -3,8 +3,8 @@
 
 package com.xenoterracide.gradle.semver;
 
-import static com.xenoterracide.gradle.semver.CommitTools.commit;
-import static com.xenoterracide.gradle.semver.CommitTools.supplies;
+import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
+import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;

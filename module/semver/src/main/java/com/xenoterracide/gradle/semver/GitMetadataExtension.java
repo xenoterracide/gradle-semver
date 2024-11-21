@@ -6,7 +6,6 @@ package com.xenoterracide.gradle.semver;
 import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
 import java.util.List;
-import org.gradle.api.Project;
 import org.gradle.api.provider.Provider;
 
 public class GitMetadataExtension {
@@ -18,10 +17,6 @@ public class GitMetadataExtension {
   private final Provider<String> branch;
   private final Provider<String> commit;
   private final Provider<List<Remote>> remotes;
-
-  GitMetadataExtension(Project project) {
-    this(new ProvidedFactory(project), project.getExtensions().getByType(GitMetadata.class));
-  }
 
   GitMetadataExtension(ProvidedFactory pf, GitMetadata gm) {
     this.uniqueShort = pf.providedString(gm::uniqueShort);

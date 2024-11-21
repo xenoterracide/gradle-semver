@@ -178,7 +178,8 @@ public class GitMetadataImpl implements GitMetadata {
       .mapTry(RemoteListCommand::call)
       .map(Collection::stream)
       .map(s -> s.map(RemoteConfig::getName))
-      .map(s -> s.map(name -> new RemoteImpl(name, this.headBranch(name))))
+      .map(s -> s.filter(Objects::nonNull))
+      .map(s -> s.map(name -> RemoteImpl.nullCheck(name, this.headBranch(name))))
       .map(s -> s.collect(Collectors.<Remote>toList()))
       .getOrElse(ArrayList::new);
   }
@@ -197,20 +198,24 @@ public class GitMetadataImpl implements GitMetadata {
   private static class RemoteImpl implements Remote {
 
     private final String name;
-    private final String headBranch;
+    private final @Nullable String headBranch;
 
-    RemoteImpl(String name, String headBranch) {
+    RemoteImpl(String name, @Nullable String headBranch) {
       this.name = name;
       this.headBranch = headBranch;
     }
 
+    static Remote nullCheck(@Nullable String name, @Nullable String headBranch) {
+      return new RemoteImpl(Objects.requireNonNull(name), headBranch);
+    }
+
     @Override
-    public String headBranch() {
+    public @Nullable String headBranch() {
       return this.headBranch;
     }
 
     @Override
-    public String name() {
+    public @NonNull String name() {
       return this.name;
     }
   }

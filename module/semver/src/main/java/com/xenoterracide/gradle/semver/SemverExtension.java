@@ -3,7 +3,6 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.Project;
@@ -37,9 +36,11 @@ public class SemverExtension {
   }
 
   SemverExtension init() {
-    var gm = this.project.getExtensions().getByType(GitMetadata.class);
     var semverProvider = project.provider(() -> {
-      var semver = new SemverBuilder(gm).withDirtyOut(this.getCheckDirty().getOrElse(false)).build();
+      var gm = this.project.getExtensions().getByType(GitMetadataExtension.class);
+      var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm))
+        .withDirtyOut(this.getCheckDirty().getOrElse(false))
+        .build();
       this.log.info("semver {} {}", project.getName(), semver);
       return semver;
     });

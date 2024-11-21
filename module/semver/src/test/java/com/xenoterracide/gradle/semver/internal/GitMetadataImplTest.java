@@ -1,13 +1,13 @@
 // © Copyright 2024 Caleb Cushing
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.internal;
 
-import static com.xenoterracide.gradle.semver.CommitTools.commit;
-import static com.xenoterracide.gradle.semver.CommitTools.supplies;
+import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
+import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
+import com.xenoterracide.gradle.semver.GitStatus;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Optional;
@@ -32,7 +32,7 @@ class GitMetadataImplTest {
       git.checkout().setName("topic/test").call();
 
       var pg = new GitMetadataImpl(() -> Optional.of(git));
-      assertThat(pg.getBranch()).isEqualTo("topic/test");
+      assertThat(pg.branch()).isEqualTo("topic/test");
     }
   }
 
@@ -40,11 +40,9 @@ class GitMetadataImplTest {
   void noGit() {
     var pg = new GitMetadataImpl(Optional::empty);
     assertThat(pg.distance()).isSameAs(0);
-    assertThat(pg.getBranch()).isNull();
-    assertThat(pg.getCommit()).isNull();
-    assertThat(pg.getDescribe()).isNull();
+    assertThat(pg.branch()).isNull();
+    assertThat(pg.commit()).isNull();
     assertThat(pg.tag()).isNull();
-    assertThat(pg.getCommitShort()).isNull();
     assertThat(pg.status()).isSameAs(GitStatus.NO_REPO);
   }
 
@@ -89,7 +87,7 @@ class GitMetadataImplTest {
 
       var pg = new GitMetadataImpl(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
-      var head = pg.getCommit();
+      var head = pg.commit();
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(40);
       assertThat(main).isEqualTo(head);
@@ -105,7 +103,7 @@ class GitMetadataImplTest {
 
       var pg = new GitMetadataImpl(() -> Optional.of(git));
       var main = pg.getRev("topic/test");
-      var head = pg.getCommitShort();
+      var head = pg.uniqueShort();
       assertThat(main).isNotNull();
       assertThat(main).hasSize(40);
       assertThat(head).hasSize(8);
@@ -133,23 +131,6 @@ class GitMetadataImplTest {
       git.commit().setMessage("second commit").call();
 
       assertThat(pg.tag()).isEqualTo("v0.1.0");
-
-      git.tag().setName("v0.1.1").call();
-      assertThat(pg.tag()).isEqualTo("v0.1.1");
-    }
-  }
-
-  @Test
-  void getDescribe() throws GitAPIException {
-    try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.commit().setMessage("initial commit").call();
-
-      var pg = new GitMetadataImpl(() -> Optional.of(git));
-      git.tag().setName("v0.1.0").call();
-      assertThat(pg.getDescribe()).isEqualTo("v0.1.0");
-
-      git.commit().setMessage("second commit").call();
-      assertThat(pg.getDescribe()).matches("v0\\.1\\.0-1-g[0-9a-f]{7}");
 
       git.tag().setName("v0.1.1").call();
       assertThat(pg.tag()).isEqualTo("v0.1.1");

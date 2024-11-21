@@ -1,7 +1,7 @@
 // © Copyright 2024 Caleb Cushing
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.internal;
 
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -16,7 +16,7 @@ public final class CommitTools {
 
   private CommitTools() {}
 
-  static Void commit(Git git) throws GitAPIException {
+  public static Void commit(Git git) throws GitAPIException {
     var commitFormat = "commit %d";
     var message = String.format(commitFormat, NEXT_INT.getAsInt());
     git.commit().setMessage(message).call();
@@ -26,7 +26,7 @@ public final class CommitTools {
   /**
    * just for silly single statement one-liners that reduce boilerplate.
    */
-  static <T> T supplies(@Nullable Void ignored, Supplier<T> supplier) {
+  public static <T> T supplies(@Nullable Void ignored, Supplier<T> supplier) {
     return supplier.get();
   }
 }
