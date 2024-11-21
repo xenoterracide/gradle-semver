@@ -20,7 +20,7 @@ public class GitMetadataExtension {
 
   GitMetadataExtension(ProvidedFactory pf, GitMetadata gm) {
     this.uniqueShort = pf.providedString(gm::uniqueShort);
-    this.tag = pf.providedString(gm::uniqueShort);
+    this.tag = pf.providedString(gm::tag);
     this.distance = pf.providedInt(gm::distance);
     this.status = pf.provided(gm::status, GitStatus.class);
     this.branch = pf.providedString(gm::branch);
