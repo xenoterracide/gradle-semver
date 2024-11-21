@@ -27,10 +27,10 @@ class SemverPluginIntegrationTest {
   static final String LOGGING =
     """
     logger.quiet("semver:" + semver.provider().get())
-    logger.quiet("branch:" + gitMetadata.branch.get() )
-    logger.quiet("commit:" + gitMetadata.commit.get())
-    logger.quiet("commitShort:" + gitMetadata.uniqueShort.get())
-    logger.quiet("latestTag:" + gitMetadata.tag.get())
+    logger.quiet("branch:" + gitMetadata.branch.getOrNull() )
+    logger.quiet("commit:" + gitMetadata.commit.getOrNull())
+    logger.quiet("commitShort:" + gitMetadata.uniqueShort.getOrNull())
+    logger.quiet("latestTag:" + gitMetadata.tag.getOrNull())
     logger.quiet("commitDistance:" + gitMetadata.distance.get())
     logger.quiet("status:" + gitMetadata.status.get())
     """;
