@@ -61,7 +61,7 @@ public interface GitMetadata {
   /**
    * Gets the remotes.
    *
-   * @return
+   * @return the configured remotes or an empty list
    */
   List<Remote> remotes();
 }

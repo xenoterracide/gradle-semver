@@ -19,23 +19,57 @@ public final class ProvidedFactory {
   private final ObjectFactory objectFactory;
   private final ProviderFactory providerFactory;
 
+  /**
+   * Instantiates a new Provided factory from a {@link Project}.
+   *
+   * @param project
+   *   the project
+   */
   public ProvidedFactory(Project project) {
     this(project.getObjects(), project.getProviders());
   }
 
-  ProvidedFactory(ObjectFactory objectFactory, ProviderFactory providerFactory) {
+  private ProvidedFactory(ObjectFactory objectFactory, ProviderFactory providerFactory) {
     this.objectFactory = objectFactory;
     this.providerFactory = providerFactory;
   }
 
+  /**
+   * Shortcut to {@link #provided(Callable, Class)} for {@link String}.
+   *
+   * @param callable
+   *   function to provide value
+   * @return provider
+   * @see #provided(Callable, Class)
+   */
   public Provider<String> providedString(Callable<String> callable) {
     return this.provided(callable, String.class);
   }
 
+  /**
+   * Shortcut to {@link #provided(Callable, Class)} for {@link Integer}.
+   *
+   * @param callable
+   *   function to provide value
+   * @return provider
+   * @see #provided(Callable, Class)
+   */
   public Provider<Integer> providedInt(Callable<Integer> callable) {
     return this.provided(callable, Integer.class);
   }
 
+  /**
+   * Provides functionality similar to {@link #provided(Callable, Class)} for {@link List}.
+   *
+   * @param <E>
+   *   element type for list
+   * @param callable
+   *   function to provide value
+   * @param type
+   *   element class
+   * @return string provider
+   * @see #provided(Callable, Class)
+   */
   public <E> Provider<List<E>> providedList(Callable<List<E>> callable, Class<E> type) {
     var prop = this.objectFactory.listProperty(type);
     prop.set(providerFactory.provider(callable));
@@ -44,6 +78,19 @@ public final class ProvidedFactory {
     return prop;
   }
 
+  /**
+   * Create an {@link Provider} from a {@link Callable} and {@link Class} ensuring the callback is not called repeatedly
+   * during a build.
+   *
+   * @param callable
+   *   function to provide value
+   * @return string provider
+   * @implNote currently this returns a {@link Property} so that the property should only be calculated once per
+   *   instance of it. This implementation could change in the future to ensure only once per build. A {@link Property}
+   *   based solution should not be assumed, but currently use of {@link Property#finalizeValueOnRead()} and
+   *   {@link Property#disallowChanges()} to ensure they are immutable and only created as a sort of cached
+   *   {@link Provider}.
+   */
   public <T> Provider<T> provided(Callable<T> callable, Class<T> type) {
     var prop = this.objectFactory.property(type);
     prop.set(providerFactory.provider(callable));
@@ -52,10 +99,26 @@ public final class ProvidedFactory {
     return prop;
   }
 
+  /**
+   * Shortcut to {@link #property(Class)} for {@link Boolean}.
+   *
+   * @return the new property
+   * @see #property(Class)
+   */
   public Property<Boolean> propertyBoolean() {
     return this.property(Boolean.class);
   }
 
+  /**
+   * Creates a {@link Property} of a given type that is {@link Property#finalizeValueOnRead()}
+   *
+   * @param type
+   *   class type of property
+   * @param <T>
+   *   type of property
+   * @return the new property
+   * @see ObjectFactory#property(Class)
+   */
   public <T> Property<T> property(Class<T> type) {
     var prop = this.objectFactory.property(type);
     prop.finalizeValueOnRead();
