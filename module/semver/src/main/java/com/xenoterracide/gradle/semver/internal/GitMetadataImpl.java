@@ -34,6 +34,8 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Git metadata extension.
@@ -44,6 +46,7 @@ public class GitMetadataImpl implements GitMetadata {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
   private static final Splitter REF_SPLITTER = Splitter.on('/');
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Supplier<Optional<Git>> git;
 
@@ -143,10 +146,14 @@ public class GitMetadataImpl implements GitMetadata {
   public int distance() {
     return this.describe()
       .filter(Objects::nonNull)
-      .map(d -> Iterables.get(DESCRIBE_SPLITTER.split(d), 1))
-      .map(Integer::parseInt)
+      .map(d -> {
+        var ary = Iterables.toArray(DESCRIBE_SPLITTER.split(d), String.class);
+        return ary.length > 2 ? ary[ary.length - 2] : "0"; // the distance should always be the element before the commit which is the last element.
+      })
+      .map(split -> Integer.parseInt(split))
       .recover(RefNotFoundException.class, 0)
       .recover(NoSuchElementException.class, e -> this.distanceFromNoCommit())
+      .onFailure(e -> this.log.error("failed to get distance", e))
       .getOrElse(0);
   }
 
