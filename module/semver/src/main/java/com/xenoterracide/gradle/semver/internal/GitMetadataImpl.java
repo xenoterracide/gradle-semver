@@ -209,7 +209,7 @@ public class GitMetadataImpl implements GitMetadata {
       .filter(Objects::nonNull)
       .map(ref -> ref.getTarget().getName())
       .map(ref -> REF_SPLITTER.splitToList(ref).get(2))
-      .onFailure(e -> this.log.debug("failed to get distance", e))
+      .onFailure(e -> this.log.debug("failed to get HEAD branch", e))
       .getOrNull();
   }
 

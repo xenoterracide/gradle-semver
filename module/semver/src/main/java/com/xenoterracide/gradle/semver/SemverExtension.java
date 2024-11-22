@@ -27,6 +27,12 @@ public class SemverExtension {
   private final Property<Boolean> checkDirty;
   private final Project project;
 
+  /**
+   * Instantiates a new Semver extension.
+   *
+   * @param project
+   *   the project
+   */
   protected SemverExtension(Project project) {
     var pf = new ProvidedFactory(project);
     this.provider = pf.property(Semver.class);
