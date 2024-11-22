@@ -65,7 +65,7 @@ public class GitMetadataImpl implements GitMetadata {
       .map(g -> Try.of(() -> supplier.apply(g)))
       .orElseGet(NoGitDirException::failure)
       .recover(NoGitDirException.class, e -> null)
-      .onFailure(e -> this.log.debug("failed to get distance", e));
+      .onFailure(e -> this.log.debug("failed", e));
   }
 
   Try<Repository> gitRepository() {
@@ -78,7 +78,7 @@ public class GitMetadataImpl implements GitMetadata {
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
       .recover(NoGitDirException.class, e -> null)
-      .onFailure(e -> this.log.debug("failed to get distance", e));
+      .onFailure(e -> this.log.debug("failed to get describe", e));
   }
 
   Try<LogCommand> gitLog() {
@@ -123,7 +123,7 @@ public class GitMetadataImpl implements GitMetadata {
       .mapTry(Repository::newObjectReader)
       .mapTry(objectReader -> objectReader.abbreviate(this.getObjectIdFor(Constants.HEAD).get(), 8))
       .map(AbbreviatedObjectId::name)
-      .onFailure(e -> this.log.debug("failed to get distance", e))
+      .onFailure(e -> this.log.debug("failed to get unique short", e))
       .getOrNull();
   }
 
@@ -133,7 +133,7 @@ public class GitMetadataImpl implements GitMetadata {
       .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0)))
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
-      .onFailure(e -> this.log.debug("failed to get distance", e))
+      .onFailure(e -> this.log.debug("failed to get tag", e))
       .getOrNull();
   }
 
@@ -143,7 +143,7 @@ public class GitMetadataImpl implements GitMetadata {
       .mapTry(LogCommand::call)
       .map(iter -> StreamSupport.stream(iter.spliterator(), false).count())
       .map(Long::intValue)
-      .onFailure(e -> this.log.debug("failed to get distance", e))
+      .onFailure(e -> this.log.debug("failed to get distance from no commit", e))
       .get();
   }
 
@@ -173,7 +173,7 @@ public class GitMetadataImpl implements GitMetadata {
       .recover(NoGitDirException.class, e -> null)
       // flip, dirty is the porcelain option.
       .map(status -> status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY)
-      .onFailure(e -> this.log.debug("failed to get distance", e))
+      .onFailure(e -> this.log.debug("failed to get status", e))
       .getOrElseThrow(ExceptionTools::toRuntime);
   }
 
@@ -196,7 +196,7 @@ public class GitMetadataImpl implements GitMetadata {
       .map(s -> s.filter(Objects::nonNull))
       .map(s -> s.map(name -> RemoteImpl.nullCheck(name, this.headBranch(name))))
       .map(s -> s.collect(Collectors.<GitRemote>toList()))
-      .onFailure(e -> this.log.debug("failed to get distance", e))
+      .onFailure(e -> this.log.debug("failed to get remotes", e))
       .getOrElse(ArrayList::new);
   }
 
