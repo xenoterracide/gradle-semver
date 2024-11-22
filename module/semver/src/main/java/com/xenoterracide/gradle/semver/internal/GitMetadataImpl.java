@@ -30,7 +30,6 @@ import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.jspecify.annotations.NonNull;
@@ -44,6 +43,7 @@ public class GitMetadataImpl implements GitMetadata {
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
+  private static final Splitter REF_SPLITTER = Splitter.on('/');
 
   private final Supplier<Optional<Git>> git;
 
@@ -192,7 +192,8 @@ public class GitMetadataImpl implements GitMetadata {
       .mapTry(LsRemoteCommand::callAsMap)
       .map(m -> m.get(Constants.HEAD))
       .filter(Objects::nonNull)
-      .map(Ref::getName)
+      .map(ref -> ref.getTarget().getName())
+      .map(ref -> REF_SPLITTER.splitToList(ref).get(2))
       .getOrNull();
   }
 
