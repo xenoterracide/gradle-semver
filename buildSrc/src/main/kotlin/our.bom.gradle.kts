@@ -24,15 +24,9 @@ configurations.configureEach {
     // cacheChangingModulesFor(5, TimeUnit.MINUTES)
     componentSelection {
       all {
-        val spotbugs = Regex("^spotbugs.*")
-        if (!name.matches(spotbugs) && !candidate.module.matches(spotbugs)) {
-          val nonRelease = Regex("^[\\d.]+-(M|ea|beta|alpha).*$")
+        if (!candidate.group.matches(Regex("^com.xenoterracide.*"))) {
+          val nonRelease = Regex("^[\\d.]+-(M|RC|ea|beta|alpha).*$")
           if (candidate.version.matches(nonRelease)) reject("no pre-release")
-        }
-
-        if (candidate.module == "nullaway") {
-          val reason = "crash https://github.com/uber/NullAway/issues/533"
-          if (candidate.version.matches(Regex("^0\\.9\\.[34]$"))) reject(reason)
         }
       }
     }

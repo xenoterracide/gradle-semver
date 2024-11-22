@@ -24,6 +24,10 @@ version =
     .orElse(Semver("0.0.0"))
     .get()
 
+tasks.dependencies {
+  dependsOn(subprojects.map { it.tasks.dependencies })
+}
+
 tasks.check {
   dependsOn(tasks.buildHealth)
 }

@@ -7,6 +7,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.xenoterracide.gradle.semver.GitRemote;
 import com.xenoterracide.gradle.semver.GitStatus;
+import com.xenoterracide.tools.java.function.ExceptionTools;
 import io.vavr.CheckedFunction1;
 import io.vavr.control.Try;
 import java.util.ArrayList;
