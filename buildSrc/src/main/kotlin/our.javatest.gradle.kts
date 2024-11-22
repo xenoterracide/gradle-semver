@@ -4,6 +4,7 @@
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.kotlin.dsl.KotlinClosure2
 
 plugins {
   `java-library`
@@ -19,16 +20,23 @@ dependencies {
   testRuntimeOnly(libs.bundles.test.runtime)
 }
 
-val available = tasks.register("tests available") {
-  val java: Provider<FileCollection> = sourceSets.test.map { it.java }
-  doLast {
-    if (java.get().isEmpty) throw RuntimeException("no tests found")
+val available =
+  tasks.register("tests available") {
+    val java: Provider<FileCollection> = sourceSets.test.map { it.java }
+    doLast {
+      if (java.get().isEmpty) throw RuntimeException("no tests found")
+    }
   }
-}
 
 tasks.withType<Test>().configureEach {
   jvmArgs("-XX:+EnableDynamicAgentLoading")
   useJUnitPlatform()
+  maxParallelForks =
+    Runtime
+      .getRuntime()
+      .availableProcessors()
+      .div(2)
+      .or(1)
   systemProperties(
     "junit.jupiter.execution.parallel.enabled" to "true",
     "junit.jupiter.execution.parallel.mode.default" to "concurrent",

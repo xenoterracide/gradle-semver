@@ -3,7 +3,6 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
-import com.xenoterracide.gradle.semver.GitMetadataExtension;
 import com.xenoterracide.gradle.semver.internal.AbstractGitService.Params;
 import io.vavr.control.Try;
 import java.io.IOException;
@@ -13,6 +12,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.services.BuildService;
 import org.gradle.api.services.BuildServiceParameters;
 import org.jspecify.annotations.Nullable;
@@ -26,6 +27,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
     preventJGitFromCallingExecutables();
   }
 
+  private final Logger log = Logging.getLogger(this.getClass());
   private @Nullable Git git;
 
   /**
@@ -57,6 +59,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
 
   Optional<Git> lazyGit() throws IOException {
     if (this.git == null) {
+      this.log.quiet("setting git");
       var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
       var gitDir = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(projectDir).getGitDir();
 
@@ -71,13 +74,16 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
    *
    * @return The SemverExtension.
    */
-  public GitMetadataExtension extension() {
-    return new GitMetadataExtension(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
+  public GitMetadata metadata() {
+    return new GitMetadataImpl(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
   }
 
   @Override
   public void close() {
-    if (this.git != null) this.git.close();
+    if (this.git != null) {
+      this.log.quiet("closing git");
+      this.git.close();
+    }
   }
 
   /**

@@ -24,11 +24,13 @@ dependencies {
   api(libs.semver)
   implementation(libs.vavr)
   implementation(libs.guava)
+  implementation(libs.java.tools)
   testImplementation(libs.junit.api)
   testImplementation(libs.maven.artifact)
   testImplementation(gradleTestKit())
   shadow(libs.vavr)
   shadow(libs.semver)
+  shadow(libs.java.tools)
 }
 
 tasks.withType<ShadowJar>().configureEach {
@@ -40,6 +42,7 @@ tasks.withType<ShadowJar>().configureEach {
     exclude { it.moduleGroup == "org.slf4j" }
     exclude { it.moduleName == "semver4j" }
   }
+  minimize()
 }
 
 gradlePlugin {
@@ -47,10 +50,11 @@ gradlePlugin {
     register("com.xenoterracide.gradle.semver") {
       displayName = "Semver with Git"
       implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
-      description = """
-        A semantic versioning plugin that derives the version from git
- tags and commits and is configuration cache safe.
-      """.trimIndent()
+      description =
+        """
+               A semantic versioning plugin that derives the version from git
+        tags and commits and is configuration cache safe.
+        """.trimIndent()
       tags = setOf("semver", "versioning", "git", "version")
       id = name
     }

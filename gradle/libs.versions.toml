@@ -4,7 +4,6 @@ checker = "3.+"
 spring = "3.+"
 
 [libraries]
-java-tools = "com.xenoterracide:tools:0.0.0-SNAPSHOT"
 api-guardian = { module = "org.apiguardian:apiguardian-api" }
 assertj = "org.assertj:assertj-core:3.+"
 autoservice = "com.google.auto.service:auto-service:1.+"
@@ -39,6 +38,7 @@ jakarta-persistence = { module = "jakarta.persistence:jakarta.persistence-api" }
 jakarta-servlet = { module = "jakarta.servlet:jakarta.servlet-api" }
 jakarta-validation = { module = "jakarta.validation:jakarta.validation-api" }
 jetbrains-annotations = "org.jetbrains:annotations:+"
+java-tools = "com.xenoterracide:tools:0.+"
 jgit = "org.eclipse.jgit:org.eclipse.jgit:7.+"
 jspecify = "org.jspecify:jspecify:1.+"
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api" }
@@ -116,6 +116,6 @@ spring-test = ["spring-test", "spring-boot-test-core", "spring-boot-autoconfigur
 [plugins]
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis" }
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version = "1.+" }
-shadow = { id = "com.github.johnrengelman.shadow", version = "8.+" }
+shadow = { id = "com.gradleup.shadow", version = "8.+" }
 semver = { id = "com.xenoterracide.gradle.semver", version = "0.+" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring" }

@@ -8,7 +8,8 @@ pluginManagement {
     maven("https://maven.pkg.github.com/xenoterracide/gradle-semver") {
       name = "gh"
       mavenContent {
-        includeGroupAndSubgroups("com.xenoterracide.gradle")
+        includeGroup("com.xenoterracide.gradle.semver")
+        includeModule("com.xenoterracide.gradle", "semver")
       }
       credentials(PasswordCredentials::class)
     }
@@ -35,6 +36,13 @@ dependencyResolutionManagement {
   rulesMode = RulesMode.FAIL_ON_PROJECT_RULES
 
   repositories {
+    maven("https://maven.pkg.github.com/xenoterracide/gradle-semver") {
+      name = "gh"
+      mavenContent {
+        includeModule("com.xenoterracide", "tools")
+      }
+      credentials(PasswordCredentials::class)
+    }
     mavenCentral()
   }
 }

@@ -27,13 +27,12 @@ class SemverPluginIntegrationTest {
   static final String LOGGING =
     """
     logger.quiet("semver:" + semver.provider().get())
-    logger.quiet("branch:" + gitMetadata.branch )
-    logger.quiet("commit:" + gitMetadata.commit)
-    logger.quiet("commitShort:" + gitMetadata.commitShort)
-    logger.quiet("latestTag:" + gitMetadata.latestTag)
-    logger.quiet("describe:" + gitMetadata.describe)
-    logger.quiet("commitDistance:" + gitMetadata.commitDistance)
-    logger.quiet("status:" + gitMetadata.status)
+    logger.quiet("branch:" + gitMetadata.branch.getOrNull() )
+    logger.quiet("commit:" + gitMetadata.commit.getOrNull())
+    logger.quiet("commitShort:" + gitMetadata.uniqueShort.getOrNull())
+    logger.quiet("latestTag:" + gitMetadata.tag.getOrNull())
+    logger.quiet("commitDistance:" + gitMetadata.distance.get())
+    logger.quiet("status:" + gitMetadata.status.get())
     """;
   static final String GROOVY_SCRIPT =
     """

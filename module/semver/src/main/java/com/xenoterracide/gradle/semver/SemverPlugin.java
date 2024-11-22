@@ -4,6 +4,7 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.internal.AbstractGitService;
+import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -29,8 +30,7 @@ public class SemverPlugin implements Plugin<Project> {
         spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
       });
 
-    var gitMeta = svcPrvdr.map(AbstractGitService::extension).get();
-    project.getExtensions().add(GIT, gitMeta);
-    project.getExtensions().add(SEMVER, new SemverExtension(gitMeta, project));
+    project.getExtensions().add(GIT, new GitMetadataExtension(new ProvidedFactory(project), svcPrvdr.get().metadata()));
+    project.getExtensions().add(SEMVER, new SemverExtension(project).init());
   }
 }
