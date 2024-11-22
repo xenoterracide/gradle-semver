@@ -34,6 +34,8 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Git metadata extension.
@@ -44,6 +46,7 @@ public class GitMetadataImpl implements GitMetadata {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
   private static final Splitter REF_SPLITTER = Splitter.on('/');
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Supplier<Optional<Git>> git;
 
@@ -61,7 +64,8 @@ public class GitMetadataImpl implements GitMetadata {
     return this.git.get()
       .map(g -> Try.of(() -> supplier.apply(g)))
       .orElseGet(NoGitDirException::failure)
-      .recover(NoGitDirException.class, e -> null);
+      .recover(NoGitDirException.class, e -> null)
+      .onFailure(e -> this.log.debug("failed", e));
   }
 
   Try<Repository> gitRepository() {
@@ -73,7 +77,8 @@ public class GitMetadataImpl implements GitMetadata {
       .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setTags(true)))
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
-      .recover(NoGitDirException.class, e -> null);
+      .recover(NoGitDirException.class, e -> null)
+      .onFailure(e -> this.log.debug("failed to get describe", e));
   }
 
   Try<LogCommand> gitLog() {
@@ -118,6 +123,7 @@ public class GitMetadataImpl implements GitMetadata {
       .mapTry(Repository::newObjectReader)
       .mapTry(objectReader -> objectReader.abbreviate(this.getObjectIdFor(Constants.HEAD).get(), 8))
       .map(AbbreviatedObjectId::name)
+      .onFailure(e -> this.log.debug("failed to get unique short", e))
       .getOrNull();
   }
 
@@ -127,6 +133,7 @@ public class GitMetadataImpl implements GitMetadata {
       .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0)))
       .orElseGet(NoGitDirException::failure)
       .mapTry(DescribeCommand::call)
+      .onFailure(e -> this.log.debug("failed to get tag", e))
       .getOrNull();
   }
 
@@ -136,6 +143,7 @@ public class GitMetadataImpl implements GitMetadata {
       .mapTry(LogCommand::call)
       .map(iter -> StreamSupport.stream(iter.spliterator(), false).count())
       .map(Long::intValue)
+      .onFailure(e -> this.log.debug("failed to get distance from no commit", e))
       .get();
   }
 
@@ -143,10 +151,15 @@ public class GitMetadataImpl implements GitMetadata {
   public int distance() {
     return this.describe()
       .filter(Objects::nonNull)
-      .map(d -> Iterables.get(DESCRIBE_SPLITTER.split(d), 1))
-      .map(Integer::parseInt)
+      .map(d -> {
+        var ary = Iterables.toArray(DESCRIBE_SPLITTER.split(d), String.class);
+        return ary.length > 2 ? ary[ary.length - 2] : "0";
+      })
+      .map(split -> Integer.parseInt(split))
+      .recover(NoGitDirException.class, 0)
       .recover(RefNotFoundException.class, 0)
       .recover(NoSuchElementException.class, e -> this.distanceFromNoCommit())
+      .onFailure(e -> this.log.debug("failed to get distance", e))
       .getOrElse(0);
   }
 
@@ -160,6 +173,7 @@ public class GitMetadataImpl implements GitMetadata {
       .recover(NoGitDirException.class, e -> null)
       // flip, dirty is the porcelain option.
       .map(status -> status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY)
+      .onFailure(e -> this.log.debug("failed to get status", e))
       .getOrElseThrow(ExceptionTools::toRuntime);
   }
 
@@ -182,6 +196,7 @@ public class GitMetadataImpl implements GitMetadata {
       .map(s -> s.filter(Objects::nonNull))
       .map(s -> s.map(name -> RemoteImpl.nullCheck(name, this.headBranch(name))))
       .map(s -> s.collect(Collectors.<GitRemote>toList()))
+      .onFailure(e -> this.log.debug("failed to get remotes", e))
       .getOrElse(ArrayList::new);
   }
 
@@ -194,6 +209,7 @@ public class GitMetadataImpl implements GitMetadata {
       .filter(Objects::nonNull)
       .map(ref -> ref.getTarget().getName())
       .map(ref -> REF_SPLITTER.splitToList(ref).get(2))
+      .onFailure(e -> this.log.debug("failed to get HEAD branch", e))
       .getOrNull();
   }
 

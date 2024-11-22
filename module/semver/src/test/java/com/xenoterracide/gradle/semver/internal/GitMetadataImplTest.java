@@ -161,6 +161,14 @@ class GitMetadataImplTest {
 
       git.tag().setName("v0.1.1").call();
       assertThat(distance.get()).isEqualTo(0);
+
+      assertThat(supplies(commit(git), distance)).isEqualTo(1);
+
+      git.tag().setName("v0.1.2-beta.0").call();
+
+      assertThat(distance.get()).isEqualTo(0);
+      assertThat(supplies(commit(git), distance)).isEqualTo(1);
+      assertThat(supplies(commit(git), distance)).isEqualTo(2);
     }
   }
 
