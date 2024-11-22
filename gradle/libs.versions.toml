@@ -58,6 +58,7 @@ plugin-semver = "com.xenoterracide.gradle:semver:0.+"
 plugin-spotbugs = "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.+"
 plugin-spotless = "com.diffplug.spotless:spotless-plugin-gradle:6.+"
 semver = "org.semver4j:semver4j:5.+"
+slf4j-api = { module = "org.slf4j:slf4j-api" }
 slf4j-bom = "org.slf4j:slf4j-bom:2.+"
 slf4j-nop = { module = "org.slf4j:slf4j-nop" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple" }
