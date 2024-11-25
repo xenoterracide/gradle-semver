@@ -5,59 +5,9 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # README
 
-A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
+This repo contains the following modules, please refer to their documentation published via javadoc. The README's on here match the latest commit, not the published version.
 
-_Plugin ID_: `"com.xenoterracide.gradle.semver"`
-_Version_: `0.12.+`
-
-## Usage
-
-```kt
-plugins {
-  id("com.xenoterracide.gradle.semver")
-}
-
-version = semver.provider().get()
-```
-
-This is the simplest way to get your semver, but I don't recommend it because [Gradle isn't lazy with anything related to publishing](https://github.com/gradle/gradle/issues/29342). Even when it becomes lazy I doubt it'll be as lazy as you want. So I do the following, and then only set `IS_PUBLISHING` in my publishing build in CI. This avoids constant configuration cache busting as well as ensuring that IO is kept to a minimum.
-
-```kt
-import org.semver4j.Semver
-
-version = providers.environmentVariable("IS_PUBLISHING")
-  .map { semver.provider().get() }
-  .orElse(Semver("0.0.0")).get()
-```
-
-This plugin expects that you will `git tag` in the format of `v0.1.1` and with only one number on prerelease versions,
-e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
-
-```kt
-// given the last tag was v0.1.0 and you have a commit distance == 1 you'll get something like
-logger.quiet("semver " + semver.provider().get()        // 0.1.1-alpha.0.1+g3aae11e
-
-// other available outputs
-logger.quiet("branch:" + gitMetadata.branch )
-logger.quiet("commit:" + gitMetadata.commit)
-logger.quiet("commitShort:" + gitMetadata.commitShort)
-logger.quiet("latestTag:" + gitMetadata.latestTag)
-logger.quiet("describe:" + gitMetadata.describe)
-logger.quiet("commitDistance:" + gitMetadata.commitDistance)
-logger.quiet("status:" + gitMetadata.status)
-```
-
-if you want you can expose whether your tree is dirty or not.
-
-```kt
-semver {
-  checkDirty.set(true)
-}
-
-logger.quiet("semver " + semver.provider().get()        // 0.1.1-alpha.0.1+g3aae11e.dirty
-```
-
-The plugin exposes a `Semver`. See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html).
+- [semver](modules/semver/README.adoc)
 
 ## Known Issues
 

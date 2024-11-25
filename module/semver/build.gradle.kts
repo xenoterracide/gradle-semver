@@ -46,6 +46,39 @@ tasks.withType<ShadowJar>().configureEach {
   minimize()
 }
 
+val asciiDoclet by configurations.registering
+
+dependencies {
+  asciiDoclet("org.asciidoctor:asciidoclet:2.+")
+}
+
+tasks.withType<Javadoc>().configureEach {
+  dependsOn(tasks.classes) // optional: for annotation preprocessor generated code
+  options {
+    docletpath(*asciiDoclet.map { it.files.toTypedArray() }.get())
+    doclet("org.asciidoctor.asciidoclet.Asciidoclet")
+    overview("README.adoc")
+    jFlags(
+      "--add-exports=jdk.javadoc/jdk.javadoc.internal.tool=ALL-UNNAMED",
+      "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+      "--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+      "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+      "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+    )
+  }
+  (options as StandardJavadocDocletOptions).apply {
+    addStringOption("-base-dir", project.layout.projectDirectory.asFile.path)
+    addStringsOption("-attribute", ",").value = listOf("name=${project.name}", "version=${project.version}")
+    addMultilineStringsOption("tag").value =
+      listOf(
+        "apiSpec:a:API Spec:",
+        "apiNote:a:API Note:",
+        "implSpec:a:Implementation Spec:",
+        "implNote:a:Implementation Note:",
+      )
+  }
+}
+
 gradlePlugin {
   plugins {
     register("com.xenoterracide.gradle.semver") {
