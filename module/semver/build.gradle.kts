@@ -31,7 +31,7 @@ dependencies {
   testImplementation(gradleTestKit())
   shadow(libs.vavr)
   shadow(libs.semver)
-  shadow(libs.java.tools)
+  shadow(libs.slf4j.api)
 }
 
 tasks.withType<ShadowJar>().configureEach {
