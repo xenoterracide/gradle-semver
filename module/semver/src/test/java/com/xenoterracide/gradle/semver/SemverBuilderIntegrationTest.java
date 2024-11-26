@@ -8,9 +8,9 @@ import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
+import io.vavr.control.Try;
 import java.io.File;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
@@ -30,7 +30,7 @@ class SemverBuilderIntegrationTest {
   @Test
   void semver() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataImpl(() -> Optional.of(git))).build();
+      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataImpl(() -> Try.success(git))).build();
 
       var v001Alpha01 = supplies(commit(git), vs);
 

@@ -15,7 +15,7 @@ public class GitMetadataExtension {
 
   private final Provider<String> uniqueShort;
   private final Provider<String> tag;
-  private final Provider<Integer> distance;
+  private final Provider<Long> distance;
   private final Provider<GitStatus> status;
   private final Provider<String> branch;
   private final Provider<String> commit;
@@ -24,7 +24,7 @@ public class GitMetadataExtension {
   GitMetadataExtension(ProvidedFactory pf, GitMetadata gm) {
     this.uniqueShort = pf.providedString(gm::uniqueShort);
     this.tag = pf.providedString(gm::tag);
-    this.distance = pf.providedInt(gm::distance);
+    this.distance = pf.providedLong(gm::distance);
     this.status = pf.provided(gm::status, GitStatus.class);
     this.branch = pf.providedString(gm::branch);
     this.commit = pf.providedString(gm::commit);
@@ -54,7 +54,7 @@ public class GitMetadataExtension {
    *
    * @return the commit distance
    */
-  public Provider<Integer> getDistance() {
+  public Provider<Long> getDistance() {
     return this.distance;
   }
 

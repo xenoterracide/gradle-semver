@@ -53,8 +53,7 @@ gradlePlugin {
       implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
       description =
         """
-               A semantic versioning plugin that derives the version from git
-        tags and commits and is configuration cache safe.
+        A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
         """.trimIndent()
       tags = setOf("semver", "versioning", "git", "version")
       id = name

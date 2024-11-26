@@ -59,6 +59,18 @@ public final class ProvidedFactory {
   }
 
   /**
+   * Shortcut to {@link #provided(Callable, Class)} for {@link Long}.
+   *
+   * @param callable
+   *   function to provide value
+   * @return provider
+   * @see #provided(Callable, Class)
+   */
+  public Provider<Long> providedLong(Callable<Long> callable) {
+    return this.provided(callable, Long.class);
+  }
+
+  /**
    * Provides functionality similar to {@link #provided(Callable, Class)} for {@link List}.
    *
    * @param <E>

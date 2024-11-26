@@ -6,7 +6,7 @@ package com.xenoterracide.gradle.semver.internal;
 import com.xenoterracide.gradle.semver.internal.AbstractGitService.Params;
 import io.vavr.control.Try;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -57,7 +57,8 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
     );
   }
 
-  Optional<Git> lazyGit() throws IOException {
+  @Nullable
+  Git lazyGit() throws IOException {
     if (this.git == null) {
       this.log.quiet("setting git");
       var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
@@ -66,16 +67,11 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
       this.git = gitDir != null ? Git.open(gitDir) : null;
     }
 
-    return Optional.ofNullable(this.git);
+    return this.git;
   }
 
-  /**
-   * Create the SemverExtension.
-   *
-   * @return The SemverExtension.
-   */
   public GitMetadata metadata() {
-    return new GitMetadataImpl(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
+    return new GitMetadataImpl(() -> Try.of(this::lazyGit).filter(Objects::nonNull));
   }
 
   @Override

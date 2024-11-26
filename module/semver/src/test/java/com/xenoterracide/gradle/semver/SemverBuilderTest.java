@@ -114,7 +114,7 @@ class SemverBuilderTest {
     }
   }
 
-  record GitMetadataInfo(int distance, GitStatus status, @Nullable String uniqueShort, @Nullable String tag)
+  record GitMetadataInfo(long distance, GitStatus status, @Nullable String uniqueShort, @Nullable String tag)
     implements GitMetadata {
     @Override
     public @Nullable String branch() {
