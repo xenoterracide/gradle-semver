@@ -53,9 +53,8 @@ dependencies {
 }
 
 tasks.withType<Javadoc>().configureEach {
-  dependsOn(tasks.classes) // optional: for annotation preprocessor generated code
   options {
-    docletpath(*asciiDoclet.map { it.files.toTypedArray() }.get())
+    docletpath(*asciiDoclet.get().files.toTypedArray())
     doclet("org.asciidoctor.asciidoclet.Asciidoclet")
     overview("README.adoc")
     jFlags(
