@@ -68,13 +68,6 @@ tasks.withType<Javadoc>().configureEach {
   (options as StandardJavadocDocletOptions).apply {
     addStringOption("-base-dir", project.layout.projectDirectory.asFile.path)
     addStringsOption("-attribute", ",").value = listOf("name=${project.name}", "version=${project.version}")
-    addMultilineStringsOption("tag").value =
-      listOf(
-        "apiSpec:a:API Spec:",
-        "apiNote:a:API Note:",
-        "implSpec:a:Implementation Spec:",
-        "implNote:a:Implementation Note:",
-      )
   }
 }
 
