@@ -3,7 +3,7 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.AbstractGitService;
+import com.xenoterracide.gradle.semver.internal.GitService;
 import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -26,7 +26,7 @@ public class SemverPlugin implements Plugin<Project> {
     var svcPrvdr = project
       .getGradle()
       .getSharedServices()
-      .registerIfAbsent(AbstractGitService.class.getCanonicalName(), AbstractGitService.class, spec -> {
+      .registerIfAbsent(GitService.class.getCanonicalName(), GitService.class, spec -> {
         spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
       });
 

@@ -176,12 +176,7 @@ public class GitMetadataImpl implements GitMetadata {
   public long distance() {
     var shortCount = this.shortCount();
     if (shortCount < 4) {
-      var command = "git fetch --all --filter blob:none";
-      this.log.warn(
-          "git has {} commits which is less than 5. This is either a new repository or a shallow clone. Run `{}` to get a full history without files or distance may not be accurate.",
-          shortCount,
-          command
-        );
+      this.log.warn("shallow clone detected! git only has {} commits", shortCount);
     }
     return this.describe()
       .filter(Objects::nonNull)
