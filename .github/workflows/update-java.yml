@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Update Java
+name: update-java
 on:
   schedule:
     #         ┌───────────── minute (0 - 59)

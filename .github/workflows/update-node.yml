@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Update Node
+name: update-node
 on:
   schedule:
     #         ┌───────────── minute (0 - 59)
