@@ -1,5 +1,7 @@
 #!/bin/sh
-
+# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
 [ -n "$CI" ] && exit 0
 
 npx git-conventional-commits commit-msg-hook "$1"

@@ -2,12 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-prettier: &prettier "prettier --cache --ignore-unknown --write"
 "*.java":
   - "reuse annotate --license 'Apache-2.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
-  - *prettier
+  - &prettier "prettier --cache --ignore-unknown --write"
 "*.gradle.kts":
-  - "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - &mit "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised"
   - ktlint --format
 "*.md":
   - "reuse annotate --license 'CC-BY-NC-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
@@ -16,5 +15,5 @@ prettier: &prettier "prettier --cache --ignore-unknown --write"
   - "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
 "!(*.java|*.gradle.kts|*.md|*.xml)":
-  - "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised"
+  - *mit
   - *prettier
