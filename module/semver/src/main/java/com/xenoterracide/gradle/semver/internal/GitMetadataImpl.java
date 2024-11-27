@@ -66,10 +66,6 @@ public class GitMetadataImpl implements GitMetadata {
     this.git = git;
   }
 
-  static boolean hasRefs(Git git) {
-    return Try.of(() -> git.getRepository().getRefDatabase().hasRefs()).getOrElse(false);
-  }
-
   static <T> Function<? super Throwable, ? extends T> allWith(@Nullable T value) {
     return e ->
       Match(e)
