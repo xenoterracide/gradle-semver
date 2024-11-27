@@ -1,7 +1,8 @@
-import org.semver4j.Semver
-
-// © Copyright 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
+
+import org.semver4j.Semver
 
 buildscript { dependencyLocking { lockAllConfigurations() } }
 

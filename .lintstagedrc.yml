@@ -1,2 +1,17 @@
-"*": prettier --cache --ignore-unknown --write
-"*.kts": ktlint --format
+# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
+
+prettier: &prettier "prettier --cache --ignore-unknown --write"
+"*.java":
+  - "reuse annotate --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --license 'Apache-2.0'"
+  - *prettier
+"*.gradle.kts":
+  - "reuse annotate --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --license 'MIT'"
+  - ktlint --format
+"*.md":
+  - "reuse annotate --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --license 'CC-BY-NC-4.0'"
+  - *prettier
+"!(*.java|*.gradle.kts|*.md)":
+  - "reuse annotate --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised --license 'MIT'"
+  - *prettier

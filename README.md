@@ -1,6 +1,7 @@
 <!--
-SPDX-License-Identifier: CC-BY-4.0
-© Copyright 2024 Caleb Cushing. All rights reserved.
+SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+
+SPDX-License-Identifier: CC-BY-NC-4.0
 -->
 
 # README
