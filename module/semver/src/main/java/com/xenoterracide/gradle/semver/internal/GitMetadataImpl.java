@@ -74,8 +74,6 @@ public class GitMetadataImpl implements GitMetadata {
     return e ->
       Match(e)
         .option(
-          Case($(instanceOf(NoRefsException.class)), value),
-          Case($(instanceOf(NoGitDirException.class)), value),
           Case($(instanceOf(RefNotFoundException.class)), value),
           Case($(instanceOf(RepositoryNotFoundException.class)), value)
         )
