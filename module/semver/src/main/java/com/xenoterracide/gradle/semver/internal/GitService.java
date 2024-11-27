@@ -3,10 +3,10 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
-import com.xenoterracide.gradle.semver.internal.AbstractGitService.Params;
+import com.xenoterracide.gradle.semver.internal.GitService.Params;
 import io.vavr.control.Try;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
  * Build Service for Git. Primary goal is to allow for lazy initialization of the Git object and keeping it open for
  * later usage. This Service should not be considered a published API, and may change or be removed in future versions.
  */
-public abstract class AbstractGitService implements BuildService<Params>, AutoCloseable {
+public abstract class GitService implements BuildService<Params>, AutoCloseable {
   static {
     preventJGitFromCallingExecutables();
   }
@@ -35,7 +35,7 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
    */
   @Inject
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
-  public AbstractGitService() {}
+  public GitService() {}
 
   // preventJGitFromCallingExecutables is copied from
   // https://github.com/diffplug/spotless/blob/224f8f96df3ad42cac81064a0461e6d4ee91dcaf/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/GitRatchetGradle.java#L35
@@ -57,7 +57,8 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
     );
   }
 
-  Optional<Git> lazyGit() throws IOException {
+  @Nullable
+  Git lazyGit() throws IOException {
     if (this.git == null) {
       this.log.quiet("setting git");
       var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
@@ -66,16 +67,16 @@ public abstract class AbstractGitService implements BuildService<Params>, AutoCl
       this.git = gitDir != null ? Git.open(gitDir) : null;
     }
 
-    return Optional.ofNullable(this.git);
+    return this.git;
   }
 
   /**
-   * Create the SemverExtension.
+   * Get information about the state of your git repository.
    *
-   * @return The SemverExtension.
+   * @return a new metadata object.
    */
   public GitMetadata metadata() {
-    return new GitMetadataImpl(() -> Try.of(this::lazyGit).getOrElse(Optional.empty()));
+    return new GitMetadataImpl(() -> Try.of(this::lazyGit).filter(Objects::nonNull));
   }
 
   @Override

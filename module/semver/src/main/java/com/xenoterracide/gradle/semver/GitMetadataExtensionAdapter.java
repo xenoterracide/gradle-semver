@@ -26,7 +26,7 @@ class GitMetadataExtensionAdapter implements GitMetadata {
   }
 
   @Override
-  public int distance() {
+  public long distance() {
     return this.delegate.getDistance().get();
   }
 

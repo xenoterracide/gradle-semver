@@ -59,7 +59,25 @@ logger.quiet("semver " + semver.provider().get()        // 0.1.1-alpha.0.1+g3aae
 
 The plugin exposes a `Semver`. See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html).
 
-## Known Issues
+## FAQ
+
+### Shallow Clones
+
+```
+shallow clone detected! git only has {} commits
+```
+
+Shallow clones will not work properly with calculating the distance and thus you must not use them. The usual reason for doing a shallow clone is that repositories can grow quiet large, and it can be quite slow to download a 100Mb repository. What most people don't realize is that git is lazy and will fetch blobs as it needs them for a checkout if you do things correctly. `git add remote <origin> <https://...>` and then doing `git fetch --all --filter blob:none` followed by an operation like `git checkout <branch>` will not retrieve any files until you do the git checkout but it will have your full history. This will achieve the correct behavior on github.
+
+```yml
+- uses: actions/checkout@v4
+  with:
+    ref: ${{ github.event.workflow_run.head_branch}}
+    filter: "blob:none"
+    fetch-depth: 0
+```
+
+### Annotated Tags
 
 - [GitHub does not checkout annotated tags properly](https://github.com/actions/checkout/issues/882)
 

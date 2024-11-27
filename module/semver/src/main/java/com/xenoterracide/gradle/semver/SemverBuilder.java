@@ -35,17 +35,17 @@ final class SemverBuilder {
     if (distance > 0) {
       if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
         this.semver = this.semver.withIncPatch()
-          .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Integer.toString(distance)));
+          .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Long.toString(distance)));
       } else { // rc.1
         var preRelease = Stream.concat(
           this.semver.getPreRelease().stream(),
-          Stream.of(Integer.toString(distance))
+          Stream.of(Long.toString(distance))
         ).collect(Collectors.joining(SEMVER_DELIMITER));
         this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
       }
     }
     if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
-      this.semver = this.semver.withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Integer.toString(distance)));
+      this.semver = this.semver.withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Long.toString(distance)));
     }
     return this;
   }

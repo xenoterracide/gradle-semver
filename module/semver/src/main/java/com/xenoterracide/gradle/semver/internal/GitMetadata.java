@@ -33,7 +33,7 @@ public interface GitMetadata {
    *
    * @return the commit distance
    */
-  int distance();
+  long distance();
 
   /**
    * Gets status.

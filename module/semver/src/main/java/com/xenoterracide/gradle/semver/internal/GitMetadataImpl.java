@@ -3,6 +3,11 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static io.vavr.Predicates.instanceOf;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.xenoterracide.gradle.semver.GitRemote;
@@ -15,10 +20,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.stream.Stream;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -26,6 +31,7 @@ import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.RemoteListCommand;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
@@ -48,7 +54,7 @@ public class GitMetadataImpl implements GitMetadata {
   private static final Splitter REF_SPLITTER = Splitter.on('/');
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  private final Supplier<Optional<Git>> git;
+  private final Supplier<Try<Git>> git;
 
   /**
    * Instantiates a new Git metadata extension.
@@ -56,16 +62,22 @@ public class GitMetadataImpl implements GitMetadata {
    * @param git
    *   a jgit instance supplier
    */
-  public GitMetadataImpl(Supplier<Optional<Git>> git) {
+  public GitMetadataImpl(Supplier<Try<Git>> git) {
     this.git = git;
   }
 
-  <R> Try<R> tryCommand(CheckedFunction1<Git, R> supplier) {
-    return this.git.get()
-      .map(g -> Try.of(() -> supplier.apply(g)))
-      .orElseGet(NoGitDirException::failure)
-      .recover(NoGitDirException.class, e -> null)
-      .onFailure(e -> this.log.debug("failed", e));
+  static <T> Function<? super Throwable, ? extends T> allWith(@Nullable T value) {
+    return e ->
+      Match(e)
+        .option(
+          Case($(instanceOf(RefNotFoundException.class)), value),
+          Case($(instanceOf(RepositoryNotFoundException.class)), value)
+        )
+        .getOrElseThrow(() -> ExceptionTools.toRuntime(e));
+  }
+
+  <R> Try<R> tryCommand(CheckedFunction1<Git, R> command) {
+    return this.git.get().mapTry(command).onFailure(e -> this.log.debug("failed", e)).filter(Objects::nonNull);
   }
 
   Try<Repository> gitRepository() {
@@ -73,16 +85,11 @@ public class GitMetadataImpl implements GitMetadata {
   }
 
   Try<@Nullable String> describe() {
-    return this.git.get()
-      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setTags(true)))
-      .orElseGet(NoGitDirException::failure)
-      .mapTry(DescribeCommand::call)
-      .recover(NoGitDirException.class, e -> null)
-      .onFailure(e -> this.log.debug("failed to get describe", e));
+    return this.tryCommand(g -> g.describe().setMatch(VERSION_GLOB).setTags(true)).mapTry(DescribeCommand::call);
   }
 
   Try<LogCommand> gitLog() {
-    return this.git.get().map(g -> Try.of(g::log)).orElseGet(NoGitDirException::failure);
+    return this.tryCommand(Git::log);
   }
 
   /**
@@ -121,59 +128,72 @@ public class GitMetadataImpl implements GitMetadata {
   public @Nullable String uniqueShort() {
     return this.gitRepository()
       .mapTry(Repository::newObjectReader)
-      .mapTry(objectReader -> objectReader.abbreviate(this.getObjectIdFor(Constants.HEAD).get(), 8))
+      .mapTry(reader -> reader.abbreviate(this.getObjectIdFor(Constants.HEAD).get(), 8))
       .map(AbbreviatedObjectId::name)
-      .onFailure(e -> this.log.debug("failed to get unique short", e))
+      .recover(NoSuchElementException.class, e -> null)
+      .onFailure(e -> this.log.error("failed to get unique short", e))
       .getOrNull();
   }
 
   @Override
   public @Nullable String tag() {
-    return this.git.get()
-      .map(g -> Try.of(() -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0)))
-      .orElseGet(NoGitDirException::failure)
+    return this.tryCommand(g -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0))
       .mapTry(DescribeCommand::call)
-      .onFailure(e -> this.log.debug("failed to get tag", e))
+      .recover(NoSuchElementException.class, e -> null)
+      .recover(GitMetadataImpl.allWith(null))
+      .onFailure(e -> this.log.error("failed to get tag", e))
       .getOrNull();
   }
 
-  private int distanceFromNoCommit() {
+  long shortCount() {
+    return this.gitLog()
+      .map(l -> l.setMaxCount(5))
+      .mapTry(LogCommand::call)
+      .map(IterableTools::of)
+      .map(Stream::count)
+      .getOrElse(0L);
+  }
+
+  long distanceFromNoTag() {
     return this.gitLog()
       .mapTry(LogCommand::all)
       .mapTry(LogCommand::call)
-      .map(iter -> StreamSupport.stream(iter.spliterator(), false).count())
-      .map(Long::intValue)
-      .onFailure(e -> this.log.debug("failed to get distance from no commit", e))
+      .map(IterableTools::of)
+      .map(Stream::count)
+      .recover(NoSuchElementException.class, 0L)
+      .recover(GitMetadataImpl.allWith(0L))
+      .onFailure(e -> this.log.error("failed to get distance without a tag", e))
       .get();
   }
 
   @Override
-  public int distance() {
+  public long distance() {
+    var shortCount = this.shortCount();
+    if (shortCount < 4) {
+      this.log.warn("shallow clone detected! git only has {} commits", shortCount);
+    }
     return this.describe()
       .filter(Objects::nonNull)
       .map(d -> {
         var ary = Iterables.toArray(DESCRIBE_SPLITTER.split(d), String.class);
         return ary.length > 2 ? ary[ary.length - 2] : "0";
       })
-      .map(split -> Integer.parseInt(split))
-      .recover(NoGitDirException.class, 0)
-      .recover(RefNotFoundException.class, 0)
-      .recover(NoSuchElementException.class, e -> this.distanceFromNoCommit())
-      .onFailure(e -> this.log.debug("failed to get distance", e))
-      .getOrElse(0);
+      .map(Long::parseLong)
+      .recover(GitMetadataImpl.allWith(0L))
+      .recover(NoSuchElementException.class, e -> this.distanceFromNoTag())
+      .onFailure(e -> this.log.error("failed to get distance", e))
+      .getOrElse(0L);
   }
 
   @Override
   public GitStatus status() {
-    return this.git.get()
-      .map(g -> Try.of(g::status))
-      .orElseGet(NoGitDirException::failure)
-      .filter(Objects::nonNull)
+    return this.tryCommand(Git::status)
       .mapTry(StatusCommand::call)
-      .recover(NoGitDirException.class, e -> null)
-      // flip, dirty is the porcelain option.
-      .map(status -> status == null ? GitStatus.NO_REPO : status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY)
-      .onFailure(e -> this.log.debug("failed to get status", e))
+      .filter(Objects::nonNull)
+      .map(status -> status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY)
+      .recover(NoSuchElementException.class, e -> GitStatus.NO_REPO)
+      .recover(RepositoryNotFoundException.class, e -> GitStatus.NO_REPO)
+      .onFailure(e -> this.log.error("failed to get status", e))
       .getOrElseThrow(ExceptionTools::toRuntime);
   }
 
@@ -196,7 +216,7 @@ public class GitMetadataImpl implements GitMetadata {
       .map(s -> s.filter(Objects::nonNull))
       .map(s -> s.map(name -> RemoteImpl.nullCheck(name, this.headBranch(name))))
       .map(s -> s.collect(Collectors.<GitRemote>toList()))
-      .onFailure(e -> this.log.debug("failed to get remotes", e))
+      .onFailure(e -> this.log.error("failed to get remotes", e))
       .getOrElse(ArrayList::new);
   }
 
@@ -209,7 +229,7 @@ public class GitMetadataImpl implements GitMetadata {
       .filter(Objects::nonNull)
       .map(ref -> ref.getTarget().getName())
       .map(ref -> REF_SPLITTER.splitToList(ref).get(2))
-      .onFailure(e -> this.log.debug("failed to get HEAD branch", e))
+      .onFailure(e -> this.log.error("failed to get HEAD branch", e))
       .getOrNull();
   }
 
