@@ -14,6 +14,8 @@
 "*.xml":
   - "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
+"gradle-wrapper.jar":
+  - "reuse annotate --license 'Apache-2.0' --copyright 'Gradle, Inc' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised gradle/wrapper/gradle-wrapper.jar"
 "!(*.java|*.gradle.kts|*.md|*.xml|*.jar)":
   - *mit
   - *prettier
