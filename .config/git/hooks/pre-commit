@@ -1,7 +1,7 @@
 #!/bin/sh
-
+# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
 [ -n "$CI" ] && exit 0
 
-./gradlew spotlessApply
-git add -u
 npx lint-staged

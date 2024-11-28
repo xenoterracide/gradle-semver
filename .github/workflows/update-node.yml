@@ -1,4 +1,8 @@
-name: Update Node
+# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
+
+name: update-node
 on:
   schedule:
     #         ┌───────────── minute (0 - 59)

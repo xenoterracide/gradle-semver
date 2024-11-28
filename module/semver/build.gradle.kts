@@ -1,4 +1,5 @@
-// © Copyright 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar

@@ -1,4 +1,8 @@
-name: Update Java
+# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
+
+name: update-java
 on:
   schedule:
     #         ┌───────────── minute (0 - 59)

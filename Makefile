@@ -1,5 +1,7 @@
-# © Copyright 2024 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+#
 # SPDX-License-Identifier: MIT
+
 HEAD := $(shell git rev-parse --verify HEAD)
 GRADLE_DIR := $(wildcard ./.gradle/)
 BUILD_DIRS := $(wildcard ./build/ */build/ ./module/*/build/)
@@ -21,13 +23,9 @@ up:
 # success if no output
 	./gradlew dependencies --write-locks --refresh-dependencies --console=plain | grep -e FAILED || exit 0
 
-.PHONY: format
-format:
-	./gradlew spotlessApply --console=plain
-
 .PHONY: build
 build:
-	./gradlew spotlessApply build --console=plain
+	./gradlew build --console=plain
 
 .PHONY: merge
 merge: create-pr build watch-full merge-squash
