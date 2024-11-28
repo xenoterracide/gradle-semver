@@ -16,6 +16,6 @@
   - *prettier
 "gradle-wrapper.jar":
   - "reuse annotate --license 'Apache-2.0' --copyright 'Gradle, Inc' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised gradle/wrapper/gradle-wrapper.jar"
-"!(*.java|*.gradle.kts|*.md|*.xml|*.jar)":
+"!(*.java|*.gradle.kts|*.md|*.xml|*.jar|*.license)":
   - *mit
   - *prettier
