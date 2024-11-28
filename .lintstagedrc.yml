@@ -14,6 +14,6 @@
 "*.xml":
   - "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
-"!(*.java|*.gradle.kts|*.md|*.xml)":
+"!(*.java|*.gradle.kts|*.md|*.xml|*.jar)":
   - *mit
   - *prettier
