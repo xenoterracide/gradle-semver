@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 NONE
 #
+# SPDX-License-Identifier: CC0-1.0
 # SPDX-License-Identifier: MIT
 
 # Software
@@ -19,7 +21,7 @@
   - "reuse annotate --license 'CC-BY-NC-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
 # Trivial files
-"(*.xml|./*.yml|./.github/*.yml|*ignore|*.properties|*.toml|*.json5|.editorconfig|.gitattributes)":
+"(*.xml|*.yml|*ignore|*.properties|*.toml|*.json5|.editorconfig|.gitattributes)":
   - "reuse annotate --license 'CC0-1.0' --copyright 'NONE' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
 # Gradle Wrapper

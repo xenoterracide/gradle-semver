@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 NONE
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: CC0-1.0
 
 name: build
 on: [push, workflow_call]
