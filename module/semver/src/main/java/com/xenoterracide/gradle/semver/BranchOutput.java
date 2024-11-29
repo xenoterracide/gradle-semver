@@ -9,29 +9,14 @@ package com.xenoterracide.gradle.semver;
  * <p>
  * In the members there are examples of the branch, and {@code master} is assumed to be the {@code HEAD branch}.
  * {@code master} is git's default branch, you can configure it to someting else, GitHub has made their default
- * {@code main}). All examples assume the same tag.
+ * {@code main}). All examples assume the same tag. Using any of the options that are not {@code NON_HEAD_BRANCH} and
+ * publishing from multiple branchs may result in your package manager not sorting your releases properly.
  */
 public enum BranchOutput {
   /**
-   * No branch output. {@code git describe} output is used as is. Every branch is treated as the HEAD Branch. On
-   * branch.
-   * <ul>
-   *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+g3aae11e}</li>
-   *   <li>{@code foo/bar} - {@code 0.1.1-alpha.0.1+g3aae11e}</li>
-   * </ul>
-   */
-  NONE,
-  /**
-   * The branch name is always included. THe distance is still calculated as {@code git describe} would.
-   * <ul>
-   *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+bmaster.g3aae11e}</li>
-   *   <li>{@code foo/bar} - {@code 0.1.1-alpha.0.1+bfoo-bar.g3aae11e}</li>
-   * </ul>
-   */
-  ALWAYS,
-  /**
    * The branch name is included if the branch is not the @{HEAD branch}. The distance is calculated from the
-   * {@code git merge-base} between the {@code HEAD} and the {@code HEAD branch}.
+   * {@code git merge-base} between the {@code HEAD} and the {@code HEAD branch}. This is the default as it will tell
+   * you if your configuration is wrong.
    * <ul>
    *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+g3aae11e}</li>
    *   <li>{@code foo/bar} - {@code 0.1.1-alpha.0.1+bfoo-bar.g3aae11e}</li>
@@ -58,4 +43,21 @@ public enum BranchOutput {
    * </ul>
    */
   NON_HEAD_BRANCH_FALLBACK_NONE,
+  /**
+   * No branch output. {@code git describe} output is used as is. Every branch is treated as the HEAD Branch. On
+   * branch.
+   * <ul>
+   *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+g3aae11e}</li>
+   *   <li>{@code foo/bar} - {@code 0.1.1-alpha.0.1+g3aae11e}</li>
+   * </ul>
+   */
+  NONE,
+  /**
+   * The branch name is always included. THe distance is still calculated as {@code git describe} would.
+   * <ul>
+   *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+bmaster.g3aae11e}</li>
+   *   <li>{@code foo/bar} - {@code 0.1.1-alpha.0.1+bfoo-bar.g3aae11e}</li>
+   * </ul>
+   */
+  ALWAYS,
 }
