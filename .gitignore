@@ -1,10 +1,12 @@
 # SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
-# SPDX-License-Identifier: MIT
 
 # direnv
 !.envrc
+
+# I think idea is adding this directory
+.kotlin/
 
 ### Java template
 # Compiled class file

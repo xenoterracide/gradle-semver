@@ -1,21 +1,27 @@
 # SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: CC0-1.0
 
+# Software
 "*.java":
   - "reuse annotate --license 'Apache-2.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - &prettier "prettier --cache --ignore-unknown --write"
+# Build Scripts
 "*.gradle.kts":
-  - &mit "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised"
+  - "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised"
   - ktlint --format
-"*.md":
+"Makefile":
+  - "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+"*.github/workflows/*yml":
+  - *prettier
+# Documentation
+"(*.md|*.adoc)":
   - "reuse annotate --license 'CC-BY-NC-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
-"*.xml":
+# Trivial files
+"(*.xml|*.yml|*ignore|*.properties|*.toml|*.json5|.editorconfig|.gitattributes)":
   - "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
+# Gradle Wrapper
 "gradle-wrapper.jar":
-  - "reuse annotate --license 'Apache-2.0' --copyright 'Gradle, Inc' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised gradle/wrapper/gradle-wrapper.jar"
-"!(*.java|*.gradle.kts|*.md|*.xml|*.jar|*.license)":
-  - *mit
-  - *prettier
+  - "reuse annotate --license 'Apache-2.0' --copyright 'Gradle, Inc' --copyright-prefix spdx-string-symbol --merge-copyrights --force-dot-license"
