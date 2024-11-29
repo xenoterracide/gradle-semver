@@ -19,7 +19,7 @@
   - "reuse annotate --license 'CC-BY-NC-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
 # Trivial files
-"(*.xml|*.yml|*ignore|*.properties|*.toml|*.json5|.editorconfig|.gitattributes)":
+"(*.xml|*.yml|*ignore|*.properties|*.toml|*.json5|.editorconfig|.gitattributes|.mailmap)":
   - "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
 # Gradle Wrapper
