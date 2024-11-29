@@ -5,7 +5,7 @@
 package com.xenoterracide.gradle.semver;
 
 /**
- * How you would like the branch name included in your semver.
+ * How you would like the branch name included in your semver. {@link #NON_HEAD_BRANCH_OR_FAIL} is the defaul behavior.
  * <p>
  * In the members there are examples of the branch, and {@code master} is assumed to be the {@code HEAD branch}.
  * {@code master} is git's default branch, you can configure it to someting else, GitHub has made their default
