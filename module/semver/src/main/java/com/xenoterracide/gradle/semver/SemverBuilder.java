@@ -19,6 +19,7 @@ final class SemverBuilder {
   private static final String ZERO = "0";
 
   private final GitMetadata gitMetadata;
+  private BranchOutput branchOutput;
   private Semver semver;
   private boolean dirtyOut;
 
@@ -31,7 +32,7 @@ final class SemverBuilder {
     return vString == null ? PRE_VERSION : vString.substring(1);
   }
 
-  private SemverBuilder withPreRelease() {
+  private void withPreRelease() {
     var distance = this.gitMetadata.distance();
     if (distance > 0) {
       if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
@@ -48,10 +49,9 @@ final class SemverBuilder {
     if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
       this.semver = this.semver.withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Long.toString(distance)));
     }
-    return this;
   }
 
-  private SemverBuilder withBuild() {
+  private void withBuild() {
     var distance = this.gitMetadata.distance();
     if (distance > 0) {
       var sha = Optional.ofNullable(this.gitMetadata.uniqueShort()).map(s -> "g" + s);
@@ -63,7 +63,6 @@ final class SemverBuilder {
         .map(s -> this.semver.withBuild(s))
         .orElse(this.semver);
     }
-    return this;
   }
 
   SemverBuilder withDirtyOut(boolean dirtyOut) {
@@ -71,8 +70,14 @@ final class SemverBuilder {
     return this;
   }
 
+  SemverBuilder withBranchOutput(BranchOutput branchOutput) {
+    this.branchOutput = branchOutput;
+    return this;
+  }
+
   Semver build() {
-    this.withPreRelease().withBuild();
+    this.withPreRelease();
+    this.withBuild();
     return this.semver;
   }
 }
