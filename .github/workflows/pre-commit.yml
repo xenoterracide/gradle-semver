@@ -11,6 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        with:
+          python-version: "3"
       - run: pip install reuse
       - run: reuse lint
   format:
@@ -19,8 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        with:
+          cache: "npm"
       - run: npm ci
-      - run: npx prettier --check .
+      - run: npx prettier --ignore-unknown --check '**'
   format-kotlin:
     runs-on: ubuntu-latest
     steps:
