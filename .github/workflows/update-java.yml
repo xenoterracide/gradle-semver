@@ -33,7 +33,10 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: gradle wrapper --write-locks
       - run: make ci-update-java
-      - run: echo "stdout=$(git status --porcelain=1)" >> $GITHUB_OUTPUT
+      - run: |
+          echo "stdout<<EOF" >> $GITHUB_OUTPUT
+          git status --porcelain=1 | tee $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         name: git status
         id: git_status
       - uses: actions/setup-python@v5
