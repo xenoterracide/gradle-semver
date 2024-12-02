@@ -35,7 +35,7 @@ jobs:
       - run: make ci-update-java
       - run: |
           echo "stdout<<EOF" >> $GITHUB_OUTPUT
-          git status --porcelain=1 >> $GITHUB_OUTPUT
+          git status --porcelain=1 | tee --append $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         name: git status
         id: git_status
