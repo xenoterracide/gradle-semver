@@ -33,14 +33,22 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: gradle wrapper --write-locks
       - run: make ci-update-java
-      - run: echo "{stdout}={$(git status)}" >> $GITHUB_OUTPUT
+      - run: |
+          echo "stdout<<EOF" >> $GITHUB_OUTPUT
+          git status --porcelain=1 | tee --append $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         name: git status
         id: git_status
       - uses: actions/setup-python@v5
-        if: ${{ contains(steps.git_status.outputs.stdout, 'gradle-wrapper.jar') }}
+        if: ${{ contains(steps.git_status.outputs.stdout, 'gradle/wrapper/') }}
       - run: pip install reuse
-        if: ${{ contains(steps.git_status.outputs.stdout, 'gradle-wrapper.jar') }}
-      - run: reuse annotate --license 'Apache-2.0' --copyright 'Gradle, Inc' --copyright-prefix spdx-string-symbol --merge-copyrights --skip-unrecognised gradle/wrapper/gradle-wrapper.jar
+        if: ${{ contains(steps.git_status.outputs.stdout, 'gradle/wrapper/') }}
+      - run: |
+          reuse annotate --license 'Apache-2.0' --copyright 'Gradle, Inc' \
+            --copyright-prefix spdx-string-symbol --merge-copyrights --force-dot-license gradle/wrapper/gradle-wrapper.jar
+          reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' \
+            --copyright-prefix spdx-string-symbol --merge-copyrights --force-dot-license gradle/wrapper/gradle-wrapper.properties
+        name: reuse
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle-wrapper.jar') }}
       - uses: peter-evans/create-pull-request@v7
         id: create_pr
