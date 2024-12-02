@@ -14,7 +14,7 @@ on:
     - cron: "0 4 * * 0" # 4am UTC every Sunday
   push:
     branches:
-      - build/auto-update
+      - ci/auto-update
 jobs:
   update-node:
     runs-on: ubuntu-latest

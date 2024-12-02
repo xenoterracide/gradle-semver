@@ -14,7 +14,7 @@ on:
     - cron: "*/5 * * * *" # 3am UTC every Sunday
   push:
     branches:
-      - build/auto-update-java
+      - ci/auto-update-java
 jobs:
   update-java:
     runs-on: ubuntu-latest
