@@ -5,6 +5,7 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
+import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -26,6 +27,7 @@ public class SemverExtension {
   private final Logger log = Logging.getLogger(this.getClass());
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
+  private final Property<BranchOutput> branchOutput;
   private final Project project;
 
   /**
@@ -36,6 +38,7 @@ public class SemverExtension {
    */
   protected SemverExtension(Project project) {
     var pf = new ProvidedFactory(project);
+    this.branchOutput = pf.property(BranchOutput.class);
     this.provider = pf.property(Semver.class);
     this.checkDirty = pf.propertyBoolean();
     this.project = project;
@@ -47,6 +50,7 @@ public class SemverExtension {
           var gm = this.project.getExtensions().getByType(GitMetadataExtension.class);
           var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm))
             .withDirtyOut(this.getCheckDirty().getOrElse(false))
+            .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_FAIL))
             .build();
           this.log.info("semver {} {}", this.project.getName(), semver);
           return semver;
@@ -61,7 +65,7 @@ public class SemverExtension {
    * {@code 0.1.1-alpha.0.1+.g3aae11e}. The longest example {@code 0.1.1-alpha.0.1+btopic-foo.g3aae11e.dirty}
    *
    * @return semver provider
-   * @implSpec {@code <major>.<minor>.<patch>[-<preRelease.tag.distance>][+[b-<branch>.]g<sha>[.dirty]]}
+   * @implSpec {@code <major>.<minor>.<patch>[-<preRelease.tag.distance>][+[b<branch>.]g<sha>[.dirty]]}
    * @implNote The value will not be recalculated more than once per project per build. It is suggested to only use on
    *   the root project. In the future this may be a single global calculation.
    */
@@ -77,5 +81,16 @@ public class SemverExtension {
    */
   public Property<Boolean> getCheckDirty() {
     return this.checkDirty;
+  }
+
+  /**
+   * Branch output configuration.
+   *
+   * @return branch output configuration property
+   * @implNote The plugin defaults to {@link BranchOutput#NON_HEAD_BRANCH_OR_FAIL}
+   */
+  @Incubating
+  public Property<BranchOutput> getBranchOutput() {
+    return branchOutput;
   }
 }

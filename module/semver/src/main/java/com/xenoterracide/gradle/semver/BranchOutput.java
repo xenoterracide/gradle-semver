@@ -4,6 +4,8 @@
 
 package com.xenoterracide.gradle.semver;
 
+import org.gradle.api.Incubating;
+
 /**
  * How you would like the branch name included in your semver. {@link #NON_HEAD_BRANCH_OR_FAIL} is the defaul behavior.
  * <p>
@@ -12,9 +14,10 @@ package com.xenoterracide.gradle.semver;
  * {@code main}). All examples assume the same tag. Using any of the options that are not {@code NON_HEAD_BRANCH} and
  * publishing from multiple branchs may result in your package manager not sorting your releases properly.
  */
+@Incubating
 public enum BranchOutput {
   /**
-   * The branch name is included if the branch is not the @{HEAD branch}. The distance is calculated from the
+   * The branch name is included if the branch is not the {@code HEAD branch}. The distance is calculated from the
    * {@code git merge-base} between the {@code HEAD} and the {@code HEAD branch}. This is the default as it will tell
    * you if your configuration is wrong.
    * <ul>
@@ -25,7 +28,7 @@ public enum BranchOutput {
   NON_HEAD_BRANCH_OR_FAIL,
   /**
    * This is the same as {@link #NON_HEAD_BRANCH_OR_FAIL} except that this will not fail if the head branch is not
-   * set, instead falling back to {link #ALWAYS}.
+   * set, instead falling back to {@link #ALWAYS}.
    * <ul>
    *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+g3aae11e}</li>
    *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+bmaster.g3aae11e} if {@code HEAD branch} is not configured.</li>

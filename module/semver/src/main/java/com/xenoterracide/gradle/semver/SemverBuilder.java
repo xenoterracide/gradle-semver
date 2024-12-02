@@ -32,7 +32,7 @@ final class SemverBuilder {
     return vString == null ? PRE_VERSION : vString.substring(1);
   }
 
-  private void withPreRelease() {
+  private void createPreRelease() {
     var distance = this.gitMetadata.distance();
     if (distance > 0) {
       if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
@@ -51,7 +51,20 @@ final class SemverBuilder {
     }
   }
 
-  private void withBuild() {
+  Optional<String> getBranch() throws HeadBranchNotAvailable {
+    switch (this.branchOutput) {
+      case NON_HEAD_BRANCH_OR_FAIL:
+      case NON_HEAD_BRANCH_FALLBACK_ALWAYS:
+      case NON_HEAD_BRANCH_FALLBACK_NONE:
+        return Optional.ofNullable(this.gitMetadata.branch());
+      case NONE:
+        return Optional.empty();
+      default:
+        throw new HeadBranchNotAvailable();
+    }
+  }
+
+  private void createBuild() throws HeadBranchNotAvailable {
     var distance = this.gitMetadata.distance();
     if (distance > 0) {
       var sha = Optional.ofNullable(this.gitMetadata.uniqueShort()).map(s -> "g" + s);
@@ -75,9 +88,9 @@ final class SemverBuilder {
     return this;
   }
 
-  Semver build() {
-    this.withPreRelease();
-    this.withBuild();
+  Semver build() throws HeadBranchNotAvailable {
+    this.createPreRelease();
+    this.createBuild();
     return this.semver;
   }
 }
