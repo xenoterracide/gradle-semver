@@ -9,6 +9,8 @@ on:
   push:
     branches:
       - ci/auto-update-java
+      - ci/auto-update
+
 jobs:
   update-java:
     runs-on: ubuntu-latest

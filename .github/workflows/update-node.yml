@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - ci/auto-update-node
+      - ci/auto-update
 jobs:
   update-node:
     runs-on: ubuntu-latest
