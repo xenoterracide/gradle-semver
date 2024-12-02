@@ -9,6 +9,8 @@ on:
   push:
     branches:
       - ci/auto-update-java
+      - ci/auto-update
+
 jobs:
   update-java:
     runs-on: ubuntu-latest
@@ -22,7 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          ref: ${{ github.event.workflow_run.head_branch}}
+          filter: "blob:none"
+          fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

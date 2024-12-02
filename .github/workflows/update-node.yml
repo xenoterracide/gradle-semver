@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - ci/auto-update-node
+      - ci/auto-update
 jobs:
   update-node:
     runs-on: ubuntu-latest
@@ -16,18 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          ref: ${{ github.event.workflow_run.head_branch}}
+          filter: "blob:none"
+          fetch-depth: 0
       - uses: actions/setup-node@v4
-      - uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          cache: "npm"
       - run: npm install
       - run: npm update
       - uses: peter-evans/create-pull-request@v7
