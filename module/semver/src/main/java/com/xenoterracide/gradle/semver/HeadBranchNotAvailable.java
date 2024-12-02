@@ -7,7 +7,7 @@ package com.xenoterracide.gradle.semver;
 /**
  * Exception thrown when the HEAD branch is not set. Run
  * {@snippet lang = sh
- *git remote set-head<remote>--auto
+ *git remote set-head <remote> --auto
  *}
  *
  * @see <a href="https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-emset-headem">git remote set-head</a>
