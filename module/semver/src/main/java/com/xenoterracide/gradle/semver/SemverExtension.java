@@ -28,6 +28,7 @@ public class SemverExtension {
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
   private final Property<BranchOutput> branchOutput;
+  private final Property<RemoteForHeadBranch> remoteForHeadBranch;
   private final Project project;
 
   /**
@@ -40,6 +41,7 @@ public class SemverExtension {
     var pf = new ProvidedFactory(project);
     this.branchOutput = pf.property(BranchOutput.class);
     this.provider = pf.property(Semver.class);
+    this.remoteForHeadBranch = pf.property(RemoteForHeadBranch.class);
     this.checkDirty = pf.propertyBoolean();
     this.project = project;
   }
@@ -91,6 +93,17 @@ public class SemverExtension {
    */
   @Incubating
   public Property<BranchOutput> getBranchOutput() {
-    return branchOutput;
+    return this.branchOutput;
+  }
+
+  /**
+   * Remote for head branch configuration. These only matter if more than one remote is configured otherwise the remote
+   * found is used.
+   *
+   * @return remote for head branch configuration property
+   * @implNote The plugin defaults to {@link RemoteForHeadBranch#CONFIGURED_ORIGIN_OR_FIRST}
+   */
+  public Property<RemoteForHeadBranch> getRemoteForHeadBranch() {
+    return this.remoteForHeadBranch;
   }
 }
