@@ -76,7 +76,7 @@ final class SemverBuilder {
           .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remoteForHeadBranch)))
           .map(GitRemote::headBranch)
           .filter(Objects::nonNull)
-          .findFirst()
+          .findAny()
           .orElseGet(() ->
             this.gitMetadata.remotes()
               .stream()
