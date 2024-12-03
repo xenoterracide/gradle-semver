@@ -15,5 +15,5 @@ public enum RemoteForHeadBranch {
   /**
    * Use the configured remote, if missing use the remote named origin, or throw an exception.
    */
-  CONFIGURED_ORIGIN_OR_ERROR,
+  CONFIGURED_ORIGIN_OR_THROW,
 }

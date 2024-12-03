@@ -52,7 +52,7 @@ public class SemverExtension {
           var gm = this.project.getExtensions().getByType(GitMetadataExtension.class);
           var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm))
             .withDirtyOut(this.getCheckDirty().getOrElse(false))
-            .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_FAIL))
+            .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
             .build();
           this.log.info("semver {} {}", this.project.getName(), semver);
           return semver;
@@ -89,7 +89,7 @@ public class SemverExtension {
    * Branch output configuration.
    *
    * @return branch output configuration property
-   * @implNote The plugin defaults to {@link BranchOutput#NON_HEAD_BRANCH_OR_FAIL}
+   * @implNote The plugin defaults to {@link BranchOutput#NON_HEAD_BRANCH_OR_THROW}
    */
   @Incubating
   public Property<BranchOutput> getBranchOutput() {

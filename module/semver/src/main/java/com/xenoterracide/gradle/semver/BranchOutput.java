@@ -7,7 +7,7 @@ package com.xenoterracide.gradle.semver;
 import org.gradle.api.Incubating;
 
 /**
- * How you would like the branch name included in your semver. {@link #NON_HEAD_BRANCH_OR_FAIL} is the defaul behavior.
+ * How you would like the branch name included in your semver. {@link #NON_HEAD_BRANCH_OR_THROW} is the defaul behavior.
  * <p>
  * In the members there are examples of the branch, and {@code master} is assumed to be the {@code HEAD branch}.
  * {@code master} is git's default branch, you can configure it to someting else, GitHub has made their default
@@ -25,9 +25,9 @@ public enum BranchOutput {
    *   <li>{@code foo/bar} - {@code 0.1.1-alpha.0.1+bfoo-bar.g3aae11e}</li>
    * </ul>
    */
-  NON_HEAD_BRANCH_OR_FAIL,
+  NON_HEAD_BRANCH_OR_THROW,
   /**
-   * This is the same as {@link #NON_HEAD_BRANCH_OR_FAIL} except that this will not fail if the head branch is not
+   * This is the same as {@link #NON_HEAD_BRANCH_OR_THROW} except that this will not fail if the head branch is not
    * set, instead falling back to {@link #ALWAYS}.
    * <ul>
    *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+g3aae11e}</li>
@@ -37,7 +37,7 @@ public enum BranchOutput {
    */
   NON_HEAD_BRANCH_FALLBACK_ALWAYS,
   /**
-   * This is the same as {@link #NON_HEAD_BRANCH_OR_FAIL} except that this will not fail if the head branch is not
+   * This is the same as {@link #NON_HEAD_BRANCH_OR_THROW} except that this will not fail if the head branch is not
    * set, instead falling back to {@link #NONE}.
    * <ul>
    *   <li>{@code master}  - {@code 0.1.1-alpha.0.1+g3aae11e}</li>

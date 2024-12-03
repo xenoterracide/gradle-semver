@@ -5,7 +5,10 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.internal.GitMetadata;
+import com.xenoterracide.tools.java.function.PredicateTools;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
@@ -19,7 +22,9 @@ final class SemverBuilder {
   private static final String ZERO = "0";
 
   private final GitMetadata gitMetadata;
-  private BranchOutput branchOutput;
+  private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
+  private RemoteForHeadBranch remoteForHeadBranchConfig = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
+  private String remoteForHeadBranch = "origin";
   private Semver semver;
   private boolean dirtyOut;
 
@@ -51,9 +56,46 @@ final class SemverBuilder {
     }
   }
 
+  boolean hasFirstHeadBranch() {
+    return this.gitMetadata.remotes().stream().map(GitRemote::headBranch).anyMatch(Objects::nonNull);
+  }
+
+  String getHeadBranch() {
+    switch (this.remoteForHeadBranchConfig) {
+      case CONFIGURED_ORIGIN_OR_THROW:
+        return this.gitMetadata.remotes()
+          .stream()
+          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remoteForHeadBranch)))
+          .map(GitRemote::headBranch)
+          .filter(Objects::nonNull)
+          .findAny()
+          .orElseThrow();
+      case CONFIGURED_ORIGIN_OR_FIRST:
+        return this.gitMetadata.remotes()
+          .stream()
+          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remoteForHeadBranch)))
+          .map(GitRemote::headBranch)
+          .filter(Objects::nonNull)
+          .findFirst()
+          .orElseGet(() ->
+            this.gitMetadata.remotes()
+              .stream()
+              .map(GitRemote::headBranch)
+              .filter(Objects::nonNull)
+              .findFirst()
+              .orElseThrow()
+          );
+      default:
+        throw new IllegalStateException("should not be reachable");
+    }
+  }
+
   Optional<String> getBranch() throws HeadBranchNotAvailable {
     switch (this.branchOutput) {
-      case NON_HEAD_BRANCH_OR_FAIL:
+      case NON_HEAD_BRANCH_OR_THROW:
+        if (this.hasFirstHeadBranch() && !Objects.equals(this.gitMetadata.branch(), this.getHeadBranch())) {
+          return Optional.ofNullable(this.gitMetadata.branch());
+        }
       case NON_HEAD_BRANCH_FALLBACK_ALWAYS:
       case NON_HEAD_BRANCH_FALLBACK_NONE:
         return Optional.ofNullable(this.gitMetadata.branch());
@@ -85,6 +127,16 @@ final class SemverBuilder {
 
   SemverBuilder withBranchOutput(BranchOutput branchOutput) {
     this.branchOutput = branchOutput;
+    return this;
+  }
+
+  SemverBuilder withRemoteForHeadBranch(String remoteForHeadBranch) {
+    this.remoteForHeadBranch = remoteForHeadBranch;
+    return this;
+  }
+
+  SemverBuilder withRemoteForHeadBranchConfig(RemoteForHeadBranch remoteForHeadBranchConfig) {
+    this.remoteForHeadBranchConfig = remoteForHeadBranchConfig;
     return this;
   }
 
