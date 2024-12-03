@@ -5,6 +5,7 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
+import org.eclipse.jgit.api.Git;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -19,7 +20,7 @@ import org.semver4j.Semver;
  *  <li>{@see <a href="https://semver.org/">Semantic Versioning</a>}</li>
  *  <li>{@see <a href="https://git-scm.com/">Git</a>}</li>
  *  <li>{@link Semver}</li>
- *  <li>{@link org.eclipse.jgit.api.Git}</li>
+ *  <li>{@link Git}</li>
  * </ul>
  */
 public class SemverExtension {
@@ -28,7 +29,8 @@ public class SemverExtension {
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
   private final Property<BranchOutput> branchOutput;
-  private final Property<RemoteForHeadBranch> remoteForHeadBranch;
+  private final Property<RemoteForHeadBranch> remoteForHeadBranchConfig;
+  private final Property<String> remote;
   private final Project project;
 
   /**
@@ -38,12 +40,13 @@ public class SemverExtension {
    *   the project
    */
   protected SemverExtension(Project project) {
+    this.project = project;
     var pf = new ProvidedFactory(project);
     this.branchOutput = pf.property(BranchOutput.class);
     this.provider = pf.property(Semver.class);
-    this.remoteForHeadBranch = pf.property(RemoteForHeadBranch.class);
+    this.remoteForHeadBranchConfig = pf.property(RemoteForHeadBranch.class);
     this.checkDirty = pf.propertyBoolean();
-    this.project = project;
+    this.remote = pf.propertyString();
   }
 
   SemverExtension init() {
@@ -53,11 +56,15 @@ public class SemverExtension {
           var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm))
             .withDirtyOut(this.getCheckDirty().getOrElse(false))
             .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
+            .withRemoteForHeadBranchConfig(
+              this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
+            )
             .build();
           this.log.info("semver {} {}", this.project.getName(), semver);
           return semver;
         });
     this.provider.set(semverProvider);
+    this.provider.finalizeValueOnRead();
     this.provider.disallowChanges();
     return this;
   }
@@ -103,7 +110,8 @@ public class SemverExtension {
    * @return remote for head branch configuration property
    * @implNote The plugin defaults to {@link RemoteForHeadBranch#CONFIGURED_ORIGIN_OR_FIRST}
    */
-  public Property<RemoteForHeadBranch> getRemoteForHeadBranch() {
-    return this.remoteForHeadBranch;
+  @Incubating
+  public Property<RemoteForHeadBranch> getRemoteForHeadBranchConfig() {
+    return this.remoteForHeadBranchConfig;
   }
 }

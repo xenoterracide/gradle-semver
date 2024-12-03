@@ -127,6 +127,16 @@ public final class ProvidedFactory {
   }
 
   /**
+   * Shortcut to {@link #property(Class)} for {@link String}.
+   *
+   * @return the new property
+   * @see #property(Class)
+   */
+  public Property<String> propertyString() {
+    return this.property(String.class);
+  }
+
+  /**
    * Creates a {@link Property} of a given type that is {@link Property#finalizeValueOnRead()}.
    *
    * @param type

@@ -6,11 +6,21 @@ package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import com.xenoterracide.tools.java.function.PredicateTools;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
@@ -23,8 +33,8 @@ final class SemverBuilder {
 
   private final GitMetadata gitMetadata;
   private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
-  private RemoteForHeadBranch remoteForHeadBranchConfig = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
-  private String remoteForHeadBranch = "origin";
+  private RemoteForHeadBranch remoteForHeadBranch = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
+  private String remote = "origin";
   private Semver semver;
   private boolean dirtyOut;
 
@@ -56,16 +66,16 @@ final class SemverBuilder {
     }
   }
 
-  boolean hasFirstHeadBranch() {
+  boolean hasHeadBranch() {
     return this.gitMetadata.remotes().stream().map(GitRemote::headBranch).anyMatch(Objects::nonNull);
   }
 
   String getHeadBranch() {
-    switch (this.remoteForHeadBranchConfig) {
+    switch (this.remoteForHeadBranch) {
       case CONFIGURED_ORIGIN_OR_THROW:
         return this.gitMetadata.remotes()
           .stream()
-          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remoteForHeadBranch)))
+          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remote)))
           .map(GitRemote::headBranch)
           .filter(Objects::nonNull)
           .findAny()
@@ -73,7 +83,7 @@ final class SemverBuilder {
       case CONFIGURED_ORIGIN_OR_FIRST:
         return this.gitMetadata.remotes()
           .stream()
-          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remoteForHeadBranch)))
+          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remote)))
           .map(GitRemote::headBranch)
           .filter(Objects::nonNull)
           .findAny()
@@ -86,28 +96,37 @@ final class SemverBuilder {
               .orElseThrow()
           );
       default:
-        throw new IllegalStateException("should not be reachable");
+        throw new IllegalStateException("remoteForHeadBranch: " + this.remoteForHeadBranch);
     }
   }
 
   Optional<String> getBranch() throws HeadBranchNotAvailable {
+    var headBranch = this.getHeadBranch();
     switch (this.branchOutput) {
       case NON_HEAD_BRANCH_OR_THROW:
-        if (this.hasFirstHeadBranch() && !Objects.equals(this.gitMetadata.branch(), this.getHeadBranch())) {
+        if (this.hasHeadBranch() && !Objects.equals(this.gitMetadata.branch(), headBranch)) {
           return Optional.ofNullable(this.gitMetadata.branch());
         }
+        throw new HeadBranchNotAvailable();
       case NON_HEAD_BRANCH_FALLBACK_ALWAYS:
-      case NON_HEAD_BRANCH_FALLBACK_NONE:
+        if (this.hasHeadBranch() && Objects.equals(this.gitMetadata.branch(), headBranch)) {
+          return Optional.empty();
+        }
         return Optional.ofNullable(this.gitMetadata.branch());
+      case NON_HEAD_BRANCH_FALLBACK_NONE:
+        if (this.hasHeadBranch() && !Objects.equals(this.gitMetadata.branch(), headBranch)) {
+          return Optional.ofNullable(this.gitMetadata.branch());
+        }
+      // fallthrough
       case NONE:
         return Optional.empty();
       default:
-        throw new HeadBranchNotAvailable();
+        throw new IllegalStateException("branchOutput: " + this.branchOutput);
     }
   }
 
   private void createBuild() throws HeadBranchNotAvailable {
-    var distance = this.gitMetadata.distance();
+    var distance = this.getDistance();
     if (distance > 0) {
       var sha = Optional.ofNullable(this.gitMetadata.uniqueShort()).map(s -> "g" + s);
       var status = Optional.ofNullable(this.dirtyOut ? this.gitMetadata.status() : null)
@@ -130,13 +149,13 @@ final class SemverBuilder {
     return this;
   }
 
-  SemverBuilder withRemoteForHeadBranch(String remoteForHeadBranch) {
-    this.remoteForHeadBranch = remoteForHeadBranch;
+  SemverBuilder withRemote(String remote) {
+    this.remote = remote;
     return this;
   }
 
-  SemverBuilder withRemoteForHeadBranchConfig(RemoteForHeadBranch remoteForHeadBranchConfig) {
-    this.remoteForHeadBranchConfig = remoteForHeadBranchConfig;
+  SemverBuilder withRemoteForHeadBranchConfig(RemoteForHeadBranch remoteForHeadBranch) {
+    this.remoteForHeadBranch = remoteForHeadBranch;
     return this;
   }
 
@@ -144,5 +163,52 @@ final class SemverBuilder {
     this.createPreRelease();
     this.createBuild();
     return this.semver;
+  }
+
+  long getDistance() {
+    if (this.branchOutput == BranchOutput.NONE || !this.hasHeadBranch()) {
+      return this.gitMetadata.distance();
+    }
+    return 0L;
+  }
+
+  static class DistanceSupplier implements Function<GitRemote, Long> {
+
+    private final Repository repo;
+
+    DistanceSupplier(Repository repo) {
+      this.repo = repo;
+    }
+
+    @Override
+    public Long apply(GitRemote gitRemote) {
+      try {
+        var remote = this.repo.resolve(gitRemote.toString());
+        var current = this.repo.resolve(Constants.HEAD);
+
+        try (var walk = new RevWalk(this.repo)) {
+          walk.setRevFilter(RevFilter.MERGE_BASE);
+          walk.markStart(List.of(walk.parseCommit(remote), walk.parseCommit(current)));
+          var mergeBase = walk.next();
+
+          var nearestTag =
+            this.repo.getRefDatabase().getRefsByPrefix("tags/v").stream().map(Ref::getObjectId).findFirst();
+          if (nearestTag.isPresent()) {
+            var distance = new AtomicLong(0);
+            for (var revCommit : walk) {
+              if (revCommit.equals(nearestTag.get())) {
+                return distance.get();
+              } else {
+                distance.incrementAndGet();
+              }
+            }
+            return distance.get();
+          }
+        }
+        return 0L;
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
   }
 }

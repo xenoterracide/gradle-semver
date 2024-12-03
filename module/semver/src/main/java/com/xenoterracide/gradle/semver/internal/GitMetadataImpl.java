@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
-import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.RemoteListCommand;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
@@ -37,6 +36,7 @@ import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.jspecify.annotations.NonNull;
@@ -223,13 +223,10 @@ public class GitMetadataImpl implements GitMetadata {
 
   @Nullable
   String headBranch(String remote) {
-    return this.tryCommand(Git::lsRemote)
-      .map(ls -> ls.setRemote(remote))
-      .mapTry(LsRemoteCommand::callAsMap)
-      .map(m -> m.get(Constants.HEAD))
-      .filter(Objects::nonNull)
-      .map(ref -> ref.getTarget().getName())
-      .map(ref -> REF_SPLITTER.splitToList(ref).get(2))
+    return this.gitRepository()
+      .map(Repository::getRefDatabase)
+      .mapTry(r -> r.findRef(remote + "/HEAD"))
+      .map(Ref::getName)
       .onFailure(e -> this.log.error("failed to get HEAD branch", e))
       .getOrNull();
   }
@@ -256,6 +253,11 @@ public class GitMetadataImpl implements GitMetadata {
     @Override
     public @NonNull String name() {
       return this.name;
+    }
+
+    @Override
+    public String toString() {
+      return this.name + "/" + this.headBranch;
     }
   }
 }
