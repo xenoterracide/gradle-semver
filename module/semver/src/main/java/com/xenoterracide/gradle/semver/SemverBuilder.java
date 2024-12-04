@@ -6,21 +6,11 @@ package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import com.xenoterracide.tools.java.function.PredicateTools;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
@@ -170,45 +160,5 @@ final class SemverBuilder {
       return this.gitMetadata.distance();
     }
     return 0L;
-  }
-
-  static class DistanceSupplier implements Function<GitRemote, Long> {
-
-    private final Repository repo;
-
-    DistanceSupplier(Repository repo) {
-      this.repo = repo;
-    }
-
-    @Override
-    public Long apply(GitRemote gitRemote) {
-      try {
-        var remote = this.repo.resolve(gitRemote.toString());
-        var current = this.repo.resolve(Constants.HEAD);
-
-        try (var walk = new RevWalk(this.repo)) {
-          walk.setRevFilter(RevFilter.MERGE_BASE);
-          walk.markStart(List.of(walk.parseCommit(remote), walk.parseCommit(current)));
-          var mergeBase = walk.next();
-
-          var nearestTag =
-            this.repo.getRefDatabase().getRefsByPrefix("tags/v").stream().map(Ref::getObjectId).findFirst();
-          if (nearestTag.isPresent()) {
-            var distance = new AtomicLong(0);
-            for (var revCommit : walk) {
-              if (revCommit.equals(nearestTag.get())) {
-                return distance.get();
-              } else {
-                distance.incrementAndGet();
-              }
-            }
-            return distance.get();
-          }
-        }
-        return 0L;
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    }
   }
 }

@@ -14,6 +14,8 @@ package com.xenoterracide.gradle.semver;
  */
 public class HeadBranchNotAvailable extends RuntimeException {
 
+  private static final long serialVersionUID = 1L;
+
   public HeadBranchNotAvailable() {
     super("HEAD branch not available. Run `git remote set-head <remote> --auto`");
   }

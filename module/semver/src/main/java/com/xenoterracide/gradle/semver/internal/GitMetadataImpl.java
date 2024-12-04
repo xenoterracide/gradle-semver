@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -223,10 +224,16 @@ public class GitMetadataImpl implements GitMetadata {
 
   @Nullable
   String headBranch(String remote) {
+    var remoteRef = Constants.R_REMOTES + remote + "/" + Constants.HEAD;
     return this.gitRepository()
-      .map(Repository::getRefDatabase)
-      .mapTry(r -> r.findRef(remote + "/HEAD"))
+      .andThenTry(r -> {
+        var oid = r.resolve(remoteRef);
+        var file = r.getDirectory().toPath().resolve(remoteRef).toFile();
+      })
+      .mapTry(r -> r.findRef(remoteRef))
+      .filter(Objects::nonNull)
       .map(Ref::getName)
+      .recover(NoSuchElementException.class, e -> null)
       .onFailure(e -> this.log.error("failed to get HEAD branch", e))
       .getOrNull();
   }
@@ -257,7 +264,10 @@ public class GitMetadataImpl implements GitMetadata {
 
     @Override
     public String toString() {
-      return this.name + "/" + this.headBranch;
+      return new StringJoiner(", ", RemoteImpl.class.getSimpleName() + "[", "]")
+        .add("name='" + name + "'")
+        .add("headBranch='" + headBranch + "'")
+        .toString();
     }
   }
 }

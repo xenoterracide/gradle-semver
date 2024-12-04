@@ -114,4 +114,8 @@ public class SemverExtension {
   public Property<RemoteForHeadBranch> getRemoteForHeadBranchConfig() {
     return this.remoteForHeadBranchConfig;
   }
+
+  public Property<String> getRemote() {
+    return this.remote;
+  }
 }
