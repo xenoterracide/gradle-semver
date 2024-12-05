@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -56,10 +57,10 @@ class SemverPluginIntegrationTest {
     }
     """;
 
-  @TempDir
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File testProjectDir;
 
-  @TempDir
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File noGitProjectDir;
 
   @BeforeEach
