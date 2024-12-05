@@ -7,10 +7,10 @@ import static com.xenoterracide.gradle.semver.CommitTools.commit;
 import static com.xenoterracide.gradle.semver.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.vavr.control.Try;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.versioning.ComparableVersion;
@@ -34,7 +34,7 @@ class SemverExtensionTest {
   void getGradlePlugin() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new SemverExtension(() -> Optional.of(git));
+      var pg = new SemverExtension(() -> new GitMetadataExtension(() -> Try.success(git)));
 
       var v000 = pg.getGradlePlugin();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0");
@@ -115,7 +115,7 @@ class SemverExtensionTest {
   @Test
   void getGitDescribed() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var pg = new SemverExtension(() -> Optional.of(git));
+      var pg = new SemverExtension(() -> new GitMetadataExtension(() -> Try.success(git)));
       Supplier<Semver> vs = pg::getGitDescribed;
 
       var v001Alpha01 = supplies(commit(git), vs);
@@ -190,7 +190,7 @@ class SemverExtensionTest {
   void getMavenSnapshot() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       git.commit().setMessage("initial commit").call();
-      var pg = new SemverExtension(() -> Optional.of(git));
+      var pg = new SemverExtension(() -> new GitMetadataExtension(() -> Try.success(git)));
 
       var v000 = pg.getMavenSnapshot();
       assertThat(v000).extracting(Semver::getVersion).isEqualTo("0.0.0-SNAPSHOT");
@@ -270,7 +270,7 @@ class SemverExtensionTest {
       git.tag().setName("latest").call();
       git.commit().setMessage("second commit").call();
 
-      var pg = new SemverExtension(() -> Optional.of(git));
+      var pg = new SemverExtension(() -> new GitMetadataExtension(() -> Try.success(git)));
 
       assertThat(pg.getMaven()).hasToString("0.0.0-SNAPSHOT");
 

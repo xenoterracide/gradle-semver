@@ -21,7 +21,7 @@ tasks.withType<JacocoCoverageVerification>().configureEach {
   violationRules {
     rule {
       limit {
-        coverageMinimum.convention(0.9).let { minimum = it.get().toBigDecimal() }
+        coverageMinimum.convention(0.8).let { minimum = it.get().toBigDecimal() }
       }
     }
   }

@@ -9,10 +9,8 @@ import static com.xenoterracide.gradle.semver.SemverBuilder.SEMVER_DELIMITER;
 import com.google.common.base.Splitter;
 import io.vavr.control.Try;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import org.eclipse.jgit.api.Git;
 import org.jspecify.annotations.NonNull;
 import org.semver4j.Semver;
 
@@ -21,7 +19,6 @@ import org.semver4j.Semver;
  *
  * @implNote pre-release versions between branches which have the same git commit distance are not
  *   guaranteed to sort correctly and would do so only by coincidence.
- *
  * @implNote Methods in this class are not lazy and invoke the
  *   {@link org.eclipse.jgit.lib.Repository}. All versions returned are Gradle safe as they are all
  *   valid semantic versions.
@@ -33,29 +30,10 @@ public class SemverExtension {
   private static final Pattern GIT_DESCRIBE_PATTERN = Pattern.compile("^\\d+-+g\\p{XDigit}{7}$");
   private static final String GIT_DESCRIBE_DELIMITER = "-";
 
-  private final Supplier<Optional<Git>> git;
+  private final Supplier<GitMetadataExtension> git;
 
-  /**
-   * Instantiates a new Semver extension.
-   *
-   * @param git {@link Supplier} of {@link Git}
-   */
-  public SemverExtension(@NonNull Supplier<Optional<Git>> git) {
+  SemverExtension(@NonNull Supplier<GitMetadataExtension> git) {
     this.git = git;
-  }
-
-  /**
-   * Gets git metatdata exstension.
-   *
-   * @return the extension for accessing git metdata
-   * @implNote does not invoke {@link org.eclipse.jgit.lib.Repository}
-   */
-  public GitMetadataExtension getGit() {
-    return new GitMetadataExtension(this.git);
-  }
-
-  Try<Semver> coerced() {
-    return this.getGit().describe().map(v -> null == v ? PRE_VERSION : v).map(Semver::coerce).filter(Objects::nonNull);
   }
 
   static Semver movePrereleaseToBuild(Semver version) {
@@ -73,13 +51,27 @@ public class SemverExtension {
   }
 
   /**
+   * Gets git metatdata exstension.
+   *
+   * @return the extension for accessing git metdata
+   * @implNote does not invoke {@link org.eclipse.jgit.lib.Repository}
+   */
+  public GitMetadataExtension getGit() {
+    return this.git.get();
+  }
+
+  Try<Semver> coerced() {
+    return this.getGit().describe().map(v -> null == v ? PRE_VERSION : v).map(Semver::coerce).filter(Objects::nonNull);
+  }
+
+  /**
    * Gets gradle plugin compatible version.
    * {@snippet :
    * logger.quiet("gradlePlugin" + semver.gradlePlugin)  // 0.1.1-alpha.1+1.g3aae11e
    *}
    *
-   * @implNote will probably delegate to {@link #getGitDescribed()} in the future.
    * @return the gradle plugin semver.
+   * @implNote will probably delegate to {@link #getGitDescribed()} in the future.
    */
   public Semver getGradlePlugin() {
     return this.coerced().map(SemverExtension::movePrereleaseToBuild).get();
@@ -98,15 +90,14 @@ public class SemverExtension {
   public Semver getMavenSnapshot() {
     return this.coerced()
       .map(v -> Objects.equals(v.getVersion(), PRE_VERSION) ? v.withPreRelease(SNAPSHOT) : v)
-      .map(
-        v ->
-          v
-            .getPreRelease()
-            .stream()
-            .filter(GIT_DESCRIBE_PATTERN.asMatchPredicate())
-            .findAny()
-            .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
-            .orElse(v)
+      .map(v ->
+        v
+          .getPreRelease()
+          .stream()
+          .filter(GIT_DESCRIBE_PATTERN.asMatchPredicate())
+          .findAny()
+          .map(p -> v.withClearedPreReleaseAndBuild().nextPatch().withPreRelease(SNAPSHOT))
+          .orElse(v)
       )
       .map(v -> new Semver(v.getVersion()))
       .get();
@@ -115,9 +106,9 @@ public class SemverExtension {
   /**
    * Gets maven compatible version.
    *
+   * @return the maven compatible semver
    * @implNote currently delegates to {@link #getMavenSnapshot()} will probably delegate to
    *   {@link #getGitDescribed()} in the future.
-   * @return the maven compatible semver
    */
   public Semver getMaven() {
     return this.getMavenSnapshot();
@@ -134,10 +125,9 @@ public class SemverExtension {
    *   <li>{@code 1.0.1-alpha.0.1+abcdef10}</li>
    * </ul>
    *
+   * @return semver
    * @implNote gradle compatability is somewhat assumed as gradle doesn't provide a valid way to
    *   unit test this assumption.
-   *
-   * @return semver
    */
   public Semver getGitDescribed() {
     return new SemverBuilder(this.getGit()).build();

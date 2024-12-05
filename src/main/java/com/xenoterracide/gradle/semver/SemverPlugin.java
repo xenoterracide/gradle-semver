@@ -28,7 +28,7 @@ public class SemverPlugin implements Plugin<Project> {
         spec.getParameters().getProjectDirectory().set(project.getLayout().getProjectDirectory());
       });
 
-    project.getExtensions().add(SEMVER, svcPrvdr.map(AbstractGitService::extension).get());
+    project.getExtensions().add(SEMVER, new SemverExtension(svcPrvdr.map(AbstractGitService::metadata)::get));
     project
       .getTasks()
       .register("version", task -> {
