@@ -52,7 +52,10 @@ class DistanceSupplierTest {
       })
       .get();
     this.git = Try.withResources(() -> Git.cloneRepository().setDirectory(projectDir).setURI(uri).call()).of(g -> {
-      var p = new ProcessBuilder().command("git", "remote", "set-head", "--auto", "origin").start();
+      var p = new ProcessBuilder()
+        .directory(projectDir)
+        .command("git", "remote", "set-head", "--auto", "origin")
+        .start();
       try (var input = p.inputReader()) {
         log.warn("set-head: {}", input.lines().toList());
       }

@@ -68,7 +68,8 @@ tasks.withType<JavaCompile>().configureEach {
     )
     disableWarningsInGeneratedCode.set(true)
     excludedPaths.set(".*/build/generated/sources/annotationProcessor/.*")
-    option("NullAway:AnnotatedPackages", "com.xenoterracide")
+    option("NullAway:AnnotatedPackages", "com,org,net,io,dev,graphql")
+    option("NullAway:UnannotatedSubPackages", listOf("io.vavr").joinToString(","))
 
     val errors =
       mutableListOf(
