@@ -53,7 +53,6 @@ public class GitMetadataImpl implements GitMetadata {
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
-  private static final Splitter REF_SPLITTER = Splitter.on('/');
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Supplier<Try<Git>> git;
@@ -226,10 +225,6 @@ public class GitMetadataImpl implements GitMetadata {
   String headBranch(String remote) {
     var remoteRef = Constants.R_REMOTES + remote + "/" + Constants.HEAD;
     return this.gitRepository()
-      .andThenTry(r -> {
-        var oid = r.resolve(remoteRef);
-        var file = r.getDirectory().toPath().resolve(remoteRef).toFile();
-      })
       .mapTry(r -> r.findRef(remoteRef))
       .filter(Objects::nonNull)
       .map(Ref::getName)

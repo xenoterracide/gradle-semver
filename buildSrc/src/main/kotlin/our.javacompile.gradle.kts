@@ -1,4 +1,4 @@
-// Copyright 2023 - 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023 - 2024 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -68,8 +68,8 @@ tasks.withType<JavaCompile>().configureEach {
     )
     disableWarningsInGeneratedCode.set(true)
     excludedPaths.set(".*/build/generated/sources/annotationProcessor/.*")
-    option("NullAway:AnnotatedPackages", "com,org,net,io,dev,graphql")
-    option("NullAway:UnannotatedSubPackages", listOf("io.vavr").joinToString(","))
+    option("NullAway:AnnotatedPackages", listOf("com", "org", "net", "io", "dev", "graphql").joinToString(","))
+    option("NullAway:UnannotatedSubPackages", listOf("io.vavr", "org.assertj").joinToString(","))
 
     val errors =
       mutableListOf(

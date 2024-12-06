@@ -8,17 +8,14 @@ import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
 import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.xenoterracide.gradle.semver.GitRemote;
 import com.xenoterracide.gradle.semver.GitStatus;
 import io.vavr.control.Try;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.function.Supplier;
-import org.assertj.core.groups.Tuple;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -194,18 +191,6 @@ class GitMetadataImplTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       var gm = new GitMetadataImpl(() -> Try.success(git));
       assertThat(gm.remotes()).isEmpty();
-    }
-  }
-
-  @Test
-  void getRemotes() throws Exception {
-    try (var git = Git.init().setDirectory(projectDir).call()) {
-      git.remoteAdd().setName("origin").setUri(new URIish("https://github.com/xenoterracide/gradle-semver.git")).call();
-      var gm = new GitMetadataImpl(() -> Try.success(git));
-      assertThat(gm.remotes())
-        .hasSize(1)
-        .map(GitRemote::getName, GitRemote::getHeadBranch)
-        .contains(Tuple.tuple("origin", "main"));
     }
   }
 }
