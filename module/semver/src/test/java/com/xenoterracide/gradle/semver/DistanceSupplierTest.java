@@ -36,6 +36,10 @@ class DistanceSupplierTest {
   @NonNull
   File bareRemote;
 
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
+  @NonNull
+  File notSetup;
+
   @NonNull
   Try<Git> git;
 
@@ -69,13 +73,37 @@ class DistanceSupplierTest {
 
   @Test
   void noRemotes() {
-    var distance = new DistanceSupplier(git.get().getRepository());
+    var gitLocal = Try.withResources(() -> Git.init().setDirectory(notSetup).call())
+      .of(g -> g)
+      .andThenTry(g -> g.commit().setMessage("initial commit").call());
 
+    var gitMetadata = new GitMetadataImpl(() -> gitLocal);
+    var distance = new DistanceSupplier(gitLocal.get().getRepository());
+
+    assertThat(gitMetadata.remotes()).isEmpty();
     assertThat(distance.apply(null)).isNotPresent();
   }
 
   @Test
   void originNoHeadBranch() {
+    var uri = this.bareRemote.toURI().toASCIIString();
+    var gitLocal = Try.withResources(() -> Git.init().setDirectory(notSetup).call())
+      .of(g -> g)
+      .andThenTry(g -> {
+        g.remoteAdd().setName("origin").setUri(new URIish(uri)).call();
+        g.commit().setMessage("initial commit").call();
+        g.push().call();
+      });
+
+    var gitMetadata = new GitMetadataImpl(() -> gitLocal);
+    var distance = new DistanceSupplier(gitLocal.get().getRepository());
+
+    assertThat(gitMetadata.remotes()).isNotEmpty();
+    assertThat(distance.apply(gitMetadata.remotes().getFirst())).isNotPresent();
+  }
+
+  @Test
+  void originHeadBranch() {
     var gitMetadata = new GitMetadataImpl(() -> this.git);
     var distance = new DistanceSupplier(this.git.get().getRepository());
     assertThat(distance.apply(gitMetadata.remotes().getFirst())).isPresent();

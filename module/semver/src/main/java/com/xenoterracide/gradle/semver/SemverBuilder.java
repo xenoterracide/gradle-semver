@@ -65,7 +65,7 @@ final class SemverBuilder {
       case CONFIGURED_ORIGIN_OR_THROW:
         return this.gitMetadata.remotes()
           .stream()
-          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remote)))
+          .filter(PredicateTools.is(GitRemote::name, Predicate.isEqual(this.remote)))
           .map(GitRemote::headBranch)
           .filter(Objects::nonNull)
           .findAny()
@@ -73,7 +73,7 @@ final class SemverBuilder {
       case CONFIGURED_ORIGIN_OR_FIRST:
         return this.gitMetadata.remotes()
           .stream()
-          .filter(PredicateTools.prop(GitRemote::name, Predicate.isEqual(this.remote)))
+          .filter(PredicateTools.is(GitRemote::name, Predicate.isEqual(this.remote)))
           .map(GitRemote::headBranch)
           .filter(Objects::nonNull)
           .findAny()

@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
@@ -31,18 +32,20 @@ class DistanceSupplier implements Function<@Nullable GitRemote, Optional<Long>> 
   public Optional<Long> apply(@Nullable GitRemote gitRemote) {
     if (gitRemote == null || gitRemote.headBranch() == null) return Optional.empty();
     try {
-      var remote = Objects.requireNonNull(this.repo.findRef(gitRemote.getName() + "/" + gitRemote.headBranch()));
-      var current = Objects.requireNonNull(this.repo.findRef(Constants.HEAD));
+      var current = Optional.ofNullable(this.repo.findRef(Constants.HEAD)).map(Ref::getObjectId).orElseThrow();
+      var remote = Optional.ofNullable(this.repo.findRef(gitRemote.headBranch())).map(Ref::getObjectId).orElseThrow();
 
       try (var walk = new RevWalk(this.repo)) {
         walk.setRevFilter(RevFilter.MERGE_BASE);
-        walk.markStart(List.of(walk.parseCommit(remote.getObjectId()), walk.parseCommit(current.getObjectId())));
+        walk.markStart(List.of(walk.parseCommit(remote), walk.parseCommit(current)));
 
         var tagStream =
           this.repo.getRefDatabase()
             .getRefsByPrefix("tags/v")
             .stream()
-            .flatMap(ref -> Try.of(() -> walk.parseCommit(ref.getObjectId())).toJavaStream())
+            .map(Ref::getObjectId)
+            .filter(Objects::nonNull)
+            .flatMap(oid -> Try.of(() -> walk.parseCommit(oid)).toJavaStream())
             .collect(Collectors.toList());
 
         @Var
