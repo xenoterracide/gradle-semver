@@ -9,6 +9,7 @@ import io.vavr.control.Try;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,12 +31,12 @@ class DistanceSupplier implements Function<@Nullable GitRemote, Optional<Long>> 
   public Optional<Long> apply(@Nullable GitRemote gitRemote) {
     if (gitRemote == null || gitRemote.headBranch() == null) return Optional.empty();
     try {
-      var remote = this.repo.resolve(gitRemote.getName() + "/" + gitRemote.headBranch());
-      var current = this.repo.resolve(Constants.HEAD);
+      var remote = Objects.requireNonNull(this.repo.findRef(gitRemote.getName() + "/" + gitRemote.headBranch()));
+      var current = Objects.requireNonNull(this.repo.findRef(Constants.HEAD));
 
       try (var walk = new RevWalk(this.repo)) {
         walk.setRevFilter(RevFilter.MERGE_BASE);
-        walk.markStart(List.of(walk.parseCommit(remote), walk.parseCommit(current)));
+        walk.markStart(List.of(walk.parseCommit(remote.getObjectId()), walk.parseCommit(current.getObjectId())));
 
         var tagStream =
           this.repo.getRefDatabase()
