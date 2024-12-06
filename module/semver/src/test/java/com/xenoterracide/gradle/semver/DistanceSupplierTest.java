@@ -4,12 +4,15 @@
 
 package com.xenoterracide.gradle.semver;
 
+import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
+import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
 import io.vavr.control.Try;
 import java.io.File;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.transport.URIish;
 import org.jspecify.annotations.NonNull;
@@ -78,10 +81,10 @@ class DistanceSupplierTest {
       .andThenTry(g -> g.commit().setMessage("initial commit").call());
 
     var gitMetadata = new GitMetadataImpl(() -> gitLocal);
-    var distance = new DistanceSupplier(gitLocal.get().getRepository());
+    var distance = new DistanceSupplier(gitLocal.get().getRepository(), null);
 
     assertThat(gitMetadata.remotes()).isEmpty();
-    assertThat(distance.apply(null)).isNotPresent();
+    assertThat(distance.get()).isNotPresent();
   }
 
   @Test
@@ -96,16 +99,50 @@ class DistanceSupplierTest {
       });
 
     var gitMetadata = new GitMetadataImpl(() -> gitLocal);
-    var distance = new DistanceSupplier(gitLocal.get().getRepository());
+    var distance = new DistanceSupplier(gitLocal.get().getRepository(), gitMetadata.remotes().getFirst());
 
     assertThat(gitMetadata.remotes()).isNotEmpty();
-    assertThat(distance.apply(gitMetadata.remotes().getFirst())).isNotPresent();
+    assertThat(distance.get()).isNotPresent();
   }
 
   @Test
-  void originHeadBranch() {
+  void originHeadBranchAllPushed() throws GitAPIException {
+    var git = this.git.get();
     var gitMetadata = new GitMetadataImpl(() -> this.git);
-    var distance = new DistanceSupplier(this.git.get().getRepository());
-    assertThat(distance.apply(gitMetadata.remotes().getFirst())).isPresent();
+    var origin = gitMetadata.remotes().getFirst();
+    var distance = new DistanceSupplier(git.getRepository(), origin);
+    assertThat(gitMetadata.distance()).isEqualTo(1L);
+    assertThat(distance.get()).hasValue(1L);
+
+    assertThat(supplies(commit(git), distance)).hasValue(1L);
+    git.push().call();
+    assertThat(gitMetadata.distance()).isEqualTo(2L);
+    assertThat(supplies(commit(git), distance)).hasValue(2L);
+
+    git.tag().setName("v0.1.0").call();
+
+    git.push().setPushTags().call();
+    assertThat(distance.get()).hasValue(0L);
+
+    git.push().setPushTags().call();
+    assertThat(supplies(commit(git), distance)).hasValue(0L);
+
+    git.push().setPushTags().call();
+    assertThat(supplies(commit(git), distance)).hasValue(1L);
+
+    git.tag().setName("v0.1.1").call();
+    git.push().setPushTags().call();
+    assertThat(distance.get()).hasValue(0L);
+
+    git.push().setPushTags().call();
+    assertThat(supplies(commit(git), distance)).hasValue(0L);
+
+    git.tag().setName("v0.1.2-beta.0").call();
+    git.push().setPushTags().call();
+    assertThat(distance.get()).hasValue(0L);
+    git.push().setPushTags().call();
+    assertThat(supplies(commit(git), distance)).hasValue(0L);
+    git.push().setPushTags().call();
+    assertThat(supplies(commit(git), distance)).hasValue(1L);
   }
 }

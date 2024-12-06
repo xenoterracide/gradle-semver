@@ -4,15 +4,16 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.google.errorprone.annotations.Var;
 import io.vavr.control.Try;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -20,20 +21,24 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.jspecify.annotations.Nullable;
 
-class DistanceSupplier implements Function<@Nullable GitRemote, Optional<Long>> {
+class DistanceSupplier implements Supplier<Optional<Long>> {
 
   private final Repository repo;
+  private final @Nullable GitRemote gitRemote;
 
-  DistanceSupplier(Repository repo) {
+  DistanceSupplier(Repository repo, @Nullable GitRemote gitRemote) {
     this.repo = repo;
+    this.gitRemote = gitRemote;
   }
 
   @Override
-  public Optional<Long> apply(@Nullable GitRemote gitRemote) {
-    if (gitRemote == null || gitRemote.headBranch() == null) return Optional.empty();
+  public Optional<Long> get() {
+    if (this.gitRemote == null || this.gitRemote.headBranch() == null) return Optional.empty();
     try {
       var current = Optional.ofNullable(this.repo.findRef(Constants.HEAD)).map(Ref::getObjectId).orElseThrow();
-      var remote = Optional.ofNullable(this.repo.findRef(gitRemote.headBranch())).map(Ref::getObjectId).orElseThrow();
+      var remote = Optional.ofNullable(this.repo.findRef(this.gitRemote.headBranch()))
+        .map(Ref::getObjectId)
+        .orElseThrow();
 
       try (var walk = new RevWalk(this.repo)) {
         walk.setRevFilter(RevFilter.MERGE_BASE);
@@ -48,16 +53,9 @@ class DistanceSupplier implements Function<@Nullable GitRemote, Optional<Long>> 
             .flatMap(oid -> Try.of(() -> walk.parseCommit(oid)).toJavaStream())
             .collect(Collectors.toList());
 
-        @Var
-        var distance = 0L;
-        for (var next : walk) {
-          if (tagStream.contains(next)) {
-            break;
-          } else {
-            distance += 1;
-          }
-        }
-        return Optional.of(distance);
+        return Optional.of(
+          StreamSupport.stream(walk.spliterator(), false).takeWhile(Predicate.not(tagStream::contains)).count()
+        );
       }
     } catch (IOException e) {
       throw new UncheckedIOException(e);
