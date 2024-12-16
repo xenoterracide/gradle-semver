@@ -5,17 +5,22 @@
 package com.xenoterracide.gradle.semver;
 
 import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
-import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
+import static java.util.function.Predicate.isEqual;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.base.Joiner;
 import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
+import io.vavr.CheckedFunction0;
 import io.vavr.control.Try;
 import java.io.File;
+import java.util.function.Supplier;
+import org.assertj.core.api.Condition;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.transport.URIish;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
@@ -23,7 +28,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class DistanceSupplierTest {
+class MergeBaseFinderTest {
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -46,6 +51,13 @@ class DistanceSupplierTest {
   @NonNull
   Try<Git> git;
 
+  @NonNull
+  ObjectId initialCommit;
+
+  static <T> Condition<T> equalTo(@Nullable Object o) {
+    return new Condition<>(isEqual(o), "equal to " + o);
+  }
+
   @BeforeEach
   void setupRemote() {
     var uri = this.bareRemote.toURI().toASCIIString();
@@ -54,7 +66,7 @@ class DistanceSupplierTest {
       .of(g -> g)
       .andThenTry(g -> {
         g.remoteAdd().setName("origin").setUri(new URIish(uri)).call();
-        g.commit().setMessage("initial commit").call();
+        this.initialCommit = g.commit().setMessage("initial commit").call();
         g.push().call();
       })
       .get();
@@ -81,10 +93,10 @@ class DistanceSupplierTest {
       .andThenTry(g -> g.commit().setMessage("initial commit").call());
 
     var gitMetadata = new GitMetadataImpl(() -> gitLocal);
-    var distance = new DistanceSupplier(gitLocal.get().getRepository(), null);
+    var distance = new MergeBaseFinder(gitLocal.get().getRepository());
 
     assertThat(gitMetadata.remotes()).isEmpty();
-    assertThat(distance.get()).isNotPresent();
+    assertThat(distance.find(null)).isNotPresent();
   }
 
   @Test
@@ -99,52 +111,40 @@ class DistanceSupplierTest {
       });
 
     var gitMetadata = new GitMetadataImpl(() -> gitLocal);
-    var distance = new DistanceSupplier(gitLocal.get().getRepository(), gitMetadata.remotes().getFirst());
+    var distance = new MergeBaseFinder(gitLocal.get().getRepository());
 
     assertThat(gitMetadata.remotes()).isNotEmpty();
-    assertThat(distance.get()).isNotPresent();
+    assertThat(distance.find(gitMetadata.remotes().getFirst())).isNotPresent();
   }
 
   @Test
-  void originHeadBranchAllPushed() throws GitAPIException {
+  void originHeadBranchAllPushed() throws Throwable {
     var git = this.git.get();
     var gitMetadata = new GitMetadataImpl(() -> this.git);
     var origin = gitMetadata.remotes().getFirst();
-    var distance = new DistanceSupplier(git.getRepository(), origin);
-    assertThat(gitMetadata.distance()).isEqualTo(1L);
+    var mergeBase = new MergeBaseFinder(git.getRepository());
+    CheckedFunction0<ObjectId> remoteHead = () -> git.getRepository().resolve("refs/remotes/origin/HEAD");
+    Supplier<String> gitLog = () -> Joiner.on('\n').join(Try.of(() -> git.log().all().call()).get());
 
-    assertThat(distance.get()).hasValue(1L);
-    assertThat(supplies(commit(git), distance)).hasValue(1L);
+    assertThat(mergeBase.find(origin)).isPresent().hasValue(initialCommit);
+    var oid1 = commit(git);
+    assertThat(mergeBase.find(origin)).isPresent().hasValue(initialCommit);
 
-    assertThat(gitMetadata.distance()).isEqualTo(2L);
     git.push().call();
-    System.out.println("---------------------------------");
-    assertThat(supplies(commit(git), distance)).hasValue(2L);
+
+    log.warn("first {} | {}", oid1, remoteHead.apply());
+    assertThat(mergeBase.find(origin)).isPresent().hasValue(oid1);
 
     git.tag().setName("v0.1.0").call();
 
     git.push().setPushTags().call();
-    assertThat(distance.get()).hasValue(0L);
+    assertThat(mergeBase.find(origin)).isPresent().hasValue(remoteHead.apply());
 
-    git.push().setPushTags().call();
-    assertThat(supplies(commit(git), distance)).hasValue(0L);
+    var oid2 = commit(git);
+    assertThat(mergeBase.find(origin)).isPresent().hasValue(remoteHead.apply()).isNot(equalTo(oid2));
 
-    git.push().setPushTags().call();
-    assertThat(supplies(commit(git), distance)).hasValue(1L);
+    git.push().call();
 
-    git.tag().setName("v0.1.1").call();
-    git.push().setPushTags().call();
-    assertThat(distance.get()).hasValue(0L);
-
-    git.push().setPushTags().call();
-    assertThat(supplies(commit(git), distance)).hasValue(0L);
-
-    git.tag().setName("v0.1.2-beta.0").call();
-    git.push().setPushTags().call();
-    assertThat(distance.get()).hasValue(0L);
-    git.push().setPushTags().call();
-    assertThat(supplies(commit(git), distance)).hasValue(0L);
-    git.push().setPushTags().call();
-    assertThat(supplies(commit(git), distance)).hasValue(1L);
+    assertThat(mergeBase.find(origin)).isPresent().as(gitLog).hasValue(oid2);
   }
 }

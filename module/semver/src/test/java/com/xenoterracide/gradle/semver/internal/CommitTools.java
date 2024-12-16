@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.jspecify.annotations.Nullable;
 
 public final class CommitTools {
@@ -17,17 +18,17 @@ public final class CommitTools {
 
   private CommitTools() {}
 
-  public static Void commit(Git git) throws GitAPIException {
+  public static ObjectId commit(Git git) throws GitAPIException {
     var commitFormat = "commit %d";
     var message = String.format(commitFormat, NEXT_INT.getAsInt());
-    git.commit().setMessage(message).call();
-    return null;
+    var commit = git.commit().setMessage(message).call();
+    return commit.toObjectId();
   }
 
   /**
    * just for silly single statement one-liners that reduce boilerplate.
    */
-  public static <T> T supplies(@Nullable Void ignored, Supplier<T> supplier) {
+  public static <T> T supplies(@Nullable ObjectId ignored, Supplier<T> supplier) {
     return supplier.get();
   }
 }
