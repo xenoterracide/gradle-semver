@@ -112,11 +112,13 @@ class DistanceSupplierTest {
     var origin = gitMetadata.remotes().getFirst();
     var distance = new DistanceSupplier(git.getRepository(), origin);
     assertThat(gitMetadata.distance()).isEqualTo(1L);
-    assertThat(distance.get()).hasValue(1L);
 
+    assertThat(distance.get()).hasValue(1L);
     assertThat(supplies(commit(git), distance)).hasValue(1L);
-    git.push().call();
+
     assertThat(gitMetadata.distance()).isEqualTo(2L);
+    git.push().call();
+    System.out.println("---------------------------------");
     assertThat(supplies(commit(git), distance)).hasValue(2L);
 
     git.tag().setName("v0.1.0").call();

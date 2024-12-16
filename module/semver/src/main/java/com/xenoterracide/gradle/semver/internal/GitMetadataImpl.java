@@ -9,8 +9,6 @@ import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static io.vavr.Predicates.instanceOf;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import com.xenoterracide.gradle.semver.GitRemote;
 import com.xenoterracide.gradle.semver.GitStatus;
 import com.xenoterracide.tools.java.function.ExceptionTools;
@@ -52,7 +50,6 @@ public class GitMetadataImpl implements GitMetadata {
 
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
-  private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Supplier<Try<Git>> git;
@@ -85,10 +82,6 @@ public class GitMetadataImpl implements GitMetadata {
     return this.tryCommand(Git::getRepository);
   }
 
-  Try<@Nullable String> describe() {
-    return this.tryCommand(g -> g.describe().setMatch(VERSION_GLOB).setTags(true)).mapTry(DescribeCommand::call);
-  }
-
   Try<LogCommand> gitLog() {
     return this.tryCommand(Git::log);
   }
@@ -114,14 +107,8 @@ public class GitMetadataImpl implements GitMetadata {
     return this.gitRepository().mapTry(r -> r.resolve(Objects.requireNonNull(shalike)));
   }
 
-  /**
-   * Gets rev.
-   *
-   * @param shalike
-   *   the shalike
-   * @return the rev
-   */
-  public @Nullable String getRev(@NonNull String shalike) {
+  @Nullable
+  String getRev(@NonNull String shalike) {
     return this.getObjectIdFor(shalike).map(AnyObjectId::getName).getOrNull();
   }
 
@@ -129,7 +116,7 @@ public class GitMetadataImpl implements GitMetadata {
   public @Nullable String uniqueShort() {
     return this.gitRepository()
       .mapTry(Repository::newObjectReader)
-      .mapTry(reader -> reader.abbreviate(this.getObjectIdFor(Constants.HEAD).get(), 8))
+      .mapTry(reader -> reader.abbreviate(this.getObjectIdFor(Constants.HEAD).get()))
       .map(AbbreviatedObjectId::name)
       .recover(NoSuchElementException.class, e -> null)
       .onFailure(e -> this.log.error("failed to get unique short", e))
@@ -173,14 +160,9 @@ public class GitMetadataImpl implements GitMetadata {
     if (shortCount < 4) {
       this.log.warn("shallow clone detected! git only has {} commits", shortCount);
     }
-    return this.describe()
+    return this.tryCommand(Describer.describe())
       .filter(Objects::nonNull)
-      .map(d -> {
-        var ary = Iterables.toArray(DESCRIBE_SPLITTER.split(d), String.class);
-        return ary.length > 2 ? ary[ary.length - 2] : "0";
-      })
-      .map(Long::parseLong)
-      .recover(GitMetadataImpl.allWith(0L))
+      .map(Describer.Described::distance)
       .recover(NoSuchElementException.class, e -> this.distanceFromNoTag())
       .onFailure(e -> this.log.error("failed to get distance", e))
       .getOrElse(0L);

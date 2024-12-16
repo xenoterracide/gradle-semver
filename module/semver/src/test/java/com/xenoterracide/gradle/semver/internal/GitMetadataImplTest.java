@@ -17,12 +17,13 @@ import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 class GitMetadataImplTest {
 
-  @TempDir
   @NonNull
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
 
   @Test
@@ -107,8 +108,8 @@ class GitMetadataImplTest {
       var head = pg.uniqueShort();
       assertThat(main).isNotNull();
       assertThat(main).hasSize(40);
-      assertThat(head).hasSize(8);
-      assertThat(main.substring(0, 8)).isEqualTo(head);
+      assertThat(head).hasSize(7);
+      assertThat(main.substring(0, 7)).isEqualTo(head);
     }
   }
 

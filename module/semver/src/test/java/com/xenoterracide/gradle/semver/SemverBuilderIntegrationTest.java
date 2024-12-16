@@ -22,7 +22,7 @@ import org.semver4j.Semver;
 class SemverBuilderIntegrationTest {
 
   static final Pattern VERSION_PATTERN = Pattern.compile(
-    "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+g\\p{XDigit}{8}$"
+    "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+g\\p{XDigit}{7}$"
   );
 
   @TempDir
@@ -35,11 +35,11 @@ class SemverBuilderIntegrationTest {
 
       var v001Alpha01 = supplies(commit(git), vs);
 
-      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(25).matches(VERSION_PATTERN);
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(24).matches(VERSION_PATTERN);
 
       var v001Alpha02 = supplies(commit(git), vs);
 
-      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(25).matches(VERSION_PATTERN);
+      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(24).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
@@ -54,7 +54,7 @@ class SemverBuilderIntegrationTest {
         .isGreaterThan(v010)
         .asString()
         .startsWith("0.1.1-alpha.0.1+")
-        .hasSize(25)
+        .hasSize(24)
         .matches(VERSION_PATTERN);
 
       assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.g3aae11e"));
