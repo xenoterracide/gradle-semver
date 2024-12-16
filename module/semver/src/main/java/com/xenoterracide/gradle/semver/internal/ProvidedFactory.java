@@ -86,8 +86,8 @@ public final class ProvidedFactory {
   public <E> Provider<List<E>> providedList(Callable<List<E>> callable, Class<E> type) {
     var prop = this.objectFactory.listProperty(type);
     prop.set(this.providerFactory.provider(callable));
+    prop.finalizeValueOnRead();
     prop.disallowChanges();
-    prop.disallowUnsafeRead();
     return prop;
   }
 
