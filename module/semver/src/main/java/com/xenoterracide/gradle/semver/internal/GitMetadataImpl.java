@@ -142,30 +142,14 @@ public class GitMetadataImpl implements GitMetadata {
       .getOrElse(0L);
   }
 
-  long distanceFromNoTag() {
-    return this.gitLog()
-      .mapTry(LogCommand::all)
-      .mapTry(LogCommand::call)
-      .map(IterableTools::of)
-      .map(Stream::count)
-      .recover(NoSuchElementException.class, 0L)
-      .recover(GitMetadataImpl.allWith(0L))
-      .onFailure(e -> this.log.error("failed to get distance without a tag", e))
-      .get();
-  }
-
   @Override
   public long distance() {
     var shortCount = this.shortCount();
     if (shortCount < 4) {
       this.log.warn("shallow clone detected! git only has {} commits", shortCount);
     }
-    return this.tryCommand(Describer.describe())
-      .filter(Objects::nonNull)
-      .map(Describer.Described::distance)
-      .recover(NoSuchElementException.class, e -> this.distanceFromNoTag())
-      .onFailure(e -> this.log.error("failed to get distance", e))
-      .getOrElse(0L);
+    var calculator = new DistanceCalculator(this.git.get());
+    return this.gitRepository().mapTry(r -> r.resolve(Constants.HEAD)).map(calculator::distance).getOrElse(0L);
   }
 
   @Override

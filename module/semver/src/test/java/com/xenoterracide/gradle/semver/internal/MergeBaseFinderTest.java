@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.internal;
 
 import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
 import static java.util.function.Predicate.isEqual;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Joiner;
-import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
 import io.vavr.CheckedFunction0;
 import io.vavr.control.Try;
 import java.io.File;

@@ -20,14 +20,10 @@ public class Describer implements CheckedFunction1<Git, Describer.Described> {
   private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
 
-  private final @Nullable ObjectId oid;
+  private final ObjectId oid;
 
-  Describer(@Nullable ObjectId oid) {
+  Describer(ObjectId oid) {
     this.oid = oid;
-  }
-
-  static CheckedFunction1<Git, Describer.Described> describe() {
-    return new Describer(null);
   }
 
   static CheckedFunction1<Git, Describer.Described> describe(ObjectId oid) {

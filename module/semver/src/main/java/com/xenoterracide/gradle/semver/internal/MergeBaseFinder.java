@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.internal;
 
+import com.xenoterracide.gradle.semver.GitRemote;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -15,12 +16,9 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class MergeBaseFinder {
 
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
   private final Repository repo;
 
   MergeBaseFinder(Repository repo) {
