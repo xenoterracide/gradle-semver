@@ -61,30 +61,25 @@ final class SemverBuilder {
   }
 
   String getHeadBranch() {
+    var matchesRemote =
+      this.gitMetadata.remotes()
+        .stream()
+        .filter(PredicateTools.is(GitRemote::name, Predicate.isEqual(this.remote)))
+        .map(GitRemote::headBranch)
+        .filter(Objects::nonNull)
+        .findAny();
     switch (this.remoteForHeadBranch) {
       case CONFIGURED_ORIGIN_OR_THROW:
-        return this.gitMetadata.remotes()
-          .stream()
-          .filter(PredicateTools.is(GitRemote::name, Predicate.isEqual(this.remote)))
-          .map(GitRemote::headBranch)
-          .filter(Objects::nonNull)
-          .findAny()
-          .orElseThrow();
+        return matchesRemote.orElseThrow();
       case CONFIGURED_ORIGIN_OR_FIRST:
-        return this.gitMetadata.remotes()
-          .stream()
-          .filter(PredicateTools.is(GitRemote::name, Predicate.isEqual(this.remote)))
-          .map(GitRemote::headBranch)
-          .filter(Objects::nonNull)
-          .findAny()
-          .orElseGet(() ->
-            this.gitMetadata.remotes()
-              .stream()
-              .map(GitRemote::headBranch)
-              .filter(Objects::nonNull)
-              .findFirst()
-              .orElseThrow()
-          );
+        return matchesRemote.orElseGet(() ->
+          this.gitMetadata.remotes()
+            .stream()
+            .map(GitRemote::headBranch)
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElseThrow()
+        );
       default:
         throw new IllegalStateException("remoteForHeadBranch: " + this.remoteForHeadBranch);
     }
