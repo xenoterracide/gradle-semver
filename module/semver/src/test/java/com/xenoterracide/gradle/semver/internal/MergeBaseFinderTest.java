@@ -12,9 +12,11 @@ import com.google.common.base.Joiner;
 import io.vavr.CheckedFunction0;
 import io.vavr.control.Try;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.function.Supplier;
 import org.assertj.core.api.Condition;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.transport.URIish;
@@ -48,7 +50,7 @@ class MergeBaseFinderTest {
   File notSetup;
 
   @NonNull
-  Try<Git> git;
+  TryGit git;
 
   @NonNull
   ObjectId initialCommit;
@@ -82,7 +84,7 @@ class MergeBaseFinderTest {
       var file = g.getRepository().getDirectory().toPath().resolve(remoteRef).toFile();
       log.warn("remoteRef: '{}' exists: {}", file, file.exists());
       return g;
-    });
+    })::get;
   }
 
   @Test
@@ -91,7 +93,7 @@ class MergeBaseFinderTest {
       .of(g -> g)
       .andThenTry(g -> g.commit().setMessage("initial commit").call());
 
-    var gitMetadata = new GitMetadataImpl(() -> gitLocal);
+    var gitMetadata = new GitMetadataImpl(() -> gitLocal::get);
     var distance = new MergeBaseFinder(gitLocal.get().getRepository());
 
     assertThat(gitMetadata.remotes()).isEmpty();
@@ -99,50 +101,47 @@ class MergeBaseFinderTest {
   }
 
   @Test
-  void originNoHeadBranch() {
+  void originNoHeadBranch() throws GitAPIException, URISyntaxException {
     var uri = this.bareRemote.toURI().toASCIIString();
-    var gitLocal = Try.withResources(() -> Git.init().setDirectory(notSetup).call())
-      .of(g -> g)
-      .andThenTry(g -> {
-        g.remoteAdd().setName("origin").setUri(new URIish(uri)).call();
-        g.commit().setMessage("initial commit").call();
-        g.push().call();
-      });
+    try (var git = Git.init().setDirectory(notSetup).call()) {
+      git.remoteAdd().setName("origin").setUri(new URIish(uri)).call();
+      git.commit().setMessage("initial commit").call();
+      git.push().call();
 
-    var gitMetadata = new GitMetadataImpl(() -> gitLocal);
-    var distance = new MergeBaseFinder(gitLocal.get().getRepository());
+      var gitMetadata = new GitMetadataImpl(() -> () -> git);
+      var mergeBase = new MergeBaseFinder(git.getRepository());
 
-    assertThat(gitMetadata.remotes()).isNotEmpty();
-    assertThat(distance.find(gitMetadata.remotes().getFirst())).isNotPresent();
+      assertThat(gitMetadata.remotes()).isNotEmpty();
+      assertThat(mergeBase.find(gitMetadata.remotes().getFirst())).isNotPresent();
+    }
   }
 
   @Test
   void originHeadBranchAllPushed() throws Throwable {
-    var git = this.git.get();
     var gitMetadata = new GitMetadataImpl(() -> this.git);
     var origin = gitMetadata.remotes().getFirst();
-    var mergeBase = new MergeBaseFinder(git.getRepository());
-    CheckedFunction0<ObjectId> remoteHead = () -> git.getRepository().resolve("refs/remotes/origin/HEAD");
-    Supplier<String> gitLog = () -> Joiner.on('\n').join(Try.of(() -> git.log().all().call()).get());
+    var mergeBase = new MergeBaseFinder(git.get().getRepository());
+    CheckedFunction0<ObjectId> remoteHead = () -> git.get().getRepository().resolve("refs/remotes/origin/HEAD");
+    Supplier<String> gitLog = () -> Joiner.on('\n').join(git.tryCommand(g -> g.log().all()));
 
     assertThat(mergeBase.find(origin)).isPresent().hasValue(initialCommit);
     var oid1 = commit(git);
     assertThat(mergeBase.find(origin)).isPresent().hasValue(initialCommit);
 
-    git.push().call();
+    git.tryCommand(Git::push);
 
     log.warn("first {} | {}", oid1, remoteHead.apply());
     assertThat(mergeBase.find(origin)).isPresent().hasValue(oid1);
 
-    git.tag().setName("v0.1.0").call();
+    git.tryCommand(g -> g.tag().setName("v0.1.0"));
 
-    git.push().setPushTags().call();
+    git.tryCommand(g -> g.push().setPushTags());
     assertThat(mergeBase.find(origin)).isPresent().hasValue(remoteHead.apply());
 
     var oid2 = commit(git);
     assertThat(mergeBase.find(origin)).isPresent().hasValue(remoteHead.apply()).isNot(equalTo(oid2));
 
-    git.push().call();
+    git.tryCommand(Git::push);
 
     assertThat(mergeBase.find(origin)).isPresent().as(gitLog).hasValue(oid2);
   }

@@ -12,7 +12,6 @@ import static io.vavr.Predicates.instanceOf;
 import com.xenoterracide.gradle.semver.GitRemote;
 import com.xenoterracide.gradle.semver.GitStatus;
 import com.xenoterracide.tools.java.function.ExceptionTools;
-import io.vavr.CheckedFunction1;
 import io.vavr.control.Try;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,11 +23,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.eclipse.jgit.api.DescribeCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.LogCommand;
-import org.eclipse.jgit.api.RemoteListCommand;
-import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
@@ -52,7 +47,7 @@ public class GitMetadataImpl implements GitMetadata {
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  private final Supplier<Try<Git>> git;
+  private final Supplier<TryGit> git;
 
   /**
    * Instantiates a new Git metadata extension.
@@ -60,7 +55,7 @@ public class GitMetadataImpl implements GitMetadata {
    * @param git
    *   a jgit instance supplier
    */
-  public GitMetadataImpl(Supplier<Try<Git>> git) {
+  public GitMetadataImpl(Supplier<TryGit> git) {
     this.git = git;
   }
 
@@ -74,16 +69,11 @@ public class GitMetadataImpl implements GitMetadata {
         .getOrElseThrow(() -> ExceptionTools.toRuntime(e));
   }
 
-  <R> Try<R> tryCommand(CheckedFunction1<Git, R> command) {
-    return this.git.get().mapTry(command).onFailure(e -> this.log.debug("failed", e)).filter(Objects::nonNull);
-  }
-
   Try<Repository> gitRepository() {
-    return this.tryCommand(Git::getRepository);
-  }
-
-  Try<LogCommand> gitLog() {
-    return this.tryCommand(Git::log);
+    return Try.of(this.git.get()::get)
+      .map(Git::getRepository)
+      .filter(Objects::nonNull)
+      .onFailure(e -> this.log.error("failed to get repository", e));
   }
 
   /**
@@ -125,8 +115,8 @@ public class GitMetadataImpl implements GitMetadata {
 
   @Override
   public @Nullable String tag() {
-    return this.tryCommand(g -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0))
-      .mapTry(DescribeCommand::call)
+    return this.git.get()
+      .tryCommand(g -> g.describe().setMatch(VERSION_GLOB).setAbbrev(0))
       .recover(NoSuchElementException.class, e -> null)
       .recover(GitMetadataImpl.allWith(null))
       .onFailure(e -> this.log.error("failed to get tag", e))
@@ -134,9 +124,8 @@ public class GitMetadataImpl implements GitMetadata {
   }
 
   long shortCount() {
-    return this.gitLog()
-      .map(l -> l.setMaxCount(5))
-      .mapTry(LogCommand::call)
+    return this.git.get()
+      .tryCommand(git -> git.log().setMaxCount(5))
       .map(IterableTools::of)
       .map(Stream::count)
       .getOrElse(0L);
@@ -148,14 +137,13 @@ public class GitMetadataImpl implements GitMetadata {
     if (shortCount < 4) {
       this.log.warn("shallow clone detected! git only has {} commits", shortCount);
     }
-    var calculator = new DistanceCalculator(this.git.get());
-    return this.gitRepository().mapTry(r -> r.resolve(Constants.HEAD)).map(calculator::distance).getOrElse(0L);
+    return new DistanceCalculator(this.git).apply(Constants.HEAD);
   }
 
   @Override
   public GitStatus status() {
-    return this.tryCommand(Git::status)
-      .mapTry(StatusCommand::call)
+    return this.git.get()
+      .tryCommand(Git::status)
       .filter(Objects::nonNull)
       .map(status -> status.isClean() ? GitStatus.CLEAN : GitStatus.DIRTY)
       .recover(NoSuchElementException.class, e -> GitStatus.NO_REPO)
@@ -176,8 +164,8 @@ public class GitMetadataImpl implements GitMetadata {
 
   @Override
   public List<GitRemote> remotes() {
-    return this.tryCommand(Git::remoteList)
-      .mapTry(RemoteListCommand::call)
+    return this.git.get()
+      .tryCommand(Git::remoteList)
       .map(Collection::stream)
       .map(s -> s.map(RemoteConfig::getName))
       .map(s -> s.filter(Objects::nonNull))

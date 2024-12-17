@@ -25,6 +25,10 @@ public final class CommitTools {
     return commit.toObjectId();
   }
 
+  public static ObjectId commit(Supplier<Git> git) throws GitAPIException {
+    return commit(git.get());
+  }
+
   /**
    * just for silly single statement one-liners that reduce boilerplate.
    */

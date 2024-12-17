@@ -8,8 +8,9 @@ import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
 import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.xenoterracide.gradle.semver.internal.DistanceCalculator;
 import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
-import io.vavr.control.Try;
+import com.xenoterracide.gradle.semver.internal.TryGit;
 import java.io.File;
 import java.util.Collections;
 import java.util.function.Supplier;
@@ -31,7 +32,8 @@ class SemverBuilderIntegrationTest {
   @Test
   void semver() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataImpl(() -> Try.success(git))).build();
+      Supplier<TryGit> tg = () -> () -> git;
+      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataImpl(tg), new DistanceCalculator(tg)).build();
 
       var v001Alpha01 = supplies(commit(git), vs);
 

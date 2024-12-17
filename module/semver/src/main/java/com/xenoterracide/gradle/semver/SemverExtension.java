@@ -4,7 +4,10 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.xenoterracide.gradle.semver.internal.DistanceCalculator;
 import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
+import com.xenoterracide.gradle.semver.internal.TryGit;
+import java.util.function.Supplier;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
@@ -49,11 +52,11 @@ public class SemverExtension {
     this.remote = pf.propertyString();
   }
 
-  SemverExtension init() {
+  SemverExtension init(Supplier<TryGit> tryGit) {
     var semverProvider =
       this.project.provider(() -> {
           var gm = this.project.getExtensions().getByType(GitMetadataExtension.class);
-          var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm))
+          var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm), new DistanceCalculator(tryGit))
             .withDirtyOut(this.getCheckDirty().getOrElse(false))
             .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
             .withRemoteForHeadBranchConfig(

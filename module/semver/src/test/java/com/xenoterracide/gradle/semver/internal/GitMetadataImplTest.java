@@ -9,7 +9,6 @@ import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.xenoterracide.gradle.semver.GitStatus;
-import io.vavr.control.Try;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.function.Supplier;
@@ -33,14 +32,14 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
       assertThat(pg.branch()).isEqualTo("topic/test");
     }
   }
 
   @Test
   void noGit() {
-    var pg = new GitMetadataImpl(() -> Try.withResources(() -> Git.open(projectDir)).of(g -> g));
+    var pg = new GitMetadataImpl(() -> () -> null);
     assertThat(pg.distance()).isSameAs(0L);
     assertThat(pg.branch()).isNull();
     assertThat(pg.commit()).isNull();
@@ -55,7 +54,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
       var main = pg.getObjectIdFor("topic/test").get().getName();
       var head = pg.getObjectIdFor("HEAD").get().getName();
       assertThat(main).hasSize(40);
@@ -71,7 +70,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
       var main = pg.getRev("topic/test");
       var head = pg.getRev("HEAD");
       assertThat(main).hasSize(40);
@@ -87,7 +86,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
       var main = pg.getRev("topic/test");
       var head = pg.commit();
       assertThat(main).hasSize(40);
@@ -103,7 +102,7 @@ class GitMetadataImplTest {
       git.branchCreate().setName("topic/test").call();
       git.checkout().setName("topic/test").call();
 
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
       var main = pg.getRev("topic/test");
       var head = pg.uniqueShort();
       assertThat(main).isNotNull();
@@ -116,7 +115,7 @@ class GitMetadataImplTest {
   @Test
   void getLastTag() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
       assertThat(pg.tag()).isNull();
 
       git.commit().setMessage("first commit").call();
@@ -142,7 +141,7 @@ class GitMetadataImplTest {
   @Test
   void getCommitDistance() throws GitAPIException {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
       Supplier<Long> distance = pg::distance;
       assertThat(distance.get()).isEqualTo(0L);
 
@@ -177,7 +176,7 @@ class GitMetadataImplTest {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
 
-      var pg = new GitMetadataImpl(() -> Try.success(git));
+      var pg = new GitMetadataImpl(() -> () -> git);
 
       assertThat(pg.status()).isEqualTo(GitStatus.CLEAN);
 
@@ -190,8 +189,8 @@ class GitMetadataImplTest {
   @Test
   void getRemotesEmpty() throws Exception {
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      var gm = new GitMetadataImpl(() -> Try.success(git));
-      assertThat(gm.remotes()).isEmpty();
+      var pg = new GitMetadataImpl(() -> () -> git);
+      assertThat(pg.remotes()).isEmpty();
     }
   }
 }

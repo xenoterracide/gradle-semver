@@ -9,8 +9,10 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,14 +25,15 @@ class SemverBuilderTest {
 
   @ParameterizedTest
   @ArgumentsSource(VersionProvider.class)
-  void gitMetadata(
+  void dirty(
     GitMetadata gitMetadata,
     String expected,
     String comp,
     String lessThan,
+    long hbDistance,
     @Nullable String greaterThan
   ) {
-    var semv = new SemverBuilder(gitMetadata).withDirtyOut(true).build();
+    var semv = new SemverBuilder(gitMetadata, rev -> hbDistance).withDirtyOut(true).build();
     assertThat(semv).describedAs("equal").isEqualTo(new Semver(expected));
     assertThat(semv).describedAs("comparing").isEqualByComparingTo(new Semver(comp));
     assertThat(semv).describedAs("lessThan").isLessThan(new Semver(lessThan));
@@ -43,70 +46,93 @@ class SemverBuilderTest {
     }
   }
 
+  // NOTE: the last 2 characters in the unique short denote the position in the array for debugging
   static class VersionProvider implements ArgumentsProvider {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
       return Stream.of(
         arguments(
-          new GitMetadataInfo(0, GitStatus.NO_REPO, null, null),
+          new GitMetadataInfoNoBranch(0, GitStatus.NO_REPO, null, null),
           "0.0.0-alpha.0.0",
           "0.0.0-alpha.0.0",
           "0.0.0-alpha.0.1",
+          0L,
           null
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef11", null),
-          "0.0.1-alpha.0.1+gabcdef11",
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef01", null),
+          "0.0.1-alpha.0.1+gabcdef01",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
+          0L,
           null
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.DIRTY, "abcdef12", null),
-          "0.0.1-alpha.0.1+gabcdef12.dirty",
+          new GitMetadataInfoNoBranch(1, GitStatus.DIRTY, "abcdef02", null),
+          "0.0.1-alpha.0.1+gabcdef02.dirty",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
+          0L,
           "0.0.1-alpha.0.0"
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef13", null),
-          "0.0.1-alpha.0.1+gabcdef13",
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef03", null),
+          "0.0.1-alpha.0.1+gabcdef03",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.1.0",
+          0L,
           "0.0.1-alpha.0.0"
         ),
         arguments(
-          new GitMetadataInfo(10, GitStatus.CLEAN, "abcdef14", null),
-          "0.0.1-alpha.0.10+gabcdef14",
+          new GitMetadataInfoNoBranch(10, GitStatus.CLEAN, "abcdef04", null),
+          "0.0.1-alpha.0.10+gabcdef04",
           "0.0.1-alpha.0.10",
           "0.0.1-alpha.0.11",
+          0L,
           "0.0.1-alpha.0.1"
         ),
         arguments(
-          new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef15", "v1.0.0-rc.1"),
+          new GitMetadataInfoNoBranch(0, GitStatus.CLEAN, "abcdef05", "v1.0.0-rc.1"),
           "1.0.0-rc.1",
           "1.0.0-rc.1",
           "1.0.0",
+          0L,
           "1.0.0-alpha.1"
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef16", "v1.0.0-rc.1"),
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef16", "v1.0.0-rc.1"),
           "1.0.0-rc.1.1+gabcdef16",
           "1.0.0-rc.1.1",
           "1.0.0-rc.2",
+          0L,
           "1.0.0-rc.1"
         ),
         arguments(
-          new GitMetadataInfo(0, GitStatus.CLEAN, "abcdef17", "v1.0.0"),
+          new GitMetadataInfoNoBranch(0, GitStatus.CLEAN, "abcdef17", "v1.0.0"),
           "1.0.0",
           "1.0.0",
           "1.0.1",
+          0L,
           "1.0.0-rc.1"
         ),
         arguments(
-          new GitMetadataInfo(1, GitStatus.CLEAN, "abcdef18", "v1.0.0"),
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef18", "v1.0.0"),
           "1.0.1-alpha.0.1+gabcdef18",
+          "1.0.1-alpha.0.1",
+          "1.0.1",
+          0L,
+          "1.0.1-alpha.0"
+        ),
+        arguments(
+          GitMetadataInfoBranch.create(
+            1,
+            GitStatus.CLEAN,
+            "abcdef09",
+            "v1.0.0",
+            Map.of("origin", "main", "upstream", "foo")
+          ),
+          "1.0.1-alpha.0.1+gabcdef09",
           "1.0.1-alpha.0.1",
           "1.0.1",
           "1.0.1-alpha.0"
@@ -115,7 +141,7 @@ class SemverBuilderTest {
     }
   }
 
-  record GitMetadataInfo(long distance, GitStatus status, @Nullable String uniqueShort, @Nullable String tag)
+  record GitMetadataInfoNoBranch(long distance, GitStatus status, @Nullable String uniqueShort, @Nullable String tag)
     implements GitMetadata {
     @Override
     public @Nullable String branch() {
@@ -130,6 +156,47 @@ class SemverBuilderTest {
     @Override
     public List<GitRemote> remotes() {
       return List.of();
+    }
+  }
+
+  record GitRemoteImpl(String name, String headBranch) implements GitRemote {
+    static GitRemote create(String name, String headBranch) {
+      return new GitRemoteImpl(name, Constants.R_REMOTES + name + "/" + headBranch);
+    }
+  }
+
+  record GitMetadataInfoBranch(
+    long distance,
+    GitStatus status,
+    @Nullable String uniqueShort,
+    @Nullable String tag,
+    List<GitRemote> remotes
+  )
+    implements GitMetadata {
+    static GitMetadata create(
+      long distance,
+      GitStatus status,
+      @Nullable String uniqueShort,
+      @Nullable String tag,
+      Map<String, String> remoteMap
+    ) {
+      var remotes = remoteMap
+        .entrySet()
+        .stream()
+        .sorted(Map.Entry.comparingByValue())
+        .map(entry -> GitRemoteImpl.create(entry.getKey(), entry.getValue()))
+        .toList();
+      return new GitMetadataInfoBranch(distance, status, uniqueShort, tag, remotes);
+    }
+
+    @Override
+    public @Nullable String branch() {
+      return "topic/foo";
+    }
+
+    @Override
+    public @Nullable String commit() {
+      return "";
     }
   }
 }

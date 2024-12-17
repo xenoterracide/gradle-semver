@@ -8,6 +8,7 @@ import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import com.xenoterracide.tools.java.function.PredicateTools;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,14 +23,16 @@ final class SemverBuilder {
   private static final String ZERO = "0";
 
   private final GitMetadata gitMetadata;
+  private final Function<String, Long> distanceCalculator;
   private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
   private RemoteForHeadBranch remoteForHeadBranch = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
   private String remote = "origin";
   private Semver semver;
   private boolean dirtyOut;
 
-  SemverBuilder(GitMetadata gitMetadata) {
+  SemverBuilder(GitMetadata gitMetadata, Function<String, Long> distanceCalculator) {
     this.gitMetadata = gitMetadata;
+    this.distanceCalculator = distanceCalculator;
     this.semver = new Semver(tagFrom(this.gitMetadata.tag()));
   }
 
@@ -154,6 +157,6 @@ final class SemverBuilder {
     if (this.branchOutput == BranchOutput.NONE || !this.hasHeadBranch()) {
       return this.gitMetadata.distance();
     }
-    return 0L;
+    return this.distanceCalculator.apply(this.getHeadBranch());
   }
 }
