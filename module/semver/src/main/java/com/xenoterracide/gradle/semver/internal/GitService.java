@@ -6,10 +6,8 @@ package com.xenoterracide.gradle.semver.internal;
 
 import com.xenoterracide.gradle.semver.internal.GitService.Params;
 import io.vavr.control.Try;
-import java.util.Objects;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.services.BuildService;
@@ -53,12 +51,10 @@ public abstract class GitService implements BuildService<Params>, AutoCloseable,
   public Git get() {
     if (this.git == null) {
       var projectDir = this.getParameters().getProjectDirectory().get().getAsFile();
-      var gitDir = new FileRepositoryBuilder().readEnvironment().setMustExist(false).findGitDir(projectDir).getGitDir();
-
-      this.git = gitDir != null ? Try.ofCallable(() -> Git.open(gitDir)).get() : null;
+      this.git = Try.ofCallable(() -> Git.open(NoGitDir.requireGitDir(projectDir))).get();
     }
 
-    return Objects.requireNonNull(this.git);
+    return this.git;
   }
 
   @Override
