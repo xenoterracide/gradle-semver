@@ -61,39 +61,39 @@ class SemverBuilderTest {
           null
         ),
         arguments(
-          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef01", null),
-          "0.0.1-alpha.0.1+gabcdef01",
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef02", null),
+          "0.0.1-alpha.0.1+gabcdef02",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
           0L,
           null
         ),
         arguments(
-          new GitMetadataInfoNoBranch(1, GitStatus.DIRTY, "abcdef02", null),
-          "0.0.1-alpha.0.1+gabcdef02.dirty",
+          new GitMetadataInfoNoBranch(1, GitStatus.DIRTY, "abcdef03", null),
+          "0.0.1-alpha.0.1+gabcdef03.dirty",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
           0L,
           "0.0.1-alpha.0.0"
         ),
         arguments(
-          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef03", null),
-          "0.0.1-alpha.0.1+gabcdef03",
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef04", null),
+          "0.0.1-alpha.0.1+gabcdef04",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.1.0",
           0L,
           "0.0.1-alpha.0.0"
         ),
         arguments(
-          new GitMetadataInfoNoBranch(10, GitStatus.CLEAN, "abcdef04", null),
-          "0.0.1-alpha.0.10+gabcdef04",
+          new GitMetadataInfoNoBranch(10, GitStatus.CLEAN, "abcdef05", null),
+          "0.0.1-alpha.0.10+gabcdef05",
           "0.0.1-alpha.0.10",
           "0.0.1-alpha.0.11",
           0L,
           "0.0.1-alpha.0.1"
         ),
         arguments(
-          new GitMetadataInfoNoBranch(0, GitStatus.CLEAN, "abcdef05", "v1.0.0-rc.1"),
+          new GitMetadataInfoNoBranch(0, GitStatus.CLEAN, "abcdef06", "v1.0.0-rc.1"),
           "1.0.0-rc.1",
           "1.0.0-rc.1",
           "1.0.0",
@@ -101,15 +101,15 @@ class SemverBuilderTest {
           "1.0.0-alpha.1"
         ),
         arguments(
-          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef16", "v1.0.0-rc.1"),
-          "1.0.0-rc.1.1+gabcdef16",
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef07", "v1.0.0-rc.1"),
+          "1.0.0-rc.1.1+gabcdef07",
           "1.0.0-rc.1.1",
           "1.0.0-rc.2",
           0L,
           "1.0.0-rc.1"
         ),
         arguments(
-          new GitMetadataInfoNoBranch(0, GitStatus.CLEAN, "abcdef17", "v1.0.0"),
+          new GitMetadataInfoNoBranch(0, GitStatus.CLEAN, "abcdef08", "v1.0.0"),
           "1.0.0",
           "1.0.0",
           "1.0.1",
@@ -117,8 +117,8 @@ class SemverBuilderTest {
           "1.0.0-rc.1"
         ),
         arguments(
-          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef18", "v1.0.0"),
-          "1.0.1-alpha.0.1+gabcdef18",
+          new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef09", "v1.0.0"),
+          "1.0.1-alpha.0.1+gabcdef09",
           "1.0.1-alpha.0.1",
           "1.0.1",
           0L,
@@ -128,13 +128,14 @@ class SemverBuilderTest {
           GitMetadataInfoBranch.create(
             1,
             GitStatus.CLEAN,
-            "abcdef09",
+            "abcdef10",
             "v1.0.0",
             Map.of("origin", "main", "upstream", "foo")
           ),
-          "1.0.1-alpha.0.1+gabcdef09",
+          "1.0.1-alpha.0.1+gabcdef10",
           "1.0.1-alpha.0.1",
           "1.0.1",
+          0L,
           "1.0.1-alpha.0"
         )
       );
