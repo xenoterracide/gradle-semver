@@ -9,12 +9,14 @@ import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.xenoterracide.gradle.semver.GitStatus;
+import io.vavr.control.Try;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.function.Supplier;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,7 +41,13 @@ class GitMetadataImplTest {
 
   @Test
   void noGit() {
-    var pg = new GitMetadataImpl(() -> () -> null);
+    var pg = new GitMetadataImpl(
+      () ->
+        () ->
+          (Git) Try.of(() -> {
+            throw new RepositoryNotFoundException(projectDir);
+          }).get()
+    );
     assertThat(pg.distance()).isSameAs(0L);
     assertThat(pg.branch()).isNull();
     assertThat(pg.commit()).isNull();

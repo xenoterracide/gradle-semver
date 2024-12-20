@@ -6,9 +6,9 @@ package com.xenoterracide.gradle.semver.internal;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.xenoterracide.gradle.semver.SemverExtension;
 import com.xenoterracide.gradle.semver.SemverPlugin;
 import java.io.File;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
@@ -25,9 +25,13 @@ class GitServiceTest {
   void noGit() {
     var project = ProjectBuilder.builder().withProjectDir(projectDir).build();
     project.getPluginManager().apply(SemverPlugin.class);
-    var semver = project.getExtensions().getByType(SemverExtension.class).provider();
-    assertThatExceptionOfType(NoGitDir.class)
-      .isThrownBy(semver::get)
-      .withMessage("No git directory found in %s", projectDir);
+    var gitSvc = project
+      .getGradle()
+      .getSharedServices()
+      .registerIfAbsent(GitService.class.getCanonicalName(), GitService.class)
+      .get();
+    assertThatExceptionOfType(RepositoryNotFoundException.class)
+      .isThrownBy(gitSvc::get)
+      .withMessage("repository not found: %s", projectDir);
   }
 }

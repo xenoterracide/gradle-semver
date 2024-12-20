@@ -11,7 +11,7 @@ public class NoGitDir extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  private NoGitDir(File projectDirectory) {
+  NoGitDir(File projectDirectory) {
     super("No git directory found in " + projectDirectory);
   }
 

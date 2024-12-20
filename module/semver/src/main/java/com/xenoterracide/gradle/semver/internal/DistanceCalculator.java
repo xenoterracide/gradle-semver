@@ -45,7 +45,8 @@ public class DistanceCalculator implements Function<String, Long> {
 
   @Override
   public Long apply(String revString) {
-    var rev = this.git.get().tryGit(git -> git.getRepository().resolve(revString)).get();
+    var rev = this.git.get().tryGit(git -> git.getRepository().resolve(revString)).getOrElse(() -> null);
+    if (rev == null) return 0L;
     return this.distance(rev);
   }
 }

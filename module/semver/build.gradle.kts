@@ -25,7 +25,7 @@ dependencies {
   api(libs.semver)
   implementation(libs.vavr)
   implementation(libs.guava)
-  implementation(libs.slf4j.api)
+  // implementation(libs.slf4j.api)
   implementation(libs.java.tools)
   testImplementation(libs.junit.api)
   testImplementation(libs.maven.artifact)
