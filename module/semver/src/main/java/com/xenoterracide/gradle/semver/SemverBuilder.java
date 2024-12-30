@@ -35,7 +35,7 @@ final class SemverBuilder {
   private Semver semver;
   private boolean dirtyOut;
 
-  SemverBuilder(Function<String, Long> distanceCalculator, String vString) {
+  SemverBuilder(Function<String, Long> distanceCalculator, @Nullable String vString) {
     this.distanceCalculator = distanceCalculator;
     this.semver = new Semver(tagFrom(vString));
   }

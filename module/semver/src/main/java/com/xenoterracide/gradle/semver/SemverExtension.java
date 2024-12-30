@@ -7,16 +7,17 @@ package com.xenoterracide.gradle.semver;
 import com.xenoterracide.gradle.git.BranchOutput;
 import com.xenoterracide.gradle.git.DistanceCalculator;
 import com.xenoterracide.gradle.git.GitExtension;
+import com.xenoterracide.gradle.git.GitService;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import com.xenoterracide.gradle.git.RemoteForHeadBranch;
-import com.xenoterracide.gradle.git.TryGit;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.services.BuildServiceRegistration;
 import org.semver4j.Semver;
 
 /**
@@ -24,8 +25,8 @@ import org.semver4j.Semver;
  * <ul>
  *  <li>{@see <a href="https://semver.org/">Semantic Versioning</a>}</li>
  *  <li>{@see <a href="https://git-scm.com/">Git</a>}</li>
+ *  <li>{@see <a href="https://www.eclipse.org/jgit/">JGit</a>}</li>
  *  <li>{@link Semver}</li>
- *  <li>{@link org.eclipse.jgit.api.Git}</li>
  * </ul>
  */
 public class SemverExtension implements Provides<Semver> {
@@ -44,7 +45,7 @@ public class SemverExtension implements Provides<Semver> {
    * @param project
    *   the project
    */
-  protected SemverExtension(Project project) {
+  private SemverExtension(Project project) {
     this.project = project;
     var pf = new ProvidedFactory(project);
     this.branchOutput = pf.property(BranchOutput.class);
@@ -54,20 +55,38 @@ public class SemverExtension implements Provides<Semver> {
     this.remote = pf.propertyString();
   }
 
-  SemverExtension init(TryGit tryGit) {
-    var gm = this.project.getExtensions().getByType(GitExtension.class).provider().map();
-    var semverProvider =
-      this.project.provider(() -> {
-          var semver = new SemverBuilder(new DistanceCalculator(tryGit))
-            .withDirtyOut(this.getCheckDirty().getOrElse(false))
-            .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
-            .withRemoteForHeadBranchConfig(
-              this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
-            )
-            .build();
-          this.log.info("semver {} {}", this.project.getName(), semver);
-          return semver;
-        });
+  static SemverExtension forProject(Project project) {
+    return new SemverExtension(project).build();
+  }
+
+  SemverExtension build() {
+    var semverProvider = project
+      .getExtensions()
+      .getByType(GitExtension.class)
+      .provider()
+      .map(gm -> {
+        var git =
+          this.project.getGradle()
+            .getSharedServices()
+            .getRegistrations()
+            .named(GitService.class.getCanonicalName())
+            .flatMap(BuildServiceRegistration::getService)
+            .map(GitService.class::cast)
+            .flatMap(GitService::provider);
+
+        var dc = new DistanceCalculator(git::get);
+
+        var semver = new SemverBuilder(dc, gm.tag())
+          .withDirtyOut(this.getCheckDirty().getOrElse(false))
+          .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
+          .withRemoteForHeadBranchConfig(
+            this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
+          )
+          .build();
+        this.log.info("semver {} {}", this.project.getName(), semver);
+        return semver;
+      });
+
     this.provider.set(semverProvider);
     this.provider.finalizeValueOnRead();
     this.provider.disallowChanges();

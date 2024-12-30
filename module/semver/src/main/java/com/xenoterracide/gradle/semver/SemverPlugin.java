@@ -4,6 +4,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.xenoterracide.gradle.git.GitPlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -21,6 +22,7 @@ public class SemverPlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    project.getExtensions().add(SEMVER, new SemverExtension(project).init(tryGit::get));
+    project.getPluginManager().apply(GitPlugin.class);
+    project.getExtensions().add(SEMVER, SemverExtension.forProject(project));
   }
 }
