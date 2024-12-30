@@ -8,6 +8,7 @@ buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
   our.javalibrary
+  `java-test-fixtures`
   alias(libs.plugins.shadow)
 }
 
@@ -20,23 +21,35 @@ dependencyLocking {
 }
 
 dependencies {
-  api(projects.git)
-
   compileOnlyApi(libs.jspecify)
-  api(libs.semver)
+  api(libs.jgit)
   implementation(libs.vavr)
   implementation(libs.guava)
   implementation(libs.commons.lang)
   implementation(libs.java.tools)
-  testImplementation(libs.junit.api)
-  testImplementation(libs.maven.artifact)
-  testImplementation(gradleTestKit())
+  testFixturesImplementation(libs.jgit)
   shadow(libs.vavr)
-  shadow(libs.semver)
+}
+
+testing {
+  suites {
+    withType<JvmTestSuite>().configureEach {
+      dependencies {
+        implementation(testFixtures(project()))
+        implementation(libs.junit.api)
+      }
+    }
+    val test by getting(JvmTestSuite::class) {
+      dependencies {
+        implementation(testFixtures(project()))
+      }
+    }
+  }
 }
 
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
+  relocate("org.eclipse.jgit", "com.xenoterracide.gradle.semver.jgit")
   relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
   relocate("com.xenoterracide.tools.java", "com.xenoterracide.tools.java")
   dependencies {
@@ -58,27 +71,6 @@ gradlePlugin {
         """.trimIndent()
       tags = setOf("semver", "versioning", "git", "version")
       id = name
-    }
-  }
-}
-
-publishing {
-  publications {
-    register<MavenPublication>("relocation") {
-      pom {
-        groupId = "com.xenoterracide"
-        artifactId = project.name
-        version = rootProject.version.toString()
-
-        distributionManagement {
-          relocation {
-            groupId = rootProject.group.toString()
-            artifactId = project.name
-            version = rootProject.version.toString()
-            message = "groupId has been changed to follow my conventions"
-          }
-        }
-      }
     }
   }
 }

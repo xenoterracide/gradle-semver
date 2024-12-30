@@ -68,10 +68,14 @@ tasks.withType<JavaCompile>().configureEach {
     )
     disableWarningsInGeneratedCode.set(true)
     excludedPaths.set(".*/build/generated/sources/annotationProcessor/.*")
+    option("Nullaway:AcknowledgeRestrictiveAnnotations", true)
+    option("NullAway:HandleTestAssertionLibraries", true)
+    option("NullAway:CheckContracts", true)
+    option("NullAway:ExcludedFieldAnnotations", "org.junit.jupiter.api.io.TempDir")
     option("NullAway:AnnotatedPackages", listOf("com", "org", "net", "io", "dev", "graphql").joinToString(","))
     option(
       "NullAway:UnannotatedSubPackages",
-      listOf("io.vavr", "org.assertj", "org.eclipse.jgit.api", "org.junit").joinToString(","),
+      listOf("io.vavr", "org.apache.commons.lang3", "org.assertj", "org.eclipse.jgit", "org.junit").joinToString(","),
     )
 
     val errors =
@@ -256,8 +260,6 @@ tasks.withType<JavaCompile>().configureEach {
         ),
       )
       disable("JavaTimeDefaultTimeZone")
-      option("NullAway:HandleTestAssertionLibraries", true)
-      option("NullAway:ExcludedFieldAnnotations", "org.junit.jupiter.api.io.TempDir")
     }
 
     error(*errors.toTypedArray())

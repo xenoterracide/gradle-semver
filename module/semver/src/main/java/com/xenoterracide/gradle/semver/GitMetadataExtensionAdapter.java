@@ -4,7 +4,10 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.GitMetadata;
+import com.xenoterracide.gradle.git.GitMetadata;
+import com.xenoterracide.gradle.git.GitMetadataExtension;
+import com.xenoterracide.gradle.git.GitRemote;
+import com.xenoterracide.gradle.git.GitStatus;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 

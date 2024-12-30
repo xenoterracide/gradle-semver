@@ -7,6 +7,8 @@ package com.xenoterracide.gradle.semver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import com.xenoterracide.gradle.git.GitRemote;
+import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +32,10 @@ class SemverBuilderTest {
     String expected,
     String comp,
     String lessThan,
-    long hbDistance,
+    long headBranchDistance,
     @Nullable String greaterThan
   ) {
-    var semv = new SemverBuilder(gitMetadata, rev -> hbDistance).withDirtyOut(true).build();
+    var semv = new SemverBuilder(gitMetadata, rev -> headBranchDistance).withDirtyOut(true).build();
     assertThat(semv).describedAs("equal").isEqualTo(new Semver(expected));
     assertThat(semv).describedAs("comparing").isEqualByComparingTo(new Semver(comp));
     assertThat(semv).describedAs("lessThan").isLessThan(new Semver(lessThan));
@@ -132,10 +134,10 @@ class SemverBuilderTest {
             "v1.0.0",
             Map.of("origin", "main", "upstream", "foo")
           ),
-          "1.0.1-alpha.0.1+gabcdef10",
+          "1.0.1-alpha.0.1+btopic-foo.gabcdef10",
           "1.0.1-alpha.0.1",
           "1.0.1",
-          0L,
+          1L,
           "1.0.1-alpha.0"
         )
       );

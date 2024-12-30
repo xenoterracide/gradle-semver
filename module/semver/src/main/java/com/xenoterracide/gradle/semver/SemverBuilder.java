@@ -4,7 +4,11 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.GitMetadata;
+import com.xenoterracide.gradle.git.BranchOutput;
+import com.xenoterracide.gradle.git.GitRemote;
+import com.xenoterracide.gradle.git.GitStatus;
+import com.xenoterracide.gradle.git.HeadBranchNotAvailable;
+import com.xenoterracide.gradle.git.RemoteForHeadBranch;
 import com.xenoterracide.tools.java.function.PredicateTools;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,17 +16,18 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 final class SemverBuilder {
 
-  static final String ALPHA = "alpha";
-  static final String SEMVER_DELIMITER = ".";
+  private static final String ALPHA = "alpha";
+  private static final String SEMVER_DELIMITER = ".";
   private static final String PRE_VERSION = "0.0.0";
   private static final String ZERO = "0";
 
-  private final GitMetadata gitMetadata;
   private final Function<String, Long> distanceCalculator;
   private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
   private RemoteForHeadBranch remoteForHeadBranch = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
@@ -30,10 +35,9 @@ final class SemverBuilder {
   private Semver semver;
   private boolean dirtyOut;
 
-  SemverBuilder(GitMetadata gitMetadata, Function<String, Long> distanceCalculator) {
-    this.gitMetadata = gitMetadata;
+  SemverBuilder(Function<String, Long> distanceCalculator, String vString) {
     this.distanceCalculator = distanceCalculator;
-    this.semver = new Semver(tagFrom(this.gitMetadata.tag()));
+    this.semver = new Semver(tagFrom(vString));
   }
 
   static String tagFrom(@Nullable String vString) {
@@ -59,8 +63,8 @@ final class SemverBuilder {
     }
   }
 
-  boolean hasHeadBranch() {
-    return this.gitMetadata.remotes().stream().map(GitRemote::headBranch).anyMatch(Objects::nonNull);
+  boolean doesNotHaveHeadBranch() {
+    return this.gitMetadata.remotes().stream().map(GitRemote::headBranch).noneMatch(Objects::nonNull);
   }
 
   String getHeadBranch() {
@@ -88,32 +92,19 @@ final class SemverBuilder {
     }
   }
 
-  Optional<String> getBranch() throws HeadBranchNotAvailable {
-    var headBranch = this.getHeadBranch();
-    switch (this.branchOutput) {
-      case NON_HEAD_BRANCH_OR_THROW:
-        if (this.hasHeadBranch() && !Objects.equals(this.gitMetadata.branch(), headBranch)) {
-          return Optional.ofNullable(this.gitMetadata.branch());
-        }
-        throw new HeadBranchNotAvailable();
-      case NON_HEAD_BRANCH_FALLBACK_ALWAYS:
-        if (this.hasHeadBranch() && Objects.equals(this.gitMetadata.branch(), headBranch)) {
-          return Optional.empty();
-        }
-        return Optional.ofNullable(this.gitMetadata.branch());
-      case NON_HEAD_BRANCH_FALLBACK_NONE:
-        if (this.hasHeadBranch() && !Objects.equals(this.gitMetadata.branch(), headBranch)) {
-          return Optional.ofNullable(this.gitMetadata.branch());
-        }
-      // fallthrough
-      case NONE:
-        return Optional.empty();
-      default:
-        throw new IllegalStateException("branchOutput: " + this.branchOutput);
-    }
+  boolean branchMatchesHeadBranch() {
+    var headBranch = StringUtils.removeStart(this.getHeadBranch(), Constants.R_REMOTES);
+    return this.gitMetadata.branch();
   }
 
-  private void createBuild() throws HeadBranchNotAvailable {
+  Optional<String> getBranch() {
+    if (this.branchOutput == BranchOutput.ALWAYS) return Optional.ofNullable(this.gitMetadata.branch());
+    if (this.branchOutput == BranchOutput.NONE || this.doesNotHaveHeadBranch()) return Optional.empty();
+
+    return Optional.ofNullable(this.gitMetadata.branch());
+  }
+
+  private void createBuild() {
     var distance = this.getDistance();
     if (distance > 0) {
       var sha = Optional.ofNullable(this.gitMetadata.uniqueShort()).map(s -> "g" + s);
@@ -154,7 +145,7 @@ final class SemverBuilder {
   }
 
   long getDistance() {
-    if (this.branchOutput == BranchOutput.NONE || !this.hasHeadBranch()) {
+    if (this.branchOutput == BranchOutput.NONE || this.doesNotHaveHeadBranch()) {
       return this.gitMetadata.distance();
     }
     return this.distanceCalculator.apply(this.getHeadBranch());

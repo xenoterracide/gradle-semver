@@ -4,11 +4,13 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.semver.internal.DistanceCalculator;
-import com.xenoterracide.gradle.semver.internal.ProvidedFactory;
-import com.xenoterracide.gradle.semver.internal.TryGit;
-import java.util.function.Supplier;
-import org.eclipse.jgit.api.Git;
+import com.xenoterracide.gradle.git.BranchOutput;
+import com.xenoterracide.gradle.git.DistanceCalculator;
+import com.xenoterracide.gradle.git.GitExtension;
+import com.xenoterracide.gradle.git.ProvidedFactory;
+import com.xenoterracide.gradle.git.Provides;
+import com.xenoterracide.gradle.git.RemoteForHeadBranch;
+import com.xenoterracide.gradle.git.TryGit;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -23,10 +25,10 @@ import org.semver4j.Semver;
  *  <li>{@see <a href="https://semver.org/">Semantic Versioning</a>}</li>
  *  <li>{@see <a href="https://git-scm.com/">Git</a>}</li>
  *  <li>{@link Semver}</li>
- *  <li>{@link Git}</li>
+ *  <li>{@link org.eclipse.jgit.api.Git}</li>
  * </ul>
  */
-public class SemverExtension {
+public class SemverExtension implements Provides<Semver> {
 
   private final Logger log = Logging.getLogger(this.getClass());
   private final Property<Semver> provider;
@@ -52,11 +54,11 @@ public class SemverExtension {
     this.remote = pf.propertyString();
   }
 
-  SemverExtension init(Supplier<TryGit> tryGit) {
+  SemverExtension init(TryGit tryGit) {
+    var gm = this.project.getExtensions().getByType(GitExtension.class).provider().map();
     var semverProvider =
       this.project.provider(() -> {
-          var gm = this.project.getExtensions().getByType(GitMetadataExtension.class);
-          var semver = new SemverBuilder(new GitMetadataExtensionAdapter(gm), new DistanceCalculator(tryGit))
+          var semver = new SemverBuilder(new DistanceCalculator(tryGit))
             .withDirtyOut(this.getCheckDirty().getOrElse(false))
             .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
             .withRemoteForHeadBranchConfig(
@@ -81,6 +83,7 @@ public class SemverExtension {
    * @implNote The value will not be recalculated more than once per project per build. It is suggested to only use on
    *   the root project. In the future this may be a single global calculation.
    */
+  @Override
   public Provider<Semver> provider() {
     return this.provider;
   }
