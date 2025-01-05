@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -28,6 +28,6 @@ public class GitPlugin implements Plugin<Project> {
         spec.getParameters().getGitDirectory().fileProvider(gitDir);
       });
 
-    project.getExtensions().add(GIT, new GitExtension(gitService));
+    project.getExtensions().add(GIT, new GitExtension(gitService, new ProvidedFactory(project)));
   }
 }
