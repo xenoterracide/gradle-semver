@@ -28,12 +28,33 @@ dependencies {
   implementation(libs.guava)
   implementation(libs.commons.lang)
   implementation(libs.java.tools)
-  testImplementation(libs.junit.api)
-  testImplementation(libs.maven.artifact)
-  testImplementation(testFixtures(projects.git))
-  testImplementation(gradleTestKit())
   shadow(libs.vavr)
   shadow(libs.semver)
+}
+
+testing {
+  suites {
+    withType<JvmTestSuite>().configureEach {
+      dependencies {
+        implementation(project())
+        implementation(libs.junit.api)
+        implementation(testFixtures(projects.git))
+        implementation(gradleTestKit())
+      }
+    }
+    val test by getting(JvmTestSuite::class) {
+      dependencies {
+        implementation(libs.maven.artifact)
+      }
+    }
+
+    val testIntegration by registering(JvmTestSuite::class) {
+      dependencies {
+        runtimeOnly.bundle(libs.bundles.test.runtime)
+        implementation.bundle(libs.bundles.test.impl)
+      }
+    }
+  }
 }
 
 tasks.withType<ShadowJar>().configureEach {

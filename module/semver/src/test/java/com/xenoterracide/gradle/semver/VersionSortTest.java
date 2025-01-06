@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,10 +15,13 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.semver4j.Semver;
 
+/**
+ * This is not a real test, but rather a way to experiment with version formatting and assumptions
+ */
 public class VersionSortTest {
 
   static String withBuild(String version, String... build) {
-    var branch = !build[0].startsWith("g") ? "b-" : "";
+    var branch = !build[0].startsWith("g") ? "b" : "";
     return version + "+" + branch + String.join(".", build);
   }
 
