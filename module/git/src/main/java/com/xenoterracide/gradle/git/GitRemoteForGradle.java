@@ -9,6 +9,9 @@ import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Delegates to {@link GitRemote} but uses Gradle's {@link Provider} for lazy evaluation.
+ */
 public class GitRemoteForGradle {
 
   private final DistanceCalculator distanceCalculator;
@@ -23,10 +26,20 @@ public class GitRemoteForGradle {
     this.pf = pf;
   }
 
+  /**
+   * Gets the name of the remote.
+   *
+   * @return the name
+   */
   public String getName() {
     return this.name;
   }
 
+  /**
+   * Gets the head branch of the remote.
+   *
+   * @return the head branch
+   */
   public Provider<String> getHeadBranch() {
     return this.headBranch.orElse(
         pf.providedString(() -> {
