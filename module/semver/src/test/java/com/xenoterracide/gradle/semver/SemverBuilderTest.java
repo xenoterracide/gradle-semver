@@ -35,7 +35,15 @@ class SemverBuilderTest {
     long headBranchDistance,
     @Nullable String greaterThan
   ) {
-    var semv = new SemverBuilder(Semver.ZERO).withDirtyOut(true).build();
+    var parsed = gitMetadata.tag() != null ? Semver.parse(gitMetadata.tag()) : Semver.ZERO;
+    assertThat(parsed).isNotNull();
+    var semv = new SemverBuilder(parsed)
+      .withDistance(gitMetadata.distance())
+      .withUniqueShort(gitMetadata.uniqueShort())
+      .withGitStatus(gitMetadata.status())
+      .withDirtyOut(true)
+      .build();
+
     assertThat(semv).describedAs("equal").isEqualTo(new Semver(expected));
     assertThat(semv).describedAs("comparing").isEqualByComparingTo(new Semver(comp));
     assertThat(semv).describedAs("lessThan").isLessThan(new Semver(lessThan));

@@ -127,7 +127,7 @@ final class SemverBuilder {
     return this;
   }
 */
-  SemverBuilder withUniqueShort(String uniqueShort) {
+  SemverBuilder withUniqueShort(@Nullable String uniqueShort) {
     this.uniqueShort = uniqueShort;
     return this;
   }
