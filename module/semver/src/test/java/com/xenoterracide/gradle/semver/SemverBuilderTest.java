@@ -12,13 +12,10 @@ import com.xenoterracide.gradle.git.GitRemote;
 import com.xenoterracide.gradle.git.GitStatus;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -27,19 +24,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.semver4j.Semver;
 
 class SemverBuilderTest {
-
-  @Test
-  void testBug() {
-    var orig = Objects.requireNonNull(Semver.parse("v1.0.0-rc.1"));
-
-    var preRelease = Stream.concat(orig.getPreRelease().stream(), Stream.of(Long.toString(0))).collect(
-      Collectors.joining(".")
-    );
-    var semver = orig.withClearedPreRelease().withPreRelease(preRelease);
-
-    var expected = Semver.parse("v1.0.0-rc.1");
-    assertThat(semver).isEqualTo(expected);
-  }
 
   @ParameterizedTest
   @ArgumentsSource(VersionProvider.class)

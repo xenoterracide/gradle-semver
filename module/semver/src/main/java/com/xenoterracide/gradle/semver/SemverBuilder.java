@@ -94,7 +94,7 @@ final class SemverBuilder {
 
    */
 
-  Optional<String> createBuild() {
+  private Optional<String> createBuild() {
     if (this.distance > 0) {
       var optSha = Optional.ofNullable(uniqueShort).map(s -> "g" + s);
       var status = Optional.ofNullable(this.dirtyOut ? this.status : null)
