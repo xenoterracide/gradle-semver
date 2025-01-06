@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,9 +7,9 @@ package com.xenoterracide.gradle.semver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import com.xenoterracide.gradle.git.GitMetadata;
 import com.xenoterracide.gradle.git.GitRemote;
 import com.xenoterracide.gradle.git.GitStatus;
-import com.xenoterracide.gradle.semver.internal.GitMetadata;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -35,7 +35,7 @@ class SemverBuilderTest {
     long headBranchDistance,
     @Nullable String greaterThan
   ) {
-    var semv = new SemverBuilder(gitMetadata, rev -> headBranchDistance).withDirtyOut(true).build();
+    var semv = new SemverBuilder(Semver.ZERO).withDirtyOut(true).build();
     assertThat(semv).describedAs("equal").isEqualTo(new Semver(expected));
     assertThat(semv).describedAs("comparing").isEqualByComparingTo(new Semver(comp));
     assertThat(semv).describedAs("lessThan").isLessThan(new Semver(lessThan));

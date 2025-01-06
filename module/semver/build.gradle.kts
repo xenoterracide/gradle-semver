@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -30,6 +30,7 @@ dependencies {
   implementation(libs.java.tools)
   testImplementation(libs.junit.api)
   testImplementation(libs.maven.artifact)
+  testImplementation(testFixtures(projects.git))
   testImplementation(gradleTestKit())
   shadow(libs.vavr)
   shadow(libs.semver)

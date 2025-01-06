@@ -1,21 +1,19 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package com.xenoterracide.gradle.semver;
 
-import static com.xenoterracide.gradle.semver.internal.CommitTools.commit;
-import static com.xenoterracide.gradle.semver.internal.CommitTools.supplies;
+import static com.xenoterracide.gradle.git.fixtures.CommitTools.commit;
+import static com.xenoterracide.gradle.git.fixtures.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.xenoterracide.gradle.semver.internal.DistanceCalculator;
-import com.xenoterracide.gradle.semver.internal.GitMetadataImpl;
-import com.xenoterracide.gradle.semver.internal.TryGit;
 import java.io.File;
 import java.util.Collections;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.semver4j.Semver;
@@ -31,9 +29,13 @@ class SemverBuilderIntegrationTest {
 
   @Test
   void semver() throws Exception {
+    var pb = ProjectBuilder.builder().withProjectDir(projectDir);
     try (var git = Git.init().setDirectory(projectDir).call()) {
-      Supplier<TryGit> tg = () -> () -> git;
-      Supplier<Semver> vs = () -> new SemverBuilder(new GitMetadataImpl(tg), new DistanceCalculator(tg)).build();
+      Supplier<Semver> vs = () -> {
+        var project = pb.build();
+        project.getPluginManager().apply(SemverPlugin.class);
+        return project.getExtensions().getByType(SemverExtension.class).provider().get();
+      };
 
       var v001Alpha01 = supplies(commit(git), vs);
 

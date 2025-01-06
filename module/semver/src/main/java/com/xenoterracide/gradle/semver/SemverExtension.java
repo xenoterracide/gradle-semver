@@ -6,7 +6,6 @@ package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.git.BranchOutput;
 import com.xenoterracide.gradle.git.GitExtension;
-import com.xenoterracide.gradle.git.GitService;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import com.xenoterracide.gradle.git.RemoteForHeadBranch;
@@ -16,7 +15,6 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.services.BuildServiceRegistration;
 import org.semver4j.Semver;
 
 /**
@@ -61,36 +59,29 @@ public class SemverExtension implements Provides<Semver> {
   SemverExtension build() {
     var gitExt = project.getExtensions().getByType(GitExtension.class);
 
-    var semverProvider =
-      this.project.getGradle()
-        .getSharedServices()
-        .getRegistrations()
-        .named(GitService.class.getCanonicalName())
-        .flatMap(BuildServiceRegistration::getService)
-        .map(GitService.class::cast)
-        .flatMap(GitService::provider)
-        .zip(
-          gitExt.getTag().map(vstring -> vstring.substring(1)).map(Semver::parse).orElse(Semver.ZERO),
-          (git, semver) ->
-            new SemverBuilder(semver)
-              .withDirtyOut(this.getCheckDirty().getOrElse(false))
-              .withDistance(gitExt.getDistance().get())
-              .withGitStatus(gitExt.getStatus().get())
-              .withUniqueShort(gitExt.getUniqueShort().get())
-              /*
-          .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
-          .withRemoteForHeadBranchConfig(
-            this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
-          )
-
-           */
-              .build()
+    var semverProvider = gitExt
+      .getTag()
+      .map(Semver::coerce)
+      .orElse(Semver.ZERO)
+      .map(semver ->
+        new SemverBuilder(semver)
+          .withDirtyOut(this.getCheckDirty().getOrElse(false))
+          .withDistance(gitExt.getDistance().get())
+          .withGitStatus(gitExt.getStatus().get())
+          .withUniqueShort(gitExt.getUniqueShort().get())
+          /*
+        .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
+        .withRemoteForHeadBranchConfig(
+          this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
         )
-        .orElse(Semver.ZERO) // ensure we have something even if git is not available
-        .map(semver -> {
-          this.log.info("semver {} {}", this.project.getName(), semver);
-          return semver;
-        });
+
+         */
+          .build()
+      )
+      .map(semver -> {
+        this.log.info("semver {} {}", this.project.getName(), semver);
+        return semver;
+      });
 
     this.provider.set(semverProvider);
     this.provider.finalizeValueOnRead();
