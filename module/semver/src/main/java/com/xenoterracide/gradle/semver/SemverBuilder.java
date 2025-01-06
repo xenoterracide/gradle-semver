@@ -96,12 +96,12 @@ final class SemverBuilder {
 
   Optional<String> createBuild() {
     if (this.distance > 0) {
-      var sha = Optional.ofNullable(uniqueShort).map(s -> "g" + s);
+      var optSha = Optional.ofNullable(uniqueShort).map(s -> "g" + s);
       var status = Optional.ofNullable(this.dirtyOut ? this.status : null)
         .filter(s -> s == GitStatus.DIRTY)
         .map(Object::toString);
 
-      return sha.map(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)).orElse(s));
+      return optSha.map(sha -> status.map(sta -> String.join(SEMVER_DELIMITER, sha, sta)).orElse(sha));
     }
     return Optional.empty();
   }

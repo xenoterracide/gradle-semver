@@ -44,9 +44,10 @@ class SemverBuilderTest {
       .withDirtyOut(true)
       .build();
 
-    assertThat(semv).describedAs("equal").isEqualTo(new Semver(expected));
-    assertThat(semv).describedAs("comparing").isEqualByComparingTo(new Semver(comp));
-    assertThat(semv).describedAs("lessThan").isLessThan(new Semver(lessThan));
+    assertThat(semv).describedAs("sringy").hasToString(expected);
+    assertThat(semv).describedAs("equal").isEqualTo(Semver.parse(expected));
+    assertThat(semv).describedAs("comparing").isEqualByComparingTo(Semver.parse(comp));
+    assertThat(semv).describedAs("lessThan").isLessThan(Semver.parse(lessThan));
     assertThat(new ComparableVersion(semv.toString())).describedAs("mvn").isLessThan(new ComparableVersion(lessThan));
 
     if (greaterThan != null) {
