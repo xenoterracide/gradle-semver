@@ -4,32 +4,44 @@
 
 package com.xenoterracide.gradle.git;
 
+import org.gradle.api.Incubating;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
 import org.jspecify.annotations.Nullable;
 
 public class GitRemoteForGradle {
 
+  private final DistanceCalculator distanceCalculator;
+  private final ProvidedFactory pf;
   private final String name;
   private final Provider<@Nullable String> headBranch;
 
-  public GitRemoteForGradle(ProvidedFactory pf, GitRemote remote) {
+  GitRemoteForGradle(ProvidedFactory pf, DistanceCalculator distanceCalculator, GitRemote remote) {
+    this.distanceCalculator = distanceCalculator;
     this.name = remote.name();
     this.headBranch = pf.providedString(remote::headBranch);
+    this.pf = pf;
   }
 
-  String getName() {
+  public String getName() {
     return this.name;
   }
 
-  Provider<@Nullable String> getHeadBranch() {
-    if (!this.headBranch.isPresent()) {
-      Logging.getLogger(this.getClass()).warn(
-        "Git remote {} has no HEAD branch; run `git remote set-head {} --auto`",
-        this.name,
-        this.name
+  public Provider<String> getHeadBranch() {
+    return this.headBranch.orElse(
+        pf.providedString(() -> {
+          Logging.getLogger(this.getClass()).warn(
+            "Git remote {} has no HEAD branch; run `git remote set-head {} --auto`",
+            this.name,
+            this.name
+          );
+          return null;
+        })
       );
-    }
-    return this.headBranch;
+  }
+
+  @Incubating
+  public Provider<@Nullable Long> distanceFromTagInCommonAncestorFromHead() {
+    return this.headBranch.map(this.distanceCalculator::apply);
   }
 }

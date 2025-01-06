@@ -56,7 +56,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Callable, Class)
    */
-  public Provider<@Nullable String> providedString(Provider<@Nullable String> callable) {
+  public Provider<String> providedString(Provider<String> callable) {
     return this.provided(callable, String.class);
   }
 
@@ -68,7 +68,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Callable, Class)
    */
-  public Provider<@Nullable Integer> providedInt(Callable<@Nullable Integer> callable) {
+  public Provider<Integer> providedInt(Callable<@Nullable Integer> callable) {
     return this.provided(callable, Integer.class);
   }
 
@@ -80,7 +80,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Callable, Class)
    */
-  public Provider<@Nullable Long> providedLong(Callable<@Nullable Long> callable) {
+  public Provider<Long> providedLong(Callable<@Nullable Long> callable) {
     return this.provided(callable, Long.class);
   }
 
@@ -92,7 +92,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Callable, Class)
    */
-  public Provider<@Nullable Long> providedLong(Provider<@Nullable Long> callable) {
+  public Provider<Long> providedLong(Provider<Long> callable) {
     return this.provided(callable, Long.class);
   }
 
@@ -144,7 +144,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Provider, Class)
    */
-  public <T> Provider<@Nullable T> provided(Callable<@Nullable T> callable, Class<T> type) {
+  public <T> Provider<T> provided(Callable<@Nullable T> callable, Class<T> type) {
     return this.provided(this.providerFactory.provider(callable), type);
   }
 

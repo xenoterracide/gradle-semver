@@ -28,10 +28,17 @@ public class GitExtension implements Provides<GitMetadata> {
     this.distance = pf.providedLong(this.gitMetadata.map(GitMetadata::distance));
     this.status = pf.provided(this.gitMetadata.map(GitMetadata::status), GitStatus.class);
     this.commit = pf.providedString(this.gitMetadata.map(GitMetadata::commit));
+
     this.remotes = pf.providedList(
-      this.gitMetadata.map(GitMetadata::remotes)
-        .map(remotes -> remotes.stream().map(r -> new GitRemoteForGradle(pf, r)).collect(Collectors.toList()))
-        .map(x -> x),
+      this.gitMetadata.map(GitMetadata::remotes).map(remotes ->
+          remotes
+            .stream()
+            .map(remote -> {
+              var dc = new DistanceCalculator(gitService.flatMap(GitService::provider)::get);
+              return new GitRemoteForGradle(pf, dc, remote);
+            })
+            .collect(Collectors.toList())
+        ),
       GitRemoteForGradle.class
     );
   }
