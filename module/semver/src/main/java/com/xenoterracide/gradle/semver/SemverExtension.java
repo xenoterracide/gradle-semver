@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -64,25 +64,27 @@ public class SemverExtension implements Provides<Semver> {
       .getExtensions()
       .getByType(GitExtension.class)
       .provider()
-      .map(gm -> {
-        var git =
+      .flatMap(gm -> {
+        var semver =
           this.project.getGradle()
             .getSharedServices()
             .getRegistrations()
             .named(GitService.class.getCanonicalName())
             .flatMap(BuildServiceRegistration::getService)
             .map(GitService.class::cast)
-            .flatMap(GitService::provider);
+            .flatMap(GitService::provider)
+            .map(git -> {
+              var dc = new DistanceCalculator(() -> git);
+              return new SemverBuilder(dc, gm.tag())
+                .withDirtyOut(this.getCheckDirty().getOrElse(false))
+                .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
+                .withRemoteForHeadBranchConfig(
+                  this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
+                )
+                .build();
+            })
+            .orElse(Semver.ZERO);
 
-        var dc = new DistanceCalculator(git::get);
-
-        var semver = new SemverBuilder(dc, gm.tag())
-          .withDirtyOut(this.getCheckDirty().getOrElse(false))
-          .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
-          .withRemoteForHeadBranchConfig(
-            this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
-          )
-          .build();
         this.log.info("semver {} {}", this.project.getName(), semver);
         return semver;
       });
