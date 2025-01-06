@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -18,14 +18,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.lib.Constants;
-import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 final class SemverBuilder {
 
   private static final String ALPHA = "alpha";
   private static final String SEMVER_DELIMITER = ".";
-  private static final String PRE_VERSION = "0.0.0";
   private static final String ZERO = "0";
 
   private final Function<String, Long> distanceCalculator;
@@ -35,13 +33,9 @@ final class SemverBuilder {
   private Semver semver;
   private boolean dirtyOut;
 
-  SemverBuilder(Function<String, Long> distanceCalculator, @Nullable String vString) {
+  SemverBuilder(Function<String, Long> distanceCalculator, Semver semver) {
     this.distanceCalculator = distanceCalculator;
-    this.semver = new Semver(tagFrom(vString));
-  }
-
-  static String tagFrom(@Nullable String vString) {
-    return vString == null ? PRE_VERSION : vString.substring(1);
+    this.semver = semver;
   }
 
   private void createPreRelease() {

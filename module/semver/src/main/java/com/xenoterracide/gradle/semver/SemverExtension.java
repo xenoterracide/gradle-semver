@@ -60,34 +60,33 @@ public class SemverExtension implements Provides<Semver> {
   }
 
   SemverExtension build() {
-    var semverProvider = project
-      .getExtensions()
-      .getByType(GitExtension.class)
-      .provider()
-      .flatMap(gm -> {
-        var semver =
-          this.project.getGradle()
-            .getSharedServices()
-            .getRegistrations()
-            .named(GitService.class.getCanonicalName())
-            .flatMap(BuildServiceRegistration::getService)
-            .map(GitService.class::cast)
-            .flatMap(GitService::provider)
-            .map(git -> {
-              var dc = new DistanceCalculator(() -> git);
-              return new SemverBuilder(dc, gm.tag())
-                .withDirtyOut(this.getCheckDirty().getOrElse(false))
-                .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
-                .withRemoteForHeadBranchConfig(
-                  this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
-                )
-                .build();
-            })
-            .orElse(Semver.ZERO);
+    var gitExt = project.getExtensions().getByType(GitExtension.class);
 
-        this.log.info("semver {} {}", this.project.getName(), semver);
-        return semver;
-      });
+    var semverProvider =
+      this.project.getGradle()
+        .getSharedServices()
+        .getRegistrations()
+        .named(GitService.class.getCanonicalName())
+        .flatMap(BuildServiceRegistration::getService)
+        .map(GitService.class::cast)
+        .flatMap(GitService::provider)
+        .map(git -> {
+          var dc = new DistanceCalculator(() -> git);
+          var semver = gitExt.getTag().map(Semver::parse).getOrElse(Semver.ZERO);
+
+          return new SemverBuilder(dc, semver)
+            .withDirtyOut(this.getCheckDirty().getOrElse(false))
+            .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
+            .withRemoteForHeadBranchConfig(
+              this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
+            )
+            .build();
+        })
+        .orElse(Semver.ZERO)
+        .map(semver -> {
+          this.log.info("semver {} {}", this.project.getName(), semver);
+          return semver;
+        });
 
     this.provider.set(semverProvider);
     this.provider.finalizeValueOnRead();
