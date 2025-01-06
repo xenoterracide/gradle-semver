@@ -69,22 +69,24 @@ public class SemverExtension implements Provides<Semver> {
         .flatMap(BuildServiceRegistration::getService)
         .map(GitService.class::cast)
         .flatMap(GitService::provider)
-        .zip(gitExt.getTag().map(Semver::parse).orElse(Semver.ZERO), (git, semver) ->
-          new SemverBuilder(semver)
-            .withDirtyOut(this.getCheckDirty().getOrElse(false))
-            .withDistance(gitExt.getDistance().get())
-            .withGitStatus(gitExt.getStatus().get())
-            .withUniqueShort(gitExt.getUniqueShort().get())
-            /*
+        .zip(
+          gitExt.getTag().map(vstring -> vstring.substring(1)).map(Semver::parse).orElse(Semver.ZERO),
+          (git, semver) ->
+            new SemverBuilder(semver)
+              .withDirtyOut(this.getCheckDirty().getOrElse(false))
+              .withDistance(gitExt.getDistance().get())
+              .withGitStatus(gitExt.getStatus().get())
+              .withUniqueShort(gitExt.getUniqueShort().get())
+              /*
           .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
           .withRemoteForHeadBranchConfig(
             this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
           )
 
            */
-            .build()
+              .build()
         )
-        .orElse(Semver.ZERO)
+        .orElse(Semver.ZERO) // ensure we have something even if git is not available
         .map(semver -> {
           this.log.info("semver {} {}", this.project.getName(), semver);
           return semver;
