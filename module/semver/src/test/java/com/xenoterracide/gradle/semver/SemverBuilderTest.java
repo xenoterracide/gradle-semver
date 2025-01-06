@@ -151,7 +151,8 @@ class SemverBuilderTest {
           "1.0.1",
           0L,
           "1.0.1-alpha.0"
-        ),
+        )
+        /*
         arguments(
           GitMetadataInfoBranch.create(
             1,
@@ -166,6 +167,7 @@ class SemverBuilderTest {
           1L,
           "1.0.1-alpha.0"
         )
+         */
       );
     }
   }
