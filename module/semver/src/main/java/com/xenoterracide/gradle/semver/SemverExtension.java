@@ -9,6 +9,7 @@ import com.xenoterracide.gradle.git.GitExtension;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import com.xenoterracide.gradle.git.RemoteForHeadBranch;
+import java.util.Objects;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -61,7 +62,7 @@ public class SemverExtension implements Provides<Semver> {
 
     var semverProvider = gitExt
       .getTag()
-      .map(Semver::coerce)
+      .map(tag -> Objects.requireNonNull(Semver.parse(tag)))
       .orElse(Semver.ZERO)
       .map(semver ->
         new SemverBuilder(semver)

@@ -37,9 +37,10 @@ testing {
     withType<JvmTestSuite>().configureEach {
       dependencies {
         implementation(project())
-        implementation(libs.junit.api)
+        implementation.bundle(libs.bundles.test.impl)
         implementation(testFixtures(projects.git))
         implementation(gradleTestKit())
+        runtimeOnly.bundle(libs.bundles.test.runtime)
       }
     }
     val test by getting(JvmTestSuite::class) {
@@ -50,15 +51,13 @@ testing {
 
     val testIntegration by registering(JvmTestSuite::class) {
       dependencies {
-        runtimeOnly.bundle(libs.bundles.test.runtime)
-        implementation.bundle(libs.bundles.test.impl)
       }
     }
-
-    tasks.check {
-      dependsOn(testIntegration)
-    }
   }
+}
+
+tasks.check {
+  dependsOn(testing.suites.named("testIntegration"))
 }
 
 tasks.withType<ShadowJar>().configureEach {

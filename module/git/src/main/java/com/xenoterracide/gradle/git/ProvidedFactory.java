@@ -61,30 +61,6 @@ public final class ProvidedFactory {
   }
 
   /**
-   * Shortcut to {@link #provided(Callable, Class)} for {@link Integer}.
-   *
-   * @param callable
-   *   function to provide value
-   * @return provider
-   * @see #provided(Callable, Class)
-   */
-  public Provider<Integer> providedInt(Callable<@Nullable Integer> callable) {
-    return this.provided(callable, Integer.class);
-  }
-
-  /**
-   * Shortcut to {@link #provided(Callable, Class)} for {@link Long}.
-   *
-   * @param callable
-   *   function to provide value
-   * @return provider
-   * @see #provided(Callable, Class)
-   */
-  public Provider<Long> providedLong(Callable<@Nullable Long> callable) {
-    return this.provided(callable, Long.class);
-  }
-
-  /**
    * Shortcut to {@link #provided(Callable, Class)} for {@link Long}.
    *
    * @param callable
@@ -108,22 +84,6 @@ public final class ProvidedFactory {
    * @return string provider
    * @see #provided(Provider, Class)
    */
-  public <E> Provider<List<E>> providedList(Callable<List<E>> callable, Class<E> type) {
-    return this.providedList(this.providerFactory.provider(callable), type);
-  }
-
-  /**
-   * Provides functionality similar to {@link #provided(Callable, Class)} for {@link List}.
-   *
-   * @param <E>
-   *   element type for list
-   * @param callable
-   *   function to provide value
-   * @param type
-   *   element class
-   * @return string provider
-   * @see #provided(Provider, Class)
-   */
   public <E> Provider<List<E>> providedList(Provider<List<E>> callable, Class<E> type) {
     var prop = this.objectFactory.listProperty(type);
     prop.set(callable);
@@ -133,7 +93,7 @@ public final class ProvidedFactory {
   }
 
   /**
-   * Create a cached {@link Provider}
+   * Create a cached {@link Provider}.
    *
    * @param <T>
    *   type the provider returns
@@ -149,7 +109,7 @@ public final class ProvidedFactory {
   }
 
   /**
-   * Create a cached {@link Provider}
+   * Create a cached {@link Provider}.
    *
    * @param <T>
    *   type the provider returns

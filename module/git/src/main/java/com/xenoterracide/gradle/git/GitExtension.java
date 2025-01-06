@@ -20,6 +20,7 @@ public class GitExtension implements Provides<GitMetadata> {
   private final Provider<String> commit;
   private final Provider<List<GitRemoteForGradle>> remotes;
 
+  @SuppressWarnings("NullAway") // false positive https://github.com/uber/NullAway/issues/1123
   public GitExtension(Provider<GitService> gitService, ProvidedFactory pf) {
     this.gitMetadata = gitService.map(GitService::provider).map(git -> new GitMetadataImpl(git::get));
     this.branch = pf.providedString(this.gitMetadata.map(GitMetadata::branch));

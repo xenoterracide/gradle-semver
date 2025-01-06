@@ -81,7 +81,6 @@ tasks.withType<JavaCompile>().configureEach {
         "org.assertj",
         "org.eclipse.jgit",
         "org.junit",
-        "org.gradle", // annotated but causing a false positive
       ).joinToString(","),
     )
 
