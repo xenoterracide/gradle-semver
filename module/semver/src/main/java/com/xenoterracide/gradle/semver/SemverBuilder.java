@@ -4,20 +4,12 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.git.BranchOutput;
-import com.xenoterracide.gradle.git.GitRemote;
 import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.git.HeadBranchNotAvailable;
-import com.xenoterracide.gradle.git.RemoteForHeadBranch;
-import com.xenoterracide.tools.java.function.PredicateTools;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jgit.lib.Constants;
+import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 final class SemverBuilder {
@@ -26,21 +18,21 @@ final class SemverBuilder {
   private static final String SEMVER_DELIMITER = ".";
   private static final String ZERO = "0";
 
-  private final Function<String, Long> distanceCalculator;
-  private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
-  private RemoteForHeadBranch remoteForHeadBranch = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
-  private String remote = "origin";
+  // private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
+  // private RemoteForHeadBranch remoteForHeadBranch = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
+  // private String remote = "origin";
   private Semver semver;
   private boolean dirtyOut;
+  private long distance;
+  private @Nullable String uniqueShort;
+  private @Nullable GitStatus status;
 
-  SemverBuilder(Function<String, Long> distanceCalculator, Semver semver) {
-    this.distanceCalculator = distanceCalculator;
+  SemverBuilder(Semver semver) {
     this.semver = semver;
   }
 
   private void createPreRelease() {
-    var distance = this.gitMetadata.distance();
-    if (distance > 0) {
+    if (this.distance > 0) {
       if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
         this.semver = this.semver.withIncPatch()
           .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Long.toString(distance)));
@@ -57,6 +49,7 @@ final class SemverBuilder {
     }
   }
 
+  /*
   boolean doesNotHaveHeadBranch() {
     return this.gitMetadata.remotes().stream().map(GitRemote::headBranch).noneMatch(Objects::nonNull);
   }
@@ -91,6 +84,7 @@ final class SemverBuilder {
     return this.gitMetadata.branch();
   }
 
+
   Optional<String> getBranch() {
     if (this.branchOutput == BranchOutput.ALWAYS) return Optional.ofNullable(this.gitMetadata.branch());
     if (this.branchOutput == BranchOutput.NONE || this.doesNotHaveHeadBranch()) return Optional.empty();
@@ -98,18 +92,18 @@ final class SemverBuilder {
     return Optional.ofNullable(this.gitMetadata.branch());
   }
 
-  private void createBuild() {
-    var distance = this.getDistance();
-    if (distance > 0) {
-      var sha = Optional.ofNullable(this.gitMetadata.uniqueShort()).map(s -> "g" + s);
-      var status = Optional.ofNullable(this.dirtyOut ? this.gitMetadata.status() : null)
+   */
+
+  Optional<String> createBuild() {
+    if (this.distance > 0) {
+      var sha = Optional.ofNullable(uniqueShort).map(s -> "g" + s);
+      var status = Optional.ofNullable(this.dirtyOut ? this.status : null)
         .filter(s -> s == GitStatus.DIRTY)
         .map(Object::toString);
-      this.semver = sha
-        .map(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)).orElse(s))
-        .map(s -> this.semver.withBuild(s))
-        .orElse(this.semver);
+
+      return sha.map(s -> status.map(sta -> String.join(SEMVER_DELIMITER, s, sta)).orElse(s));
     }
+    return Optional.empty();
   }
 
   SemverBuilder withDirtyOut(boolean dirtyOut) {
@@ -117,6 +111,7 @@ final class SemverBuilder {
     return this;
   }
 
+  /*
   SemverBuilder withBranchOutput(BranchOutput branchOutput) {
     this.branchOutput = branchOutput;
     return this;
@@ -131,17 +126,25 @@ final class SemverBuilder {
     this.remoteForHeadBranch = remoteForHeadBranch;
     return this;
   }
+*/
+  SemverBuilder withUniqueShort(String uniqueShort) {
+    this.uniqueShort = uniqueShort;
+    return this;
+  }
+
+  SemverBuilder withDistance(long distance) {
+    this.distance = distance;
+    return this;
+  }
+
+  SemverBuilder withGitStatus(GitStatus status) {
+    this.status = status;
+    return this;
+  }
 
   Semver build() throws HeadBranchNotAvailable {
     this.createPreRelease();
-    this.createBuild();
+    this.createBuild().ifPresent(build -> this.semver = this.semver.withBuild(build));
     return this.semver;
-  }
-
-  long getDistance() {
-    if (this.branchOutput == BranchOutput.NONE || this.doesNotHaveHeadBranch()) {
-      return this.gitMetadata.distance();
-    }
-    return this.distanceCalculator.apply(this.getHeadBranch());
   }
 }

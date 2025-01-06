@@ -5,7 +5,6 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.git.BranchOutput;
-import com.xenoterracide.gradle.git.DistanceCalculator;
 import com.xenoterracide.gradle.git.GitExtension;
 import com.xenoterracide.gradle.git.GitService;
 import com.xenoterracide.gradle.git.ProvidedFactory;
@@ -70,18 +69,21 @@ public class SemverExtension implements Provides<Semver> {
         .flatMap(BuildServiceRegistration::getService)
         .map(GitService.class::cast)
         .flatMap(GitService::provider)
-        .map(git -> {
-          var dc = new DistanceCalculator(() -> git);
-          var semver = gitExt.getTag().map(Semver::parse).getOrElse(Semver.ZERO);
-
-          return new SemverBuilder(dc, semver)
+        .zip(gitExt.getTag().map(Semver::parse).orElse(Semver.ZERO), (git, semver) ->
+          new SemverBuilder(semver)
             .withDirtyOut(this.getCheckDirty().getOrElse(false))
-            .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
-            .withRemoteForHeadBranchConfig(
-              this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
-            )
-            .build();
-        })
+            .withDistance(gitExt.getDistance().get())
+            .withGitStatus(gitExt.getStatus().get())
+            .withUniqueShort(gitExt.getUniqueShort().get())
+            /*
+          .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
+          .withRemoteForHeadBranchConfig(
+            this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
+          )
+
+           */
+            .build()
+        )
         .orElse(Semver.ZERO)
         .map(semver -> {
           this.log.info("semver {} {}", this.project.getName(), semver);
