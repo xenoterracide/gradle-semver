@@ -1,23 +1,22 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package com.xenoterracide.gradle.git;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.eclipse.jgit.lib.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DistanceCalculator implements Function<String, Long> {
+class DistanceCalculator implements Function<String, Long> {
 
   private final TryGit git;
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  public DistanceCalculator(TryGit git) {
+  DistanceCalculator(TryGit git) {
     this.git = git;
   }
 
@@ -31,9 +30,8 @@ public class DistanceCalculator implements Function<String, Long> {
       .get();
   }
 
-  public long distance(ObjectId oid) {
+  long distance(ObjectId oid) {
     return this.git.tryGit(Describer.describe(oid))
-      .filter(Objects::nonNull)
       .map(Describer.Described::distance)
       .recover(NoSuchElementException.class, e -> this.distanceFromNoTag(oid))
       .onFailure(e -> this.log.error("failed to get distance", e))

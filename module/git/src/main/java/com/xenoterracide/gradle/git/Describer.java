@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -14,7 +14,7 @@ import org.eclipse.jgit.errors.InvalidPatternException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.jspecify.annotations.Nullable;
 
-public class Describer implements CheckedFunction1<Git, Describer.Described> {
+class Describer implements CheckedFunction1<Git, Describer.Described> {
 
   private static final long serialVersionUID = 1L;
   private static final Splitter DESCRIBE_SPLITTER = Splitter.on('-');
@@ -32,13 +32,12 @@ public class Describer implements CheckedFunction1<Git, Describer.Described> {
 
   @Override
   public @Nullable Described apply(Git git) throws InvalidPatternException, IOException, GitAPIException {
-    var cmd = git.describe().setMatch(VERSION_GLOB).setLong(true).setTags(true);
-    if (oid != null) cmd.setTarget(oid);
+    var cmd = git.describe().setMatch(VERSION_GLOB).setLong(true).setTags(true).setTarget(this.oid);
     var desc = cmd.call();
     return desc != null ? new Described(DESCRIBE_SPLITTER.splitToList(desc)) : null;
   }
 
-  public static class Described {
+  static class Described {
 
     private final List<String> parts;
 
@@ -46,16 +45,18 @@ public class Describer implements CheckedFunction1<Git, Describer.Described> {
       this.parts = parts;
     }
 
-    public @Nullable ObjectId commit() {
-      return parts.size() > 1 ? ObjectId.fromString(parts.get(parts.size() - 1)) : null;
+    @Nullable
+    ObjectId commit() {
+      return this.parts.size() > 1 ? ObjectId.fromString(this.parts.get(this.parts.size() - 1)) : null;
     }
 
-    public long distance() {
-      return parts.size() > 2 ? Long.parseLong(parts.get(parts.size() - 2)) : 0;
+    long distance() {
+      return this.parts.size() > 2 ? Long.parseLong(this.parts.get(this.parts.size() - 2)) : 0;
     }
 
-    public @Nullable String tag() {
-      return !parts.isEmpty() ? parts.get(0) : null;
+    @Nullable
+    String tag() {
+      return !this.parts.isEmpty() ? this.parts.get(0) : null;
     }
   }
 }
