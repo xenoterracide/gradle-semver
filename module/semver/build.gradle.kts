@@ -54,6 +54,10 @@ testing {
         implementation.bundle(libs.bundles.test.impl)
       }
     }
+
+    tasks.check {
+      dependsOn(testIntegration)
+    }
   }
 }
 
