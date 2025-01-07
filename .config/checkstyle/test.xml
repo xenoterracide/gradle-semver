@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--
-SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 
 SPDX-License-Identifier: CC0-1.0
 -->
@@ -163,7 +163,9 @@ SPDX-License-Identifier: CC0-1.0
     <!-- Checks for Size Violations https://checkstyle.org/checks/sizes/ -->
     <module name="AnonInnerLength" />
     <module name="ExecutableStatementCount" />
-    <module name="LambdaBodyLength" />
+    <module name="LambdaBodyLength">
+      <property name="max" value="20" />
+    </module>
     <module name="MethodCount" />
     <module name="MethodLength" />
     <module name="OuterTypeNumber" />

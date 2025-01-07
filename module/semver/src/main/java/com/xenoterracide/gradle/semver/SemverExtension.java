@@ -12,6 +12,7 @@ import com.xenoterracide.gradle.git.RemoteForHeadBranch;
 import java.util.Objects;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
+import org.gradle.api.Transformer;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
@@ -27,7 +28,10 @@ import org.semver4j.Semver;
  *  <li>{@link Semver}</li>
  * </ul>
  */
+// CHECKSTYLE.OFF: FinalClass
 public class SemverExtension implements Provides<Semver> {
+
+  // CHECKSTYLE.ON: FinalClass
 
   private final Logger log = Logging.getLogger(this.getClass());
   private final Property<Semver> provider;
@@ -57,28 +61,32 @@ public class SemverExtension implements Provides<Semver> {
     return new SemverExtension(project).build();
   }
 
+  Transformer<Semver, Semver> configureBuilder(GitExtension gitExt) {
+    return semver -> {
+      return new SemverBuilder(semver)
+        .withDirtyOut(this.getCheckDirty().getOrElse(false))
+        .withDistance(gitExt.getDistance().get())
+        .withGitStatus(gitExt.getStatus().get())
+        .withUniqueShort(gitExt.getUniqueShort().get())
+        /*
+      .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
+      .withRemoteForHeadBranchConfig(
+        this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
+      )
+
+       */
+        .build();
+    };
+  }
+
   SemverExtension build() {
-    var gitExt = project.getExtensions().getByType(GitExtension.class);
+    var gitExt = this.project.getExtensions().getByType(GitExtension.class);
 
     var semverProvider = gitExt
       .getTag()
       .map(tag -> Objects.requireNonNull(Semver.parse(tag)))
       .orElse(Semver.ZERO)
-      .map(semver ->
-        new SemverBuilder(semver)
-          .withDirtyOut(this.getCheckDirty().getOrElse(false))
-          .withDistance(gitExt.getDistance().get())
-          .withGitStatus(gitExt.getStatus().get())
-          .withUniqueShort(gitExt.getUniqueShort().get())
-          /*
-        .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
-        .withRemoteForHeadBranchConfig(
-          this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
-        )
-
-         */
-          .build()
-      )
+      .map(this.configureBuilder(gitExt))
       .map(semver -> {
         this.log.info("semver {} {}", this.project.getName(), semver);
         return semver;
@@ -137,6 +145,13 @@ public class SemverExtension implements Provides<Semver> {
     return this.remoteForHeadBranchConfig;
   }
 
+  /**
+   * Remote to use for head branch configuration.
+   *
+   * @return remote configuration property
+   * @implNote The plugin defaults to "origin"
+   */
+  @Incubating
   public Property<String> getRemote() {
     return this.remote;
   }

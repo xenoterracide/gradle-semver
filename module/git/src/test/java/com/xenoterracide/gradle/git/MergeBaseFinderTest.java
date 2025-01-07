@@ -121,8 +121,6 @@ class MergeBaseFinderTest {
     var gitMetadata = new GitMetadataImpl(this.git);
     var origin = gitMetadata.remotes().getFirst();
     var mergeBase = new MergeBaseFinder(git.get().getRepository());
-    CheckedFunction0<ObjectId> remoteHead = () -> git.get().getRepository().resolve("refs/remotes/origin/HEAD");
-    Supplier<String> gitLog = () -> Joiner.on('\n').join(git.tryCommand(g -> g.log().all()));
 
     assertThat(mergeBase.find(origin)).isPresent().hasValue(initialCommit);
     var oid1 = commit(git);
@@ -130,6 +128,7 @@ class MergeBaseFinderTest {
 
     git.tryCommand(Git::push);
 
+    CheckedFunction0<ObjectId> remoteHead = () -> git.get().getRepository().resolve("refs/remotes/origin/HEAD");
     log.warn("first {} | {}", oid1, remoteHead.apply());
     assertThat(mergeBase.find(origin)).isPresent().hasValue(oid1);
 
@@ -143,6 +142,7 @@ class MergeBaseFinderTest {
 
     git.tryCommand(Git::push);
 
+    Supplier<String> gitLog = () -> Joiner.on('\n').join(git.tryCommand(g -> g.log().all()));
     assertThat(mergeBase.find(origin)).isPresent().as(gitLog).hasValue(oid2);
   }
 }
