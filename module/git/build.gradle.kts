@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -63,13 +63,13 @@ tasks.withType<ShadowJar>().configureEach {
 gradlePlugin {
   plugins {
     register("com.xenoterracide.gradle.semver") {
-      displayName = "Semver with Git"
-      implementationClass = "com.xenoterracide.gradle.semver.SemverPlugin"
+      displayName = "Git Metadata"
+      implementationClass = "com.xenoterracide.gradle.git.GitPlugin"
       description =
         """
-        A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
+        This plugin provides git metadata
         """.trimIndent()
-      tags = setOf("semver", "versioning", "git", "version")
+      tags = setOf("git")
       id = name
     }
   }

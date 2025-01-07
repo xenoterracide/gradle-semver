@@ -1,4 +1,5 @@
-// © Copyright 2023-2024 Caleb Cushing
+// Copyright 2023 - 2025 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
 
 import org.gradle.accessors.dm.LibrariesForLibs
@@ -12,12 +13,27 @@ plugins {
 
 val libs = the<LibrariesForLibs>()
 
-dependencies {
-  testImplementation(platform(libs.junit.bom))
-  testImplementation(libs.bundles.test.impl)
+testing {
+  suites {
+    withType<JvmTestSuite>().configureEach {
+      dependencies {
+        implementation(gradleTestKit())
+        implementation(platform(libs.junit.bom))
+        implementation(project())
+        implementation.bundle(libs.bundles.test.impl)
+        runtimeOnly.bundle(libs.bundles.test.runtime)
+      }
+    }
 
-  testRuntimeOnly(platform(libs.junit.bom))
-  testRuntimeOnly(libs.bundles.test.runtime)
+    val testIntegration by registering(JvmTestSuite::class) {
+      dependencies {
+      }
+    }
+  }
+}
+
+tasks.check {
+  dependsOn(testing.suites.named("testIntegration"))
 }
 
 val available =

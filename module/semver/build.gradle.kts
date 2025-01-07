@@ -20,38 +20,27 @@ dependencyLocking {
 }
 
 dependencies {
-  api(projects.git)
-
-  compileOnlyApi(libs.jspecify)
   api(libs.semver)
-  implementation(libs.vavr)
-  implementation(libs.guava)
+  api(projects.git)
+  compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang)
+  implementation(libs.guava)
   implementation(libs.java.tools)
-  shadow(libs.vavr)
+  implementation(libs.vavr)
   shadow(libs.semver)
+  shadow(libs.vavr)
 }
 
 testing {
   suites {
     withType<JvmTestSuite>().configureEach {
       dependencies {
-        implementation(gradleTestKit())
-        implementation(platform(libs.junit.bom))
-        implementation(project())
         implementation(testFixtures(projects.git))
-        implementation.bundle(libs.bundles.test.impl)
-        runtimeOnly.bundle(libs.bundles.test.runtime)
       }
     }
     val test by getting(JvmTestSuite::class) {
       dependencies {
         implementation(libs.maven.artifact)
-      }
-    }
-
-    val testIntegration by registering(JvmTestSuite::class) {
-      dependencies {
       }
     }
   }
