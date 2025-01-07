@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 import org.gradle.api.Incubating;
 import org.gradle.api.provider.Provider;
 
+/**
+ * Extension for the {@link GitPlugin} mainly providing {@link Provider}'s for {@link GitMetadata}.
+ */
 public class GitExtension implements Provides<GitMetadata> {
 
   private final Provider<GitMetadata> gitMetadata;

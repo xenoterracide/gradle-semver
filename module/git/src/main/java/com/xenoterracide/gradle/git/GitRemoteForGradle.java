@@ -42,17 +42,22 @@ public class GitRemoteForGradle {
    */
   public Provider<String> getHeadBranch() {
     return this.headBranch.orElse(
-        pf.providedString(() -> {
-          Logging.getLogger(this.getClass()).warn(
-            "Git remote {} has no HEAD branch; run `git remote set-head {} --auto`",
-            this.name,
-            this.name
-          );
-          return null;
-        })
+        this.pf.providedString(() -> {
+            Logging.getLogger(this.getClass()).warn(
+              "Git remote {} has no HEAD branch; run `git remote set-head {} --auto`",
+              this.name,
+              this.name
+            );
+            return null;
+          })
       );
   }
 
+  /**
+   * Gets the distance from the tag in the common ancestor from the head branch.
+   *
+   * @return the distance
+   */
   @Incubating
   public Provider<@Nullable Long> distanceFromTagInCommonAncestorFromHead() {
     return this.headBranch.map(this.distanceCalculator::apply);
