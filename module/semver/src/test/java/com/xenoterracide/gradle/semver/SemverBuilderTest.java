@@ -136,6 +136,7 @@ class SemverBuilderTest {
           0L,
           "1.0.1-alpha.0"
         )
+        // CHECKSTYLE.OFF: CommentsIndentation
         /*
         arguments(
           GitMetadataInfoBranch.create(
@@ -151,7 +152,8 @@ class SemverBuilderTest {
           1L,
           "1.0.1-alpha.0"
         )
-         */
+        */
+        // CHECKSTYLE.ON: CommentsIndentation
       );
     }
   }
