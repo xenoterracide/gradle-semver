@@ -63,6 +63,7 @@ class SemverBuilderTest {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+      // CHECKSTYLE.OFF: CommentsIndentation
       return Stream.of(
         arguments(
           new GitMetadataInfoNoBranch(0, GitStatus.NO_REPO, null, null),
@@ -136,7 +137,6 @@ class SemverBuilderTest {
           0L,
           "1.0.1-alpha.0"
         )
-        // CHECKSTYLE.OFF: CommentsIndentation
         /*
         arguments(
           GitMetadataInfoBranch.create(
@@ -153,8 +153,8 @@ class SemverBuilderTest {
           "1.0.1-alpha.0"
         )
         */
-        // CHECKSTYLE.ON: CommentsIndentation
       );
+      // CHECKSTYLE.ON: CommentsIndentation
     }
   }
 
