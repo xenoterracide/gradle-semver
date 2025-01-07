@@ -36,10 +36,11 @@ testing {
   suites {
     withType<JvmTestSuite>().configureEach {
       dependencies {
-        implementation(project())
-        implementation.bundle(libs.bundles.test.impl)
-        implementation(testFixtures(projects.git))
         implementation(gradleTestKit())
+        implementation(platform(libs.junit.bom))
+        implementation(project())
+        implementation(testFixtures(projects.git))
+        implementation.bundle(libs.bundles.test.impl)
         runtimeOnly.bundle(libs.bundles.test.runtime)
       }
     }
