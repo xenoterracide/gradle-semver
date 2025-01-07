@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,7 +7,7 @@ package com.xenoterracide.gradle.git;
 import org.eclipse.jgit.util.SystemReader;
 import org.eclipse.jgit.util.SystemReader.Delegate;
 
-public class NoExecSystemReader extends Delegate {
+class NoExecSystemReader extends Delegate {
   static {
     getCreateAndSet();
   }

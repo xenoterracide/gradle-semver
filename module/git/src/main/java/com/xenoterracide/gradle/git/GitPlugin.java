@@ -7,6 +7,9 @@ package com.xenoterracide.gradle.git;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+/**
+ * A plugin that provides Git-related functionality.
+ */
 public class GitPlugin implements Plugin<Project> {
 
   private static final String GIT = "git";

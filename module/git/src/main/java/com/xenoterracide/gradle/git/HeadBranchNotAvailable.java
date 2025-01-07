@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,7 +16,7 @@ public class HeadBranchNotAvailable extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public HeadBranchNotAvailable() {
+  HeadBranchNotAvailable() {
     super("HEAD branch not available. Run `git remote set-head <remote> --auto`");
   }
 }

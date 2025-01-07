@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,6 +11,9 @@ import org.gradle.api.provider.ValueSource;
 import org.gradle.api.provider.ValueSourceParameters;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A {@link ValueSource} that obtains a {@link File} representing a Git directory.
+ */
 public abstract class GitDirectoryValueSource implements ValueSource<File, GitDirectoryValueSource.Parameters> {
 
   @Override
@@ -22,7 +25,15 @@ public abstract class GitDirectoryValueSource implements ValueSource<File, GitDi
       .getGitDir();
   }
 
+  /**
+   * Parameters for {@link GitDirectoryValueSource}.
+   */
   public interface Parameters extends ValueSourceParameters {
+    /**
+     * Returns the project directory.
+     *
+     * @return the project directory
+     */
     DirectoryProperty getProjectDirectory();
   }
 }

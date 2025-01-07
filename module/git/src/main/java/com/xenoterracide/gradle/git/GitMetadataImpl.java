@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,11 +16,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -47,13 +48,7 @@ public class GitMetadataImpl implements GitMetadata {
 
   private final TryGit git;
 
-  /**
-   * Instantiates a new Git metadata extension.
-   *
-   * @param git
-   *   a jgit instance supplier
-   */
-  public GitMetadataImpl(TryGit git) {
+  GitMetadataImpl(TryGit git) {
     this.git = git;
   }
 
@@ -194,7 +189,7 @@ public class GitMetadataImpl implements GitMetadata {
 
     @Override
     public @Nullable String headBranch() {
-      return StringUtils.removeStart(this.headBranch, Constants.R_REMOTES + "/" + this.name);
+      return StringUtils.removeStart(this.headBranch, Constants.R_REMOTES + this.name);
     }
 
     @Override
@@ -204,10 +199,7 @@ public class GitMetadataImpl implements GitMetadata {
 
     @Override
     public String toString() {
-      return new StringJoiner(", ", RemoteImpl.class.getSimpleName() + "[", "]")
-        .add("name='" + name + "'")
-        .add("headBranch='" + headBranch + "'")
-        .toString();
+      return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
   }
 }
