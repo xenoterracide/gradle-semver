@@ -8,6 +8,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.KotlinClosure2
 
 plugins {
+  `java-gradle-plugin`
   `java-library`
 }
 
@@ -29,7 +30,18 @@ testing {
         implementation(project())
       }
     }
+
+    val testIntegration by registering(JvmTestSuite::class) {
+      gradlePlugin.testSourceSet(sources)
+      dependencies {
+        runtimeOnly(project())
+      }
+    }
   }
+}
+
+tasks.check {
+  dependsOn(testing.suites.named("testIntegration"))
 }
 
 val available =
