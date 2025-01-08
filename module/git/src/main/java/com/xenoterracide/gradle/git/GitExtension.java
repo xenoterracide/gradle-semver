@@ -14,7 +14,7 @@ import org.gradle.api.provider.Provider;
  */
 public class GitExtension implements Provides<GitMetadata> {
 
-  private final Provider<GitMetadata> gitMetadata;
+  private final Provider<GitMetadata> provider;
   private final Provider<String> uniqueShort;
   private final Provider<String> tag;
   private final Provider<Long> distance;
@@ -26,16 +26,16 @@ public class GitExtension implements Provides<GitMetadata> {
   @SuppressWarnings("NullAway")
   // false positive https://github.com/uber/NullAway/issues/1123
   GitExtension(Provider<GitService> gitService, ProvidedFactory pf) {
-    this.gitMetadata = gitService.map(GitService::getProvider).map(git -> new GitMetadataImpl(git::getOrNull));
-    this.branch = pf.providedString(this.gitMetadata.map(GitMetadata::branch));
-    this.uniqueShort = pf.providedString(this.gitMetadata.map(GitMetadata::uniqueShort));
-    this.tag = pf.providedString(this.gitMetadata.map(GitMetadata::tag));
-    this.distance = pf.providedLong(this.gitMetadata.map(GitMetadata::distance));
-    this.status = pf.provided(this.gitMetadata.map(GitMetadata::status), GitStatus.class);
-    this.commit = pf.providedString(this.gitMetadata.map(GitMetadata::commit));
+    this.provider = gitService.map(GitService::getProvider).map(git -> new GitMetadataImpl(git::getOrNull));
+    this.branch = pf.providedString(this.provider.map(GitMetadata::branch));
+    this.uniqueShort = pf.providedString(this.provider.map(GitMetadata::uniqueShort));
+    this.tag = pf.providedString(this.provider.map(GitMetadata::tag));
+    this.distance = pf.providedLong(this.provider.map(GitMetadata::distance));
+    this.status = pf.provided(this.provider.map(GitMetadata::status), GitStatus.class);
+    this.commit = pf.providedString(this.provider.map(GitMetadata::commit));
 
     this.remotes = pf.providedList(
-      this.gitMetadata.map(GitMetadata::remotes).map(remotes ->
+      this.provider.map(GitMetadata::remotes).map(remotes ->
           remotes
             .stream()
             .map(remote -> {
@@ -50,7 +50,7 @@ public class GitExtension implements Provides<GitMetadata> {
 
   @Override
   public Provider<GitMetadata> getProvider() {
-    return this.gitMetadata;
+    return this.provider;
   }
 
   /**
