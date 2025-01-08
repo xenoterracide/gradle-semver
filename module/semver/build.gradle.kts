@@ -23,13 +23,8 @@ dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
-  implementation(libs.commons.lang)
-  implementation(libs.guava)
-  implementation(libs.java.tools)
-  implementation(libs.vavr)
   shadow(libs.jspecify)
   shadow(libs.semver)
-  shadow(libs.vavr)
   shadow(projects.git)
 }
 
@@ -38,6 +33,7 @@ testing {
     withType<JvmTestSuite>().configureEach {
       dependencies {
         implementation(testFixtures(projects.git))
+        implementation(libs.jgit)
       }
     }
     val test by getting(JvmTestSuite::class) {
@@ -51,9 +47,7 @@ testing {
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
   relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
-  relocate("com.xenoterracide.tools.java", "com.xenoterracide.tools.java")
   dependencies {
-    exclude { it.moduleGroup == "io.vavr" }
     exclude { it.moduleGroup == "org.jspecify" }
     exclude { it.moduleGroup == "org.slf4j" }
     exclude { it.moduleName == "com.xenoterracide.gradle.git" }

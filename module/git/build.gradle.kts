@@ -22,13 +22,14 @@ dependencyLocking {
 
 dependencies {
   api(libs.jgit)
+  api(libs.vavr)
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang)
   implementation(libs.guava)
   implementation(libs.java.tools)
-  implementation(libs.vavr)
   shadow(libs.vavr)
-  testFixturesImplementation(libs.jgit)
+  testFixturesApi(libs.jgit)
+  testFixturesApi(libs.jspecify)
 }
 
 testing {
@@ -66,5 +67,11 @@ gradlePlugin {
       tags = setOf("git")
       id = name
     }
+  }
+}
+
+dependencyAnalysis {
+  issues {
+    onAny { exclude("org.slf4j:slf4j-api") }
   }
 }
