@@ -69,9 +69,3 @@ gradlePlugin {
     }
   }
 }
-
-dependencyAnalysis {
-  issues {
-    onAny { exclude("org.slf4j:slf4j-api") }
-  }
-}

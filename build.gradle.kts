@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -43,10 +43,12 @@ dependencyAnalysis {
     all {
       onAny {
         severity("fail")
+        exclude("org.slf4j:slf4j-api")
       }
       onUnusedDependencies {
         exclude(libs.junit.parameters)
       }
+      ignoreSourceSet("testIntegration")
     }
   }
 }
