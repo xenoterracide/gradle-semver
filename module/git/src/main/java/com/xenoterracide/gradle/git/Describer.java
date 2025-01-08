@@ -45,18 +45,8 @@ class Describer implements CheckedFunction1<Git, Describer.Described> {
       this.parts = parts;
     }
 
-    @Nullable
-    ObjectId commit() {
-      return this.parts.size() > 1 ? ObjectId.fromString(this.parts.get(this.parts.size() - 1)) : null;
-    }
-
     long distance() {
       return this.parts.size() > 2 ? Long.parseLong(this.parts.get(this.parts.size() - 2)) : 0;
-    }
-
-    @Nullable
-    String tag() {
-      return !this.parts.isEmpty() ? this.parts.get(0) : null;
     }
   }
 }
