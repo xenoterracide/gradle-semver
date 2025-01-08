@@ -28,7 +28,7 @@ class SemverPluginIntegrationTest {
 
   static final String LOGGING =
     """
-      logger.quiet("semver:" + semver.provider.getOrNull())
+        logger.quiet("semver:" + semver.provider.get())
     """;
   static final String GROOVY_SCRIPT =
     """

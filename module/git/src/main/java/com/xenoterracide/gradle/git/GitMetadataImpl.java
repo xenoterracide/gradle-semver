@@ -64,8 +64,8 @@ public class GitMetadataImpl implements GitMetadata {
 
   Try<Repository> gitRepository() {
     return Try.of(this.git::get)
-      .filter(git -> git != null)
-      .map(git -> git.getRepository())
+      .filter(Objects::nonNull)
+      .map(Git::getRepository)
       .onFailure(e -> this.log.error("failed to get repository", e));
   }
 

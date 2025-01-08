@@ -67,7 +67,7 @@ public class SemverExtension implements Provides<Semver> {
         .withDirtyOut(this.getCheckDirty().getOrElse(false))
         .withDistance(gitExt.getDistance().get())
         .withGitStatus(gitExt.getStatus().get())
-        .withUniqueShort(gitExt.getUniqueShort().get())
+        .withUniqueShort(gitExt.getUniqueShort().getOrNull())
         /*
       .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
       .withRemoteForHeadBranchConfig(
