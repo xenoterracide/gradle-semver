@@ -64,8 +64,8 @@ public class GitMetadataImpl implements GitMetadata {
 
   Try<Repository> gitRepository() {
     return Try.of(this.git::get)
-      .map(Git::getRepository)
-      .filter(Objects::nonNull)
+      .filter(git -> git != null)
+      .map(git -> git.getRepository())
       .onFailure(e -> this.log.error("failed to get repository", e));
   }
 
@@ -76,7 +76,10 @@ public class GitMetadataImpl implements GitMetadata {
    */
   @Override
   public @Nullable String branch() {
-    return this.gitRepository().mapTry(Repository::getBranch).getOrNull();
+    return this.gitRepository()
+      .mapTry(Repository::getBranch)
+      .recover(NoSuchElementException.class, e -> null)
+      .getOrNull();
   }
 
   /**

@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.git.blackbox;
+package com.xenoterracide.gradle.git.test;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

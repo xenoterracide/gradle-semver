@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * Use this to wrap Git commands using {@link Try} to handle exceptions.
  */
 @FunctionalInterface
-public interface TryGit extends Supplier<Git> {
+public interface TryGit extends Supplier<@Nullable Git> {
   /**
    * Wraps a {@link GitCommand} in a {@link Try} to handle exceptions.
    *
@@ -42,6 +42,7 @@ public interface TryGit extends Supplier<Git> {
    */
   default <R> Try<R> tryGit(CheckedFunction1<Git, @Nullable R> command) {
     return Try.of(this::get)
+      .filter(Objects::nonNull)
       .mapTry(command)
       .onFailure(e -> LoggerFactory.getLogger(this.getClass()).debug("failed", e))
       .filter(Objects::nonNull);

@@ -21,14 +21,14 @@ dependencyLocking {
 }
 
 dependencies {
-  compileOnlyApi(libs.jspecify)
   api(libs.jgit)
-  implementation(libs.vavr)
-  implementation(libs.guava)
+  compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang)
+  implementation(libs.guava)
   implementation(libs.java.tools)
-  testFixturesImplementation(libs.jgit)
+  implementation(libs.vavr)
   shadow(libs.vavr)
+  testFixturesImplementation(libs.jgit)
 }
 
 testing {
@@ -62,7 +62,7 @@ tasks.withType<ShadowJar>().configureEach {
 
 gradlePlugin {
   plugins {
-    register("com.xenoterracide.gradle.semver") {
+    register("com.xenoterracide.gradle.git") {
       displayName = "Git Metadata"
       implementationClass = "com.xenoterracide.gradle.git.GitPlugin"
       description =

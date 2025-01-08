@@ -1,4 +1,4 @@
-// Copyright 2023 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -19,14 +19,20 @@ testing {
       dependencies {
         implementation(gradleTestKit())
         implementation(platform(libs.junit.bom))
-        implementation(project())
         implementation.bundle(libs.bundles.test.impl)
         runtimeOnly.bundle(libs.bundles.test.runtime)
       }
     }
 
+    val test by getting(JvmTestSuite::class) {
+      dependencies {
+        implementation(project())
+      }
+    }
+
     val testIntegration by registering(JvmTestSuite::class) {
       dependencies {
+        runtimeOnly(project())
       }
     }
   }
