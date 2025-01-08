@@ -106,7 +106,8 @@ SPDX-License-Identifier: CC0-1.0
   <!--- PRETTIER END -->
 
   <module name="TreeWalker">
-    <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
+    <!-- https://checkstyle.sourceforge.io/filters/ -->
+    <!-- in case you're dumb again it's CHECKSTYLE.OFF: checkname|checkname -->
     <module name="SuppressionCommentFilter">
       <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)" />
       <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)" />
@@ -162,12 +163,22 @@ SPDX-License-Identifier: CC0-1.0
 
     <!-- Checks for Size Violations https://checkstyle.org/checks/sizes/ -->
     <module name="AnonInnerLength" />
-    <module name="ExecutableStatementCount" />
+    <module name="ExecutableStatementCount">
+      <property name="max" value="20" />
+    </module>
+    <module name="ExecutableStatementCount">
+      <property name="max" value="10" />
+      <property name="tokens" value="LAMBDA" />
+    </module>
     <module name="LambdaBodyLength">
       <property name="max" value="20" />
     </module>
-    <module name="MethodCount" />
-    <module name="MethodLength" />
+    <module name="MethodCount">
+      <property name="maxTotal" value="20" />
+    </module>
+    <module name="MethodLength">
+      <property name="max" value="25" />
+    </module>
     <module name="OuterTypeNumber" />
     <module name="ParameterNumber" />
     <module name="RecordComponentNumber" />
@@ -232,20 +243,21 @@ SPDX-License-Identifier: CC0-1.0
     <module name="FallThrough" />
     <module name="EmptyStatement" />
     <module name="EqualsHashCode" />
-    <module name="RequireThis" />
+    <module name="RequireThis">
+      <property name="validateOnlyOverlapping" value="false" />
+    </module>
     <module name="ExplicitInitialization" />
     <module name="IllegalInstantiation" />
     <module name="IllegalCatch" />
     <module name="IllegalToken" />
     <module name="IllegalType" />
     <module name="InnerAssignment" />
-    <!-- error prone has got this
-    <module name="MissingSwitchDefault"/>
-    -->
+    <module name="MissingSwitchDefault" />
     <module name="MultipleVariableDeclarations" />
     <module name="SimplifyBooleanExpression" />
     <module name="SimplifyBooleanReturn" />
     <module name="ModifiedControlVariable" />
+    <module name="MultipleStringLiterals" />
     <module name="NestedForDepth" />
     <module name="NestedIfDepth" />
     <module name="NestedTryDepth" />
@@ -264,12 +276,15 @@ SPDX-License-Identifier: CC0-1.0
     <module name="ThrowsCount">
       <property name="ignorePrivateMethods" value="false" />
     </module>
+    <module name="VisibilityModifier" />
 
     <!-- Miscellaneous https://checkstyle.org/checks/misc/ -->
     <module name="ArrayTypeStyle" />
     <module name="TodoComment" />
     <module name="UpperEll" />
-    <module name="UncommentedMain" />
+    <module name="UncommentedMain">
+      <property name="excludedClasses" value="^Application$" />
+    </module>
 
     <module name="SuppressWarningsHolder" />
   </module>
@@ -284,10 +299,6 @@ SPDX-License-Identifier: CC0-1.0
     <property name="maximum" value="0" />
     <property name="message" value="Line has trailing spaces." />
   </module>
-
-  <!-- Checks that a package-info.java file exists for each package.     -->
-  <!-- See https://checkstyle.org/config_javadoc.html#JavadocPackage -->
-  <!-- <module name="JavadocPackage"/> -->
 
   <!-- Miscellaneous https://checkstyle.org/checks/misc/ -->
   <module name="FileLength" />

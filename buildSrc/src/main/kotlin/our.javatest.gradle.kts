@@ -1,4 +1,5 @@
-// © Copyright 2023-2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023 - 2025 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
 
 import org.gradle.accessors.dm.LibrariesForLibs
@@ -7,17 +8,40 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.KotlinClosure2
 
 plugins {
+  `java-gradle-plugin`
   `java-library`
 }
 
 val libs = the<LibrariesForLibs>()
 
-dependencies {
-  testImplementation(platform(libs.junit.bom))
-  testImplementation(libs.bundles.test.impl)
+testing {
+  suites {
+    withType<JvmTestSuite>().configureEach {
+      dependencies {
+        implementation(gradleTestKit())
+        implementation(platform(libs.junit.bom))
+        implementation.bundle(libs.bundles.test.impl)
+        runtimeOnly.bundle(libs.bundles.test.runtime)
+      }
+    }
 
-  testRuntimeOnly(platform(libs.junit.bom))
-  testRuntimeOnly(libs.bundles.test.runtime)
+    val test by getting(JvmTestSuite::class) {
+      dependencies {
+        implementation(project())
+      }
+    }
+
+    val testIntegration by registering(JvmTestSuite::class) {
+      gradlePlugin.testSourceSet(sources)
+      dependencies {
+        runtimeOnly(project())
+      }
+    }
+  }
+}
+
+tasks.check {
+  dependsOn(testing.suites.named("testIntegration"))
 }
 
 val available =

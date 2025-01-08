@@ -1,14 +1,11 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
   our.javalibrary
-  alias(libs.plugins.shadow)
 }
 
 tasks.compileJava {
@@ -20,31 +17,25 @@ dependencyLocking {
 }
 
 dependencies {
-  compileOnlyApi(libs.jspecify)
-  api(libs.jgit)
   api(libs.semver)
-  implementation(libs.vavr)
-  implementation(libs.guava)
-  implementation(libs.slf4j.api)
-  implementation(libs.java.tools)
-  testImplementation(libs.junit.api)
-  testImplementation(libs.maven.artifact)
-  testImplementation(gradleTestKit())
-  shadow(libs.vavr)
-  shadow(libs.semver)
+  api(projects.git)
+  compileOnlyApi(libs.jspecify)
 }
 
-tasks.withType<ShadowJar>().configureEach {
-  archiveClassifier.set("")
-  relocate("org.eclipse.jgit", "com.xenoterracide.gradle.semver.jgit")
-  relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
-  relocate("com.xenoterracide.tools.java", "com.xenoterracide.tools.java")
-  dependencies {
-    exclude { it.moduleGroup == "io.vavr" }
-    exclude { it.moduleGroup == "org.slf4j" }
-    exclude { it.moduleName == "semver4j" }
+testing {
+  suites {
+    withType<JvmTestSuite>().configureEach {
+      dependencies {
+        implementation(testFixtures(projects.git))
+        implementation(libs.jgit)
+      }
+    }
+    val test by getting(JvmTestSuite::class) {
+      dependencies {
+        implementation(libs.maven.artifact)
+      }
+    }
   }
-  minimize()
 }
 
 gradlePlugin {

@@ -1,7 +1,9 @@
-// © Copyright 2023-2024 Caleb Cushing
+// Copyright 2023 - 2025 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
 
 import org.gradle.accessors.dm.LibrariesForLibs
+import java.util.Locale
 
 plugins {
   checkstyle
@@ -19,10 +21,9 @@ fun checkstyleConfig(filename: String): File {
   return if (f.exists()) f else rootProject.file(path)
 }
 
-tasks.named<Checkstyle>("checkstyleMain") {
-  configFile = checkstyleConfig("main.xml")
-}
-
-tasks.named<Checkstyle>("checkstyleTest") {
-  configFile = checkstyleConfig("test.xml")
+tasks.withType<Checkstyle>().configureEach {
+  configFile =
+    checkstyleConfig(
+      this.name.removePrefix("checkstyle").replaceFirstChar { it.lowercase(Locale.getDefault()) } + ".xml",
+    )
 }
