@@ -1,4 +1,5 @@
-// © Copyright 2024 Caleb Cushing
+// Copyright 2024 - 2025 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
 
 rootProject.name = "gradle-semver"
@@ -10,6 +11,8 @@ pluginManagement {
       mavenContent {
         includeGroup("com.xenoterracide.gradle.semver")
         includeModule("com.xenoterracide.gradle", "semver")
+        includeGroup("com.xenoterracide.gradle.git")
+        includeModule("com.xenoterracide.gradle", "git")
       }
       credentials(PasswordCredentials::class)
     }

@@ -1,8 +1,8 @@
+import org.semver4j.Semver
+
 // SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
-
-import org.semver4j.Semver
 
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
@@ -21,8 +21,8 @@ dependencyLocking {
 version =
   providers
     .environmentVariable("IS_PUBLISHING")
-    .map { semver.provider().get() }
-    .orElse(Semver("0.0.0"))
+    .map { semver.provider.get() }
+    .orElse(Semver.ZERO)
     .get()
 
 tasks.dependencies {
