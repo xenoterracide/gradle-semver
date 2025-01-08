@@ -56,7 +56,12 @@ class GitServiceTest {
       assertThat(svc.getProvider().getOrNull()).isNotNull();
       var ext = project.getExtensions().findByType(GitExtension.class);
       assertThat(ext).hasNoNullFieldsOrProperties();
-      assertThat(ext.getRemotes().getOrNull()).isNotEmpty();
+      assertThat(ext.getRemotes().getOrNull())
+        .isNotEmpty()
+        .allSatisfy(remote -> {
+          assertThat(remote).hasNoNullFieldsOrProperties();
+          assertThat(remote.getHeadBranch().getOrNull()).isNull();
+        });
       assertThat(ext.getDirty().getOrNull()).isTrue();
     }
   }

@@ -4,7 +4,6 @@
 
 package com.xenoterracide.gradle.git;
 
-import org.gradle.api.Incubating;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
 import org.jspecify.annotations.Nullable;
@@ -14,13 +13,11 @@ import org.jspecify.annotations.Nullable;
  */
 public class GitRemoteForGradle {
 
-  private final DistanceCalculator distanceCalculator;
   private final ProvidedFactory pf;
   private final String name;
   private final Provider<@Nullable String> headBranch;
 
-  GitRemoteForGradle(ProvidedFactory pf, DistanceCalculator distanceCalculator, GitRemote remote) {
-    this.distanceCalculator = distanceCalculator;
+  GitRemoteForGradle(ProvidedFactory pf, GitRemote remote) {
     this.name = remote.name();
     this.headBranch = pf.providedString(remote::headBranch);
     this.pf = pf;
@@ -51,15 +48,5 @@ public class GitRemoteForGradle {
             return null;
           })
       );
-  }
-
-  /**
-   * Gets the distance from the tag in the common ancestor from the head branch.
-   *
-   * @return the distance
-   */
-  @Incubating
-  public Provider<@Nullable Long> distanceFromTagInCommonAncestorFromHead() {
-    return this.headBranch.map(this.distanceCalculator::apply);
   }
 }
