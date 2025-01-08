@@ -2,13 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
   our.javalibrary
-  alias(libs.plugins.shadow)
 }
 
 tasks.compileJava {
@@ -23,9 +20,6 @@ dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
-  shadow(libs.jspecify)
-  shadow(libs.semver)
-  shadow(projects.git)
 }
 
 testing {
@@ -42,18 +36,6 @@ testing {
       }
     }
   }
-}
-
-tasks.withType<ShadowJar>().configureEach {
-  archiveClassifier.set("")
-  relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
-  dependencies {
-    exclude { it.moduleGroup == "org.jspecify" }
-    exclude { it.moduleGroup == "org.slf4j" }
-    exclude { it.moduleName == "com.xenoterracide.gradle.git" }
-    exclude { it.moduleName == "semver4j" }
-  }
-  minimize()
 }
 
 gradlePlugin {
