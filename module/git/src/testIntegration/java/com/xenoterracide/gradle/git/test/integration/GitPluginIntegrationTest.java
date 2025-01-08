@@ -65,7 +65,7 @@ class GitPluginIntegrationTest {
   @BeforeEach
   public void setupRunner() throws IOException, GitAPIException {
     Files.writeString(testProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = " + "'hello-world'");
-    try (var git = Git.init().setDirectory(testProjectDir).call()) {
+    try (var git = Git.init().setDirectory(testProjectDir).setInitialBranch("main").call()) {
       git.commit().setMessage("initial commit").call();
       git.tag().setName("v0.1.0").call();
     }
