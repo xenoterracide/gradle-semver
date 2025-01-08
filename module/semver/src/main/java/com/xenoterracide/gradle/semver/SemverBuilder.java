@@ -5,7 +5,6 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.git.GitStatus;
-import com.xenoterracide.gradle.git.HeadBranchNotAvailable;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -144,7 +143,7 @@ final class SemverBuilder {
     return this;
   }
 
-  Semver build() throws HeadBranchNotAvailable {
+  Semver build() {
     this.createPreRelease();
     this.createBuild().ifPresent(build -> this.semver = this.semver.withBuild(build));
     return this.semver;

@@ -4,11 +4,9 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.xenoterracide.gradle.git.BranchOutput;
 import com.xenoterracide.gradle.git.GitExtension;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
-import com.xenoterracide.gradle.git.RemoteForHeadBranch;
 import java.util.Objects;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
@@ -36,8 +34,6 @@ public class SemverExtension implements Provides<Semver> {
   private final Logger log = Logging.getLogger(this.getClass());
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
-  private final Property<BranchOutput> branchOutput;
-  private final Property<RemoteForHeadBranch> remoteForHeadBranchConfig;
   private final Property<String> remote;
   private final Project project;
 
@@ -50,9 +46,7 @@ public class SemverExtension implements Provides<Semver> {
   private SemverExtension(Project project) {
     this.project = project;
     var pf = new ProvidedFactory(project);
-    this.branchOutput = pf.property(BranchOutput.class);
     this.provider = pf.property(Semver.class);
-    this.remoteForHeadBranchConfig = pf.property(RemoteForHeadBranch.class);
     this.checkDirty = pf.propertyBoolean();
     this.remote = pf.propertyString();
   }
@@ -68,13 +62,6 @@ public class SemverExtension implements Provides<Semver> {
         .withDistance(gitExt.getDistance().get())
         .withGitStatus(gitExt.getStatus().get())
         .withUniqueShort(gitExt.getUniqueShort().getOrNull())
-        /*
-      .withBranchOutput(this.getBranchOutput().getOrElse(BranchOutput.NON_HEAD_BRANCH_OR_THROW))
-      .withRemoteForHeadBranchConfig(
-        this.getRemoteForHeadBranchConfig().getOrElse(RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW)
-      )
-
-       */
         .build();
     };
   }
@@ -120,29 +107,6 @@ public class SemverExtension implements Provides<Semver> {
    */
   public Property<Boolean> getCheckDirty() {
     return this.checkDirty;
-  }
-
-  /**
-   * Branch output configuration.
-   *
-   * @return branch output configuration property
-   * @implNote The plugin defaults to {@link BranchOutput#NON_HEAD_BRANCH_OR_THROW}
-   */
-  @Incubating
-  public Property<BranchOutput> getBranchOutput() {
-    return this.branchOutput;
-  }
-
-  /**
-   * Remote for head branch configuration. These only matter if more than one remote is configured otherwise the remote
-   * found is used.
-   *
-   * @return remote for head branch configuration property
-   * @implNote The plugin defaults to {@link RemoteForHeadBranch#CONFIGURED_ORIGIN_OR_FIRST}
-   */
-  @Incubating
-  public Property<RemoteForHeadBranch> getRemoteForHeadBranchConfig() {
-    return this.remoteForHeadBranchConfig;
   }
 
   /**
