@@ -27,8 +27,10 @@ dependencies {
   implementation(libs.guava)
   implementation(libs.java.tools)
   implementation(libs.vavr)
+  shadow(libs.jspecify)
   shadow(libs.semver)
   shadow(libs.vavr)
+  shadow(projects.git)
 }
 
 testing {
@@ -46,17 +48,15 @@ testing {
   }
 }
 
-tasks.check {
-  dependsOn(testing.suites.named("testIntegration"))
-}
-
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
   relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
   relocate("com.xenoterracide.tools.java", "com.xenoterracide.tools.java")
   dependencies {
     exclude { it.moduleGroup == "io.vavr" }
+    exclude { it.moduleGroup == "org.jspecify" }
     exclude { it.moduleGroup == "org.slf4j" }
+    exclude { it.moduleName == "com.xenoterracide.gradle.git" }
     exclude { it.moduleName == "semver4j" }
   }
   minimize()

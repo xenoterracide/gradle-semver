@@ -36,12 +36,6 @@ testing {
     withType<JvmTestSuite>().configureEach {
       dependencies {
         implementation(testFixtures(project()))
-        implementation(libs.junit.api)
-      }
-    }
-    val test by getting(JvmTestSuite::class) {
-      dependencies {
-        implementation(testFixtures(project()))
       }
     }
   }

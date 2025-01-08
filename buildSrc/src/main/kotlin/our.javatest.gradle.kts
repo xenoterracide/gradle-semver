@@ -29,17 +29,7 @@ testing {
         implementation(project())
       }
     }
-
-    val testIntegration by registering(JvmTestSuite::class) {
-      dependencies {
-        runtimeOnly(project())
-      }
-    }
   }
-}
-
-tasks.check {
-  dependsOn(testing.suites.named("testIntegration"))
 }
 
 val available =
