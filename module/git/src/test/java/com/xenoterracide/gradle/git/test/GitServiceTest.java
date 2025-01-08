@@ -29,6 +29,6 @@ class GitServiceTest {
       .getSharedServices()
       .registerIfAbsent(GitService.class.getCanonicalName(), GitService.class)
       .get();
-    assertThatExceptionOfType(MissingValueException.class).isThrownBy(gitSvc.provider()::get);
+    assertThatExceptionOfType(MissingValueException.class).isThrownBy(gitSvc.getProvider()::get);
   }
 }

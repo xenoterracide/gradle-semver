@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -30,7 +30,7 @@ public abstract class GitService implements BuildService<GitService.Params>, Aut
   public GitService() {}
 
   @Override
-  public Provider<Git> provider() {
+  public Provider<Git> getProvider() {
     return this.getParameters()
       .getGitDirectory()
       .map(Directory::getAsFile)

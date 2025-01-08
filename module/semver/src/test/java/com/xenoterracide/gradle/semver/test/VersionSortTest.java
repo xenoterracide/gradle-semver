@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

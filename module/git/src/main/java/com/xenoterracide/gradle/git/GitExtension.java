@@ -26,7 +26,7 @@ public class GitExtension implements Provides<GitMetadata> {
   @SuppressWarnings("NullAway")
   // false positive https://github.com/uber/NullAway/issues/1123
   GitExtension(Provider<GitService> gitService, ProvidedFactory pf) {
-    this.gitMetadata = gitService.map(GitService::provider).map(git -> new GitMetadataImpl(git::getOrNull));
+    this.gitMetadata = gitService.map(GitService::getProvider).map(git -> new GitMetadataImpl(git::getOrNull));
     this.branch = pf.providedString(this.gitMetadata.map(GitMetadata::branch));
     this.uniqueShort = pf.providedString(this.gitMetadata.map(GitMetadata::uniqueShort));
     this.tag = pf.providedString(this.gitMetadata.map(GitMetadata::tag));
@@ -39,7 +39,7 @@ public class GitExtension implements Provides<GitMetadata> {
           remotes
             .stream()
             .map(remote -> {
-              var dc = new DistanceCalculator(gitService.flatMap(GitService::provider)::get);
+              var dc = new DistanceCalculator(gitService.flatMap(GitService::getProvider)::get);
               return new GitRemoteForGradle(pf, dc, remote);
             })
             .collect(Collectors.toList())
@@ -49,7 +49,7 @@ public class GitExtension implements Provides<GitMetadata> {
   }
 
   @Override
-  public Provider<GitMetadata> provider() {
+  public Provider<GitMetadata> getProvider() {
     return this.gitMetadata;
   }
 

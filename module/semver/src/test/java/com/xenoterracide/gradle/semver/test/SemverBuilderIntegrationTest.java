@@ -2,12 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.test;
 
 import static com.xenoterracide.gradle.git.fixtures.CommitTools.commit;
 import static com.xenoterracide.gradle.git.fixtures.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.xenoterracide.gradle.semver.SemverExtension;
+import com.xenoterracide.gradle.semver.SemverPlugin;
 import java.io.File;
 import java.util.Collections;
 import java.util.function.Supplier;
@@ -34,7 +36,7 @@ class SemverBuilderIntegrationTest {
       Supplier<Semver> vs = () -> {
         var project = pb.build();
         project.getPluginManager().apply(SemverPlugin.class);
-        return project.getExtensions().getByType(SemverExtension.class).provider().get();
+        return project.getExtensions().getByType(SemverExtension.class).getProvider().get();
       };
 
       var v001Alpha01 = supplies(commit(git), vs);

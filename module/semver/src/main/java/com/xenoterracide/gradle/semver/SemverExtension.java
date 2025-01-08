@@ -108,7 +108,7 @@ public class SemverExtension implements Provides<Semver> {
    *   the root project. In the future this may be a single global calculation.
    */
   @Override
-  public Provider<Semver> provider() {
+  public Provider<Semver> getProvider() {
     return this.provider;
   }
 

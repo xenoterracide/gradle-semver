@@ -18,5 +18,5 @@ public interface Provides<T> {
    *
    * @return a provider of the value
    */
-  Provider<T> provider();
+  Provider<T> getProvider();
 }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,13 +28,7 @@ class SemverPluginIntegrationTest {
 
   static final String LOGGING =
     """
-    logger.quiet("semver:" + semver.provider().get())
-    logger.quiet("branch:" + gitMetadata.branch.getOrNull() )
-    logger.quiet("commit:" + gitMetadata.commit.getOrNull())
-    logger.quiet("commitShort:" + gitMetadata.uniqueShort.getOrNull())
-    logger.quiet("latestTag:" + gitMetadata.tag.getOrNull())
-    logger.quiet("commitDistance:" + gitMetadata.distance.get())
-    logger.quiet("status:" + gitMetadata.status.get())
+      logger.quiet("semver:" + semver.provider.getOrNull())
     """;
   static final String GROOVY_SCRIPT =
     """
@@ -42,7 +36,7 @@ class SemverPluginIntegrationTest {
       id("com.xenoterracide.gradle.semver")
     }
 
-    task getSemVer {
+      task logSemver {
     %s
     }
     """;
@@ -52,7 +46,7 @@ class SemverPluginIntegrationTest {
       id("com.xenoterracide.gradle.semver")
     }
 
-    tasks.register("getSemVer") {
+      tasks.register("logSemver") {
     %s
     }
     """;
@@ -79,11 +73,11 @@ class SemverPluginIntegrationTest {
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(testProjectDir)
-      .withArguments("getSemVer", "--stacktrace")
+      .withArguments("logSemver", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.1.0");
+    assertThat(build.getOutput()).contains("semver:0.1.0", "BUILD SUCCESSFUL");
   }
 
   @Test
@@ -93,11 +87,11 @@ class SemverPluginIntegrationTest {
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(noGitProjectDir)
-      .withArguments("getSemVer", "--stacktrace")
+      .withArguments("logSemver", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.0.0");
+    assertThat(build.getOutput()).contains("semver:0.0.0", "BUILD SUCCESSFUL");
   }
 
   @ParameterizedTest
@@ -106,11 +100,11 @@ class SemverPluginIntegrationTest {
     Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
     var build = GradleRunner.create()
       .withProjectDir(testProjectDir)
-      .withArguments("getSemVer", "--configuration-cache", "--stacktrace")
+      .withArguments("logSemver", "--configuration-cache", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.1.0");
+    assertThat(build.getOutput()).contains("semver:0.1.0", "BUILD SUCCESSFUL");
   }
 
   @ParameterizedTest
@@ -121,11 +115,11 @@ class SemverPluginIntegrationTest {
 
     var build = GradleRunner.create()
       .withProjectDir(noGitProjectDir)
-      .withArguments("getSemVer", "--configuration-cache", "--stacktrace")
+      .withArguments("logSemver", "--configuration-cache", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.0.0");
+    assertThat(build.getOutput()).contains("semver:0.0.0", "BUILD SUCCESSFUL");
   }
 
   static class BuildScriptArgumentsProvider implements ArgumentsProvider {

@@ -1,11 +1,13 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package com.xenoterracide.gradle.semver;
+package com.xenoterracide.gradle.semver.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.xenoterracide.gradle.semver.SemverExtension;
+import com.xenoterracide.gradle.semver.SemverPlugin;
 import java.io.File;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.Project;
@@ -46,7 +48,7 @@ class SemverPluginTest {
   @Test
   void apply() {
     project.getPluginManager().apply(SemverPlugin.class);
-    var semver = project.getExtensions().getByType(SemverExtension.class).provider();
+    var semver = project.getExtensions().getByType(SemverExtension.class).getProvider();
     assertThat(semver.get()).hasToString("0.1.3");
   }
 }
