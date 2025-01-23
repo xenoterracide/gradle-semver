@@ -75,7 +75,7 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef02", null),
-          "0.0.1-alpha.0.1+gabcdef02",
+          "0.0.1-alpha.0.1+git.1.abcdef02",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
           0L,
@@ -83,7 +83,7 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfoNoBranch(1, GitStatus.DIRTY, "abcdef03", null),
-          "0.0.1-alpha.0.1+gabcdef03.dirty",
+          "0.0.1-alpha.0.1+git.1.abcdef03.dirty",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.0.2",
           0L,
@@ -91,7 +91,7 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef04", null),
-          "0.0.1-alpha.0.1+gabcdef04",
+          "0.0.1-alpha.0.1+git.1.abcdef04",
           "0.0.1-alpha.0.1",
           "0.0.1-alpha.1.0",
           0L,
@@ -99,7 +99,7 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfoNoBranch(10, GitStatus.CLEAN, "abcdef05", null),
-          "0.0.1-alpha.0.10+gabcdef05",
+          "0.0.1-alpha.0.10+git.10.abcdef05",
           "0.0.1-alpha.0.10",
           "0.0.1-alpha.0.11",
           0L,
@@ -115,7 +115,7 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef07", "v1.0.0-rc.1"),
-          "1.0.0-rc.1.1+gabcdef07",
+          "1.0.0-rc.1.1+git.1.abcdef07",
           "1.0.0-rc.1.1",
           "1.0.0-rc.2",
           0L,
@@ -131,7 +131,7 @@ class SemverBuilderTest {
         ),
         arguments(
           new GitMetadataInfoNoBranch(1, GitStatus.CLEAN, "abcdef09", "v1.0.0"),
-          "1.0.1-alpha.0.1+gabcdef09",
+          "1.0.1-alpha.0.1+git.1.abcdef09",
           "1.0.1-alpha.0.1",
           "1.0.1",
           0L,
@@ -162,12 +162,12 @@ class SemverBuilderTest {
     implements GitMetadata {
     @Override
     public @Nullable String branch() {
-      return "";
+      return null;
     }
 
     @Override
     public @Nullable String commit() {
-      return "";
+      return null;
     }
 
     @Override
@@ -207,12 +207,12 @@ class SemverBuilderTest {
     }
 
     @Override
-    public @Nullable String branch() {
+    public String branch() {
       return "topic/foo";
     }
 
     @Override
-    public @Nullable String commit() {
+    public String commit() {
       return "";
     }
   }
