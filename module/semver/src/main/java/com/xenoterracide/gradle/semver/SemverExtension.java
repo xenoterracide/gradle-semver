@@ -8,6 +8,9 @@ import com.xenoterracide.gradle.git.GitExtension;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import org.eclipse.jgit.lib.Constants;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.Transformer;
@@ -30,6 +33,8 @@ import org.semver4j.Semver;
 public class SemverExtension implements Provides<Semver> {
 
   // CHECKSTYLE.ON: FinalClass
+
+  private static final Pattern REMOTE = Pattern.compile(Pattern.quote(Constants.R_REMOTES) + "(.*)");
 
   private final Logger log = Logging.getLogger(this.getClass());
   private final Property<Semver> provider;
@@ -55,6 +60,24 @@ public class SemverExtension implements Provides<Semver> {
     return new SemverExtension(project).build();
   }
 
+  static Provider<String> getBranch(GitExtension gitExt) {
+    return gitExt
+      .getRemotes()
+      .map(remotes ->
+        remotes
+          .stream()
+          .filter(remote -> Objects.equals(remote.getName(), "origin"))
+          .filter(remote -> remote.getHeadBranch().isPresent())
+          .map(remote -> remote.getHeadBranch().get())
+          .findAny()
+      )
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .zip(gitExt.getBranch(), (remoteBranch, localBranch) ->
+        REMOTE.matcher(remoteBranch).group(1).contains(localBranch) ? null : localBranch
+      );
+  }
+
   Transformer<Semver, Semver> configureBuilder(GitExtension gitExt) {
     return semver -> {
       return new SemverBuilder(semver)
@@ -62,6 +85,7 @@ public class SemverExtension implements Provides<Semver> {
         .withDistance(gitExt.getDistance().get())
         .withGitStatus(gitExt.getStatus().get())
         .withUniqueShort(gitExt.getUniqueShort().getOrNull())
+        .withBranch(getBranch(gitExt).getOrNull())
         .build();
     };
   }

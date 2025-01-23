@@ -154,7 +154,7 @@ final class SemverBuilder {
     return this;
   }
 
-  SemverBuilder withBranch(String branch) {
+  SemverBuilder withBranch(@Nullable String branch) {
     this.branch = branch;
     return this;
   }

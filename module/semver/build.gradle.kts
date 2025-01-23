@@ -20,6 +20,7 @@ dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
+  implementation(libs.jgit)
 }
 
 testing {
@@ -27,7 +28,6 @@ testing {
     withType<JvmTestSuite>().configureEach {
       dependencies {
         implementation(testFixtures(projects.git))
-        implementation(libs.jgit)
       }
     }
     val test by getting(JvmTestSuite::class) {
