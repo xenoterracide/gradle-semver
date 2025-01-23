@@ -25,6 +25,7 @@ final class SemverBuilder {
   private long distance;
   private @Nullable String uniqueShort;
   private @Nullable GitStatus status;
+  private @Nullable String branch;
 
   SemverBuilder(Semver semver) {
     this.semver = semver;
@@ -98,14 +99,21 @@ final class SemverBuilder {
   private Optional<String> createBuild() {
     if (this.distance > 0) {
       var optSha = Optional.ofNullable(this.uniqueShort);
-      var status = Optional.ofNullable(this.dirtyOut ? this.status : null)
-        .filter(s -> s == GitStatus.DIRTY)
-        .map(Object::toString);
 
-      var g = "git";
-      var distance = Long.toString(this.distance);
-      return optSha.map(sha -> status.map(sta -> semverJoin(g, distance, sha, sta)).orElse(semverJoin(g, distance, sha))
-      );
+      return optSha.map(sha -> {
+        var g = Optional.of("git");
+        var distance = Optional.of(this.distance).map(l -> Long.toString(l));
+        var branch = Optional.ofNullable(this.branch);
+        var hasBranch = branch.map(b -> "branch");
+        var status = Optional.ofNullable(this.dirtyOut ? this.status : null)
+          .filter(s -> s == GitStatus.DIRTY)
+          .map(Object::toString);
+
+        return Stream.of(hasBranch, branch, g, distance, optSha, status)
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .collect(Collectors.joining(SEMVER_DELIMITER));
+      });
     }
     return Optional.empty();
   }
@@ -143,6 +151,11 @@ final class SemverBuilder {
 
   SemverBuilder withGitStatus(GitStatus status) {
     this.status = status;
+    return this;
+  }
+
+  SemverBuilder withBranch(String branch) {
+    this.branch = branch;
     return this;
   }
 
