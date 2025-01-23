@@ -30,24 +30,8 @@ final class SemverBuilder {
     this.semver = semver;
   }
 
-  private void createPreRelease() {
-    if (this.distance > 0) {
-      if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
-        this.semver = this.semver.withIncPatch()
-          .withPreRelease(String.join(SEMVER_DELIMITER, ALPHA, ZERO, Long.toString(this.distance)));
-      } else { // rc.1
-        var preRelease = Stream.concat(
-          this.semver.getPreRelease().stream(),
-          Stream.of(Long.toString(this.distance))
-        ).collect(Collectors.joining(SEMVER_DELIMITER));
-        this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
-      }
-    }
-    if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
-      this.semver = this.semver.withPreRelease(
-          String.join(SEMVER_DELIMITER, ALPHA, ZERO, Long.toString(this.distance))
-        );
-    }
+  static String semverJoin(String... parts) {
+    return String.join(SEMVER_DELIMITER, parts);
   }
 
   /*
@@ -92,17 +76,36 @@ final class SemverBuilder {
 
     return Optional.ofNullable(this.gitMetadata.branch());
   }
-
    */
+
+  private void createPreRelease() {
+    if (this.distance > 0) {
+      if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
+        this.semver = this.semver.withIncPatch().withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.distance)));
+      } else { // rc.1
+        var preRelease = Stream.concat(
+          this.semver.getPreRelease().stream(),
+          Stream.of(Long.toString(this.distance))
+        ).collect(Collectors.joining(SEMVER_DELIMITER));
+        this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
+      }
+    }
+    if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
+      this.semver = this.semver.withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.distance)));
+    }
+  }
 
   private Optional<String> createBuild() {
     if (this.distance > 0) {
-      var optSha = Optional.ofNullable(this.uniqueShort).map(s -> "g" + s);
+      var optSha = Optional.ofNullable(this.uniqueShort);
       var status = Optional.ofNullable(this.dirtyOut ? this.status : null)
         .filter(s -> s == GitStatus.DIRTY)
         .map(Object::toString);
 
-      return optSha.map(sha -> status.map(sta -> String.join(SEMVER_DELIMITER, sha, sta)).orElse(sha));
+      var g = "git";
+      var distance = Long.toString(this.distance);
+      return optSha.map(sha -> status.map(sta -> semverJoin(g, distance, sha, sta)).orElse(semverJoin(g, distance, sha))
+      );
     }
     return Optional.empty();
   }

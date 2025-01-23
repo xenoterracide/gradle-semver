@@ -86,13 +86,16 @@ public class SemverExtension implements Provides<Semver> {
   }
 
   /**
-   * {@link Provider} of {@link Semver}. For a distance of 1 away from tag or your HEAD branch
-   * {@code 0.1.1-alpha.0.1+.g3aae11e}. The longest example {@code 0.1.1-alpha.0.1+btopic-foo.g3aae11e.dirty}
+   * {@link Provider} of {@link Semver}. For a distance of 1 away from tag or your HEAD branch, but 40 commits on your
+   * deviated branch.
+   * {@code 0.1.1-alpha.0.1+git.1.3aae11e}. The longest example
+   * {@code 0.1.1-alpha.0.1+branch.topic-foo.git.40.3aae11e.dirty}
    *
    * @return semver provider
-   * @implSpec {@code <major>.<minor>.<patch>[-<preRelease.tag.distance>][+[b<branch>.]g<sha>[.dirty]]}
+   * @implSpec {@code
+   *   <major>.<minor>.<patch>[-<preRelease.tag.headBranchDistance>][+branch.<branch>.]git.<distance>.<sha>[.dirty]]}
    * @implNote The value will not be recalculated more than once per project per build. It is suggested to only use on
-   *   the root project. In the future this may be a single global calculation.
+   *   the root project.
    */
   @Override
   public Provider<Semver> getProvider() {
