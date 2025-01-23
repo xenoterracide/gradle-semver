@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
  */
 public interface GitRemote {
   /**
-   * Gets the remote HEAD branch.
+   * Gets the remote HEAD branch. This removes the {@code refs/heads/} prefix.
    *
    * @return HEAD branch
    */
