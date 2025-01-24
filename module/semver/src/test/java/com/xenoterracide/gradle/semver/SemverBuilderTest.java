@@ -39,6 +39,7 @@ class SemverBuilderTest {
     var parsed = tag != null ? Semver.parse(tag.substring(1)) : Semver.ZERO;
     assertThat(parsed).isNotNull();
     var semv = new SemverBuilder(parsed)
+      .withBranch(gitMetadata.branch())
       .withDistance(gitMetadata.distance())
       .withUniqueShort(gitMetadata.uniqueShort())
       .withGitStatus(gitMetadata.status())
@@ -136,8 +137,7 @@ class SemverBuilderTest {
           "1.0.1",
           0L,
           "1.0.1-alpha.0"
-        )
-        /*
+        ),
         arguments(
           GitMetadataInfoBranch.create(
             1,
@@ -146,13 +146,12 @@ class SemverBuilderTest {
             "v1.0.0",
             Map.of("origin", "main", "upstream", "foo")
           ),
-          "1.0.1-alpha.0.1+btopic-foo.gabcdef10",
+          "1.0.1-alpha.0.1+branch.topic-foo.git.1.abcdef10",
           "1.0.1-alpha.0.1",
           "1.0.1",
           1L,
           "1.0.1-alpha.0"
         )
-        */
       );
       // CHECKSTYLE.ON: CommentsIndentation
     }
@@ -212,8 +211,8 @@ class SemverBuilderTest {
     }
 
     @Override
-    public String commit() {
-      return "";
+    public @Nullable String commit() {
+      return null;
     }
   }
 }

@@ -98,6 +98,16 @@ class SemverBuilderIntegrationTest {
         .hasToString("0.1.1")
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease, Semver::getBuild)
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
+
+      var v011BldV1 = supplies(commit(git), vs);
+
+      assertThat(v011BldV1)
+        .isGreaterThan(v011)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .asString()
+        .startsWith("0.1.1-alpha.0.2+")
+        .matches(VERSION_PATTERN);
     }
   }
 }

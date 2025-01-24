@@ -8,6 +8,7 @@ import com.xenoterracide.gradle.git.GitStatus;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.RegExUtils;
 import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
@@ -155,7 +156,7 @@ final class SemverBuilder {
   }
 
   SemverBuilder withBranch(@Nullable String branch) {
-    this.branch = branch;
+    this.branch = RegExUtils.replaceAll(branch, "\\P{Alnum}", "-");
     return this;
   }
 
