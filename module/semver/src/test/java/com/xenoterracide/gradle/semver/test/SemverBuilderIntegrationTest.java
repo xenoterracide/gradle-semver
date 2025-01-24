@@ -12,11 +12,14 @@ import com.xenoterracide.gradle.semver.SemverExtension;
 import com.xenoterracide.gradle.semver.SemverPlugin;
 import java.io.File;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.transport.URIish;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.semver4j.Semver;
 
@@ -26,13 +29,14 @@ class SemverBuilderIntegrationTest {
     "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+git\\.\\d+\\.\\p{XDigit}{7}$"
   );
 
-  @TempDir
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
 
   @Test
   void semver() throws Exception {
     var pb = ProjectBuilder.builder().withProjectDir(projectDir);
-    try (var git = Git.init().setDirectory(projectDir).call()) {
+    var main = "main";
+    try (var git = Git.init().setDirectory(projectDir).setInitialBranch(main).call()) {
       Supplier<Semver> vs = () -> {
         var project = pb.build();
         project.getPluginManager().apply(SemverPlugin.class);
@@ -99,14 +103,41 @@ class SemverBuilderIntegrationTest {
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease, Semver::getBuild)
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
 
-      var v011BldV1 = supplies(commit(git), vs);
+      git.remoteAdd().setUri(new URIish("https://example.com/repo.git")).setName("origin").call();
+      new ProcessBuilder("git", "remote", "set-head", "origin", "main")
+        .directory(projectDir)
+        .start()
+        .waitFor(1, TimeUnit.SECONDS);
 
-      assertThat(v011BldV1)
+      commit(git);
+      var branch = "topic/foo";
+      git.checkout().setCreateBranch(true).setName(branch).call();
+      assertThat(vs.get())
         .isGreaterThan(v011)
-        .isGreaterThan(v010)
-        .isGreaterThan(v010BldV2)
         .asString()
-        .startsWith("0.1.1-alpha.0.2+")
+        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.1.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
+      commit(git);
+      commit(git);
+
+      git.checkout().setName(main).call();
+
+      commit(git);
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.2+git.2.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
+
+      git.checkout().setName(branch).call().getObjectId();
+
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.3.")
+        .hasSize(size)
         .matches(VERSION_PATTERN);
     }
   }
