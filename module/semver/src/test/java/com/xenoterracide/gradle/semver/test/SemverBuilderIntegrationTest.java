@@ -10,13 +10,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.xenoterracide.gradle.semver.SemverExtension;
 import com.xenoterracide.gradle.semver.SemverPlugin;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.URIish;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
@@ -26,24 +30,46 @@ import org.semver4j.Semver;
 class SemverBuilderIntegrationTest {
 
   static final Pattern VERSION_PATTERN = Pattern.compile(
-    "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+git\\.\\d+\\.\\p{XDigit}{7}$"
+    "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+(branch\\.[\\p{Alnum}-]+\\.)?git\\.\\d+\\.\\p{XDigit}{7}$"
   );
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
+  File bareRepo;
+
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
+
+  private Logger log = Logging.getLogger(this.getClass());
 
   @Test
   void semver() throws Exception {
     var pb = ProjectBuilder.builder().withProjectDir(projectDir);
     var main = "main";
+    Git.init().setDirectory(bareRepo).setInitialBranch(main).setBare(true).call().close();
     try (var git = Git.init().setDirectory(projectDir).setInitialBranch(main).call()) {
+      var origin = "origin";
+      git.remoteAdd().setUri(new URIish(bareRepo.toURI().toString())).setName(origin).call();
+
+      var initial = commit(git);
+      git.push().setRemote(origin).setPushAll().call();
+      var setHead = new ProcessBuilder("git", "remote", "set-head", origin, "--auto")
+        .directory(projectDir)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start();
+
+      var reader = new BufferedReader(new InputStreamReader(setHead.getErrorStream(), StandardCharsets.UTF_8));
+      setHead.waitFor();
+      this.log.warn("set-head: {}", reader.lines().toList());
+
       Supplier<Semver> vs = () -> {
         var project = pb.build();
         project.getPluginManager().apply(SemverPlugin.class);
         return project.getExtensions().getByType(SemverExtension.class).getProvider().get();
       };
       var size = 29;
-      var v001Alpha01 = supplies(commit(git), vs);
+
+      var v001Alpha01 = supplies(initial, vs);
 
       assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(size).matches(VERSION_PATTERN);
 
@@ -103,12 +129,6 @@ class SemverBuilderIntegrationTest {
         .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease, Semver::getBuild)
         .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
 
-      git.remoteAdd().setUri(new URIish("https://example.com/repo.git")).setName("origin").call();
-      new ProcessBuilder("git", "remote", "set-head", "origin", "main")
-        .directory(projectDir)
-        .start()
-        .waitFor(1, TimeUnit.SECONDS);
-
       commit(git);
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
@@ -116,7 +136,7 @@ class SemverBuilderIntegrationTest {
         .isGreaterThan(v011)
         .asString()
         .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.1.")
-        .hasSize(size)
+        .hasSize(46)
         .matches(VERSION_PATTERN);
       commit(git);
       commit(git);

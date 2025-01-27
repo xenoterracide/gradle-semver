@@ -170,6 +170,8 @@ public class GitMetadataImpl implements GitMetadata {
     return this.gitRepository()
       .mapTry(r -> r.findRef(remoteRef))
       .filter(Objects::nonNull)
+      .filter(Ref::isSymbolic)
+      .map(Ref::getLeaf)
       .map(Ref::getName)
       .recover(NoSuchElementException.class, e -> null)
       .onFailure(e -> this.log.error("failed to get HEAD branch", e))
@@ -192,7 +194,7 @@ public class GitMetadataImpl implements GitMetadata {
 
     @Override
     public @Nullable String headBranch() {
-      return StringUtils.removeStart(this.headBranch, Constants.R_REMOTES + this.name);
+      return StringUtils.removeStart(this.headBranch, Constants.R_REMOTES + this.name + "/");
     }
 
     @Override
