@@ -33,26 +33,34 @@ class SemverBuilderIntegrationTest {
     "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+(branch\\.[\\p{Alnum}-]+\\.)?git\\.\\d+\\.\\p{XDigit}{7}$"
   );
 
+  static final String MAIN = "main";
+  static final String ORIGIN = "origin";
+  private static Logger log = Logging.getLogger(SemverBuilderIntegrationTest.class);
+
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File bareRepo;
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
 
-  private Logger log = Logging.getLogger(this.getClass());
+  static Supplier<Semver> versionSupplier(ProjectBuilder pb) {
+    return () -> {
+      var project = pb.build();
+      project.getPluginManager().apply(SemverPlugin.class);
+      return project.getExtensions().getByType(SemverExtension.class).getProvider().get();
+    };
+  }
 
   @Test
-  void semver() throws Exception {
+  void headBranch() throws Exception {
     var pb = ProjectBuilder.builder().withProjectDir(projectDir);
-    var main = "main";
-    Git.init().setDirectory(bareRepo).setInitialBranch(main).setBare(true).call().close();
-    try (var git = Git.init().setDirectory(projectDir).setInitialBranch(main).call()) {
-      var origin = "origin";
-      git.remoteAdd().setUri(new URIish(bareRepo.toURI().toString())).setName(origin).call();
+    Git.init().setDirectory(bareRepo).setInitialBranch(MAIN).setBare(true).call().close();
+    try (var git = Git.init().setDirectory(projectDir).setInitialBranch(MAIN).call()) {
+      git.remoteAdd().setUri(new URIish(bareRepo.toURI().toString())).setName(ORIGIN).call();
 
       commit(git);
-      git.push().setRemote(origin).setPushAll().call();
-      var setHead = new ProcessBuilder("git", "remote", "set-head", origin, "--auto")
+      git.push().setRemote(ORIGIN).setPushAll().call();
+      var setHead = new ProcessBuilder("git", "remote", "set-head", ORIGIN, "--auto")
         .directory(projectDir)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectError(ProcessBuilder.Redirect.PIPE)
@@ -60,13 +68,9 @@ class SemverBuilderIntegrationTest {
 
       var reader = new BufferedReader(new InputStreamReader(setHead.getErrorStream(), StandardCharsets.UTF_8));
       setHead.waitFor();
-      this.log.warn("set-head: {}", reader.lines().toList());
+      log.warn("set-head: {}", reader.lines().toList());
 
-      Supplier<Semver> vs = () -> {
-        var project = pb.build();
-        project.getPluginManager().apply(SemverPlugin.class);
-        return project.getExtensions().getByType(SemverExtension.class).getProvider().get();
-      };
+      var vs = versionSupplier(pb);
       var size = 29;
 
       var v001Alpha01 = vs.get();
@@ -140,7 +144,7 @@ class SemverBuilderIntegrationTest {
       commit(git);
       commit(git);
 
-      git.checkout().setName(main).call();
+      git.checkout().setName(MAIN).call();
 
       commit(git);
       assertThat(vs.get())
@@ -159,6 +163,106 @@ class SemverBuilderIntegrationTest {
         .hasSize(size)
         .matches(VERSION_PATTERN);
        */
+    }
+  }
+
+  @Test
+  void noHeadBranch() throws Exception {
+    var pb = ProjectBuilder.builder().withProjectDir(projectDir);
+    try (var git = Git.init().setDirectory(projectDir).setInitialBranch(MAIN).call()) {
+      commit(git);
+      var vs = versionSupplier(pb);
+      var size = 29;
+
+      var v001Alpha01 = vs.get();
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(size).matches(VERSION_PATTERN);
+
+      var v001Alpha02 = supplies(commit(git), vs);
+
+      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(size).matches(VERSION_PATTERN);
+
+      git.tag().setName("v0.1.0").call();
+
+      var v010 = vs.get();
+
+      assertThat(v010).isGreaterThan(v001Alpha01);
+
+      var v010BldV2 = supplies(commit(git), vs);
+
+      assertThat(v010BldV2)
+        .isGreaterThan(v001Alpha01)
+        .isGreaterThan(v010)
+        .asString()
+        .startsWith("0.1.1-alpha.0.1+")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
+
+      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.git.3aae11e"));
+
+      var v010BldV3 = supplies(commit(git), vs);
+
+      assertThat(v010BldV3)
+        .isGreaterThan(v001Alpha01)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .asString()
+        .startsWith("0.1.1-alpha.0.2+")
+        .matches(VERSION_PATTERN);
+
+      git.tag().setName("v0.1.1-rc.1").call();
+
+      var v011Rc1 = vs.get();
+
+      assertThat(v011Rc1)
+        .isGreaterThan(v001Alpha01)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .isGreaterThan(v010BldV3)
+        .asString()
+        .isEqualTo("0.1.1-rc.1");
+
+      git.tag().setName("v0.1.1").call();
+
+      var v011 = vs.get();
+
+      assertThat(v011)
+        .isGreaterThan(v010BldV2)
+        .isGreaterThan(v010)
+        .isGreaterThan(v001Alpha01)
+        .hasToString("0.1.1")
+        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease, Semver::getBuild)
+        .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
+
+      commit(git);
+      var branch = "topic/foo";
+      git.checkout().setCreateBranch(true).setName(branch).call();
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+git.1.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
+      commit(git);
+      commit(git);
+
+      git.checkout().setName(MAIN).call();
+
+      commit(git);
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.2+git.2.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
+
+      git.checkout().setName(branch).call().getObjectId();
+
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.3+git.3.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
     }
   }
 }
