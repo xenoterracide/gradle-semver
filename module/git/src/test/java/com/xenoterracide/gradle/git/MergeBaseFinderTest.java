@@ -82,7 +82,7 @@ class MergeBaseFinderTest {
       p.waitFor();
       var remoteRef = Constants.R_REMOTES + "origin" + "/" + Constants.HEAD;
       var file = g.getRepository().getDirectory().toPath().resolve(remoteRef).toFile();
-      log.warn("remoteRef: '{}' exists: {}", file, file.exists());
+      log.warn("project: '{} with remoteRef: '{}' exists: {}", projectDir, file, file.exists());
       return g;
     })::get;
   }
@@ -122,9 +122,9 @@ class MergeBaseFinderTest {
     var origin = gitMetadata.remotes().getFirst();
     var mergeBase = new MergeBaseFinder(git.get().getRepository());
 
-    assertThat(mergeBase.find(origin)).isPresent().hasValue(initialCommit);
+    assertThat(mergeBase.find(origin)).as("initial").isPresent().hasValue(initialCommit);
     var oid1 = commit(git);
-    assertThat(mergeBase.find(origin)).isPresent().hasValue(initialCommit);
+    assertThat(mergeBase.find(origin)).as("first").isPresent().hasValue(initialCommit);
 
     git.tryCommand(Git::push);
 

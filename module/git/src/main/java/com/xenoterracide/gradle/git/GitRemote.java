@@ -4,6 +4,8 @@
 
 package com.xenoterracide.gradle.git;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,7 +18,12 @@ public interface GitRemote {
    * @return HEAD branch
    */
   @Nullable
-  String headBranch();
+  default String headBranch() {
+    return StringUtils.removeStart(this.headBranchRefName(), Constants.R_REMOTES + this.name() + "/");
+  }
+
+  @Nullable
+  String headBranchRefName();
 
   /**
    * Gets the remote name; a common example is origin.

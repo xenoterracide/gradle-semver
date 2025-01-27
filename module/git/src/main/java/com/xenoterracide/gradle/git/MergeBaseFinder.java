@@ -28,7 +28,9 @@ class MergeBaseFinder {
     if (gitRemote == null || gitRemote.headBranch() == null) return Optional.empty();
     try {
       var current = Optional.ofNullable(this.repo.findRef(Constants.HEAD)).map(Ref::getObjectId).orElseThrow();
-      var remote = Optional.ofNullable(this.repo.findRef(gitRemote.headBranch())).map(Ref::getObjectId).orElseThrow();
+      var remote = Optional.ofNullable(this.repo.findRef(gitRemote.headBranchRefName()))
+        .map(Ref::getObjectId)
+        .orElseThrow();
 
       try (var walk = new RevWalk(this.repo)) {
         walk.setRevFilter(RevFilter.MERGE_BASE);

@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.eclipse.jgit.api.Git;
@@ -182,20 +181,20 @@ public class GitMetadataImpl implements GitMetadata {
   private static class RemoteImpl implements GitRemote {
 
     private final String name;
-    private final @Nullable String headBranch;
+    private final @Nullable String headBranchRefName;
 
-    RemoteImpl(String name, @Nullable String headBranch) {
+    RemoteImpl(String name, @Nullable String headBranchRefName) {
       this.name = name;
-      this.headBranch = headBranch;
+      this.headBranchRefName = headBranchRefName;
     }
 
-    static GitRemote nullCheck(@Nullable String name, @Nullable String headBranch) {
-      return new RemoteImpl(Objects.requireNonNull(name), headBranch);
+    static GitRemote nullCheck(@Nullable String name, @Nullable String headBranchRefName) {
+      return new RemoteImpl(Objects.requireNonNull(name), headBranchRefName);
     }
 
     @Override
-    public @Nullable String headBranch() {
-      return StringUtils.removeStart(this.headBranch, Constants.R_REMOTES + this.name + GIT_SEPARATOR);
+    public @Nullable String headBranchRefName() {
+      return this.headBranchRefName;
     }
 
     @Override
