@@ -8,6 +8,7 @@ import com.xenoterracide.gradle.git.GitExtension;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import java.util.Objects;
+import java.util.Optional;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.Transformer;
@@ -55,6 +56,24 @@ public class SemverExtension implements Provides<Semver> {
     return new SemverExtension(project).build();
   }
 
+  static Provider<String> getBranch(GitExtension gitExt) {
+    return gitExt
+      .getRemotes()
+      .map(remotes ->
+        remotes
+          .stream()
+          .filter(remote -> Objects.equals(remote.getName(), "origin"))
+          .filter(remote -> remote.getHeadBranch().isPresent())
+          .map(remote -> remote.getHeadBranch().get())
+          .findAny()
+      )
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .zip(gitExt.getBranch(), (remoteBranch, localBranch) ->
+        Objects.equals(remoteBranch, localBranch) ? null : localBranch
+      );
+  }
+
   Transformer<Semver, Semver> configureBuilder(GitExtension gitExt) {
     return semver -> {
       return new SemverBuilder(semver)
@@ -62,6 +81,7 @@ public class SemverExtension implements Provides<Semver> {
         .withDistance(gitExt.getDistance().get())
         .withGitStatus(gitExt.getStatus().get())
         .withUniqueShort(gitExt.getUniqueShort().getOrNull())
+        .withBranch(getBranch(gitExt).getOrNull())
         .build();
     };
   }
