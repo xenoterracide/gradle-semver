@@ -50,7 +50,7 @@ class SemverBuilderIntegrationTest {
       var origin = "origin";
       git.remoteAdd().setUri(new URIish(bareRepo.toURI().toString())).setName(origin).call();
 
-      var initial = commit(git);
+      commit(git);
       git.push().setRemote(origin).setPushAll().call();
       var setHead = new ProcessBuilder("git", "remote", "set-head", origin, "--auto")
         .directory(projectDir)
@@ -69,8 +69,7 @@ class SemverBuilderIntegrationTest {
       };
       var size = 29;
 
-      var v001Alpha01 = supplies(initial, vs);
-
+      var v001Alpha01 = vs.get();
       assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(size).matches(VERSION_PATTERN);
 
       var v001Alpha02 = supplies(commit(git), vs);

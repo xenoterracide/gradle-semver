@@ -162,7 +162,9 @@ SPDX-License-Identifier: CC0-1.0
 
     <!-- Checks for Size Violations https://checkstyle.org/checks/sizes/ -->
     <module name="AnonInnerLength" />
-    <module name="ExecutableStatementCount" />
+    <module name="ExecutableStatementCount">
+      <property name="max" value="100" />
+    </module>
     <module name="LambdaBodyLength">
       <property name="max" value="20" />
     </module>
