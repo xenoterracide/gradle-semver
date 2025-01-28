@@ -11,15 +11,17 @@ import org.jspecify.annotations.Nullable;
 /**
  * Delegates to {@link GitRemote} but uses Gradle's {@link Provider} for lazy evaluation.
  */
-public class GitRemoteForGradle {
+public class GitRemoteForGradle implements GitRemote {
 
   private final ProvidedFactory pf;
   private final String name;
-  private final Provider<@Nullable String> headBranch;
+  private final Provider<String> headBranch;
+  private final Provider<String> headBranchRefName;
 
   GitRemoteForGradle(ProvidedFactory pf, GitRemote remote) {
     this.name = remote.name();
     this.headBranch = pf.providedString(remote::headBranch);
+    this.headBranchRefName = pf.providedString(remote::headBranchRefName);
     this.pf = pf;
   }
 
@@ -48,5 +50,19 @@ public class GitRemoteForGradle {
             return null;
           })
       );
+  }
+
+  Provider<String> getHeadBranchRefName() {
+    return this.headBranchRefName;
+  }
+
+  @Override
+  public @Nullable String headBranchRefName() {
+    return this.headBranchRefName.getOrNull();
+  }
+
+  @Override
+  public String name() {
+    return this.name;
   }
 }

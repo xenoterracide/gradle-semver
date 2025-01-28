@@ -135,6 +135,7 @@ class SemverBuilderIntegrationTest {
       commit(git);
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
+      git.push().setPushAll().call();
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
@@ -144,9 +145,11 @@ class SemverBuilderIntegrationTest {
       commit(git);
       commit(git);
 
+      git.push().setPushAll().call();
       git.checkout().setName(MAIN).call();
 
       commit(git);
+      git.push().setPushAll().call();
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
@@ -155,14 +158,12 @@ class SemverBuilderIntegrationTest {
         .matches(VERSION_PATTERN);
 
       git.checkout().setName(branch).call().getObjectId();
-      /*
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
         .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.3.")
-        .hasSize(size)
+        .hasSize(46)
         .matches(VERSION_PATTERN);
-       */
     }
   }
 
