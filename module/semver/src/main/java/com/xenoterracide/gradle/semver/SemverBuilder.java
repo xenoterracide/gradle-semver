@@ -23,7 +23,8 @@ final class SemverBuilder {
   // private String remote = "origin";
   private Semver semver;
   private boolean dirtyOut;
-  private long distance;
+  private long preReleaseDistance;
+  private long buildDistance;
   private @Nullable String uniqueShort;
   private @Nullable GitStatus status;
   private @Nullable String branch;
@@ -81,29 +82,30 @@ final class SemverBuilder {
    */
 
   private void createPreRelease() {
-    if (this.distance > 0) {
+    if (this.preReleaseDistance > 0) {
       if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
-        this.semver = this.semver.withIncPatch().withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.distance)));
+        this.semver = this.semver.withIncPatch()
+          .withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.preReleaseDistance)));
       } else { // rc.1
         var preRelease = Stream.concat(
           this.semver.getPreRelease().stream(),
-          Stream.of(Long.toString(this.distance))
+          Stream.of(Long.toString(this.preReleaseDistance))
         ).collect(Collectors.joining(SEMVER_DELIMITER));
         this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
       }
     }
     if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
-      this.semver = this.semver.withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.distance)));
+      this.semver = this.semver.withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.preReleaseDistance)));
     }
   }
 
   private Optional<String> createBuild() {
-    if (this.distance > 0) {
+    if (this.preReleaseDistance > 0) {
       var optSha = Optional.ofNullable(this.uniqueShort);
 
       return optSha.map(sha -> {
         var g = Optional.of("git");
-        var distance = Optional.of(this.distance).map(l -> Long.toString(l));
+        var distance = Optional.of(this.buildDistance).map(l -> Long.toString(l));
         var branch = Optional.ofNullable(this.branch);
         var hasBranch = branch.map(b -> "branch");
         var status = Optional.ofNullable(this.dirtyOut ? this.status : null)
@@ -145,8 +147,18 @@ final class SemverBuilder {
     return this;
   }
 
-  SemverBuilder withDistance(long distance) {
-    this.distance = distance;
+  SemverBuilder withPreReleaseDistance(long distance) {
+    this.preReleaseDistance = distance;
+    return this;
+  }
+
+  SemverBuilder withBuildDistance(long distance) {
+    this.buildDistance = distance;
+    return this;
+  }
+
+  SemverBuilder withRemoteDistance(long remoteDistance) {
+    this.preReleaseDistance = remoteDistance;
     return this;
   }
 

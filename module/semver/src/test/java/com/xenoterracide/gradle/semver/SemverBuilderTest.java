@@ -40,7 +40,8 @@ class SemverBuilderTest {
     assertThat(parsed).isNotNull();
     var semv = new SemverBuilder(parsed)
       .withBranch(gitMetadata.branch())
-      .withDistance(gitMetadata.distance())
+      .withPreReleaseDistance(gitMetadata.distance())
+      .withBuildDistance(gitMetadata.distance())
       .withUniqueShort(gitMetadata.uniqueShort())
       .withGitStatus(gitMetadata.status())
       .withDirtyOut(true)
@@ -175,7 +176,7 @@ class SemverBuilderTest {
     }
   }
 
-  record GitRemoteImpl(String name, String headBranch) implements GitRemote {
+  record GitRemoteImpl(String name, String headBranchRefName) implements GitRemote {
     static GitRemote create(String name, String headBranch) {
       return new GitRemoteImpl(name, Constants.R_REMOTES + name + "/" + headBranch);
     }

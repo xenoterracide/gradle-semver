@@ -5,7 +5,9 @@
 package com.xenoterracide.gradle.git;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.eclipse.jgit.api.Git;
 import org.gradle.api.Incubating;
 import org.gradle.api.provider.Provider;
 
@@ -22,10 +24,12 @@ public class GitExtension implements Provides<GitMetadata> {
   private final Provider<String> branch;
   private final Provider<String> commit;
   private final Provider<List<GitRemoteForGradle>> remotes;
+  private final Provider<Git> git;
 
   @SuppressWarnings("NullAway")
   // false positive https://github.com/uber/NullAway/issues/1123
   GitExtension(Provider<GitService> gitService, ProvidedFactory pf) {
+    this.git = gitService.flatMap(GitService::getProvider);
     this.provider = gitService.map(GitService::getProvider).map(git -> new GitMetadataImpl(git::getOrNull));
     this.branch = pf.providedString(this.provider.map(GitMetadata::branch));
     this.uniqueShort = pf.providedString(this.provider.map(GitMetadata::uniqueShort));
@@ -118,5 +122,18 @@ public class GitExtension implements Provides<GitMetadata> {
   @Incubating
   public Provider<List<GitRemoteForGradle>> getRemotes() {
     return this.remotes;
+  }
+
+  /**
+   * will find the common ancestor between this branch and the given remote reference that is in your local git databse.
+   * Essentially this is the distance from a tag from a {@code git merge base}.
+   *
+   * @param remote
+   *   the remote
+   * @return the distance
+   */
+  public Optional<Long> commonAncestorDistanceFor(GitRemoteForGradle remote) {
+    var oObjectId = new MergeBaseFinder(this.git.get().getRepository()).find(remote);
+    return oObjectId.map(oid -> new DistanceCalculator(this.git::get).apply(oid.getName()));
   }
 }

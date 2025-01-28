@@ -22,6 +22,11 @@ public interface GitRemote {
     return StringUtils.removeStart(this.headBranchRefName(), Constants.R_REMOTES + this.name() + "/");
   }
 
+  /**
+   * Gets the remote HEAD branch ref name. This will look something like {@code refs/remotes/origin/main}.
+   *
+   * @return HEAD branch ref name
+   */
   @Nullable
   String headBranchRefName();
 
