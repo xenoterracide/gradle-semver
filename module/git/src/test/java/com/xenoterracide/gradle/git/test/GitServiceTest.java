@@ -63,6 +63,7 @@ class GitServiceTest {
           assertThat(remote.getHeadBranch().getOrNull()).isNull();
         });
       assertThat(ext.getDirty().getOrNull()).isTrue();
+      assertThat(ext.commonAncestorDistanceFor(ext.getRemotes().getOrNull().getFirst())).isEmpty();
     }
   }
 }
