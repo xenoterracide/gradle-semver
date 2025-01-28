@@ -89,6 +89,7 @@ public class SemverExtension implements Provides<Semver> {
       .map(SemverExtension::getOrigin)
       .filter(Optional::isPresent)
       .map(Optional::get)
+      .zip(gitExt.getBranch(), (remote, local) -> Objects.equals(remote.headBranch(), local) ? null : remote)
       .map(commonAncestorDistanceFor(gitExt)::apply)
       .orElse(gitExt.getDistance());
   }
