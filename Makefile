@@ -44,7 +44,7 @@ pre-release:
 	$(call check_defined, semver)
 	$(info Attempting to release $(semver))
 	./gradlew build --quiet
-	git tag -m $(semver) -a v$(semver)
+	git tag -m v$(semver) -a v$(semver)
 	./gradlew assemble shadowJar --quiet
 	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
 
