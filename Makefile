@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 #
 # SPDX-License-Identifier: MIT
 
@@ -21,11 +21,15 @@ endef
 .PHONY: up
 up:
 # success if no output
-	./gradlew dependencies --write-locks --refresh-dependencies --console=plain | grep -e FAILED || exit 0
+	./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0
+
+.PHONY: format
+format:
+	./gradlew spotlessApply --console=plain
 
 .PHONY: build
 build:
-	./gradlew build --console=plain
+	./gradlew spotlessApply build --console=plain
 
 .PHONY: merge
 merge: create-pr build watch-full merge-squash
@@ -36,6 +40,26 @@ clean:
 
 .PHONY: cleaner
 cleaner: clean-build clean-gradle
+
+.PHONY: release
+release: pre-release gh-release
+
+pre-release:
+	$(call check_defined, semver)
+	$(info Attempting to release $(semver))
+	./gradlew build --quiet
+	git tag -m $(semver) -a v$(semver)
+	./gradlew assemble shadowJar --quiet
+	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
+
+gh-release: build/libs/*.jar
+	git push --tags
+
+.PHONY: rollback
+rollback:
+	$(call check_defined, tags)
+	git tag --delete $(tags)
+	git push origin --delete $(tags)
 
 clean-cc: $(CONFIGURATION_CACHE)
 	- rm -rf $(CONFIGURATION_CACHE)
@@ -67,7 +91,7 @@ create-pr:
 	gh pr create --body "" || exit 0
 
 merge-squash:
-	gh pr merge --squash --delete-branch --auto --body ""
+	gh pr merge --squash --delete-branch --auto
 
 run-url:
 	$(call check_defined, workflow)
