@@ -48,7 +48,7 @@ pre-release:
 	./gradlew assemble shadowJar --quiet
 	./gradlew publishPlugins --validate-only --no-configuration-cache --warn
 
-gh-release: build/libs/*.jar
+gh-release: module/*/build/libs/*.jar
 	git push --tags
 
 .PHONY: rollback
