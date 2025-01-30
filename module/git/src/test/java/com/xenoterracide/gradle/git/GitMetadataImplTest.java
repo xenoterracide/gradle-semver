@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,15 +9,21 @@ import static com.xenoterracide.gradle.git.fixtures.CommitTools.supplies;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.function.Supplier;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 class GitMetadataImplTest {
+
+  static final String MAIN = "main";
+  static final String ORIGIN = "origin";
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
@@ -197,6 +203,19 @@ class GitMetadataImplTest {
     try (var git = Git.init().setDirectory(projectDir).call()) {
       var pg = new GitMetadataImpl(() -> git);
       assertThat(pg.remotes()).isEmpty();
+    }
+  }
+
+  @Test
+  void remoteImplToString() throws GitAPIException, URISyntaxException, IOException, InterruptedException {
+    try (var git = Git.init().setDirectory(projectDir).call()) {
+      git.remoteAdd().setUri(new URIish("https://example.org/repo.git")).setName(ORIGIN).call();
+
+      commit(git);
+
+      assertThat(new GitMetadataImpl(() -> git).remotes()).allSatisfy(r ->
+        assertThat(r.toString()).isNotEmpty().startsWith("com.xenoterracide.gradle.git.GitMetadataImpl$RemoteImpl@")
+      );
     }
   }
 }

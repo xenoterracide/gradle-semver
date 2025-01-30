@@ -44,7 +44,13 @@ public class VersionSortTest {
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
       var version = "0.1.1-alpha.0.";
       var sha = "g3aae11c";
-      return Stream.of(Arguments.of(withBuild(version + "1", sha), withBuild(version + "1", "topic-foo", sha)));
+      return Stream.of(
+        Arguments.of(withBuild(version + "1", sha), withBuild(version + "1", "topic-foo", sha)),
+        Arguments.of("0.1.1-rc.1.2+branch.topic-foo.git.7.3aae11b", "0.1.1-rc.1.2+branch.topic-foo.git.6.3aae11b"),
+        Arguments.of("0.1.1-rc.1.2+branch.topic-foo.git.70.3aae11b", "0.1.1-rc.1.2+branch.topic-foo.git.7.3aae11b"),
+        Arguments.of("0.1.1-rc.1.3+branch.topic-foo.git.70.3aae11b", "0.1.1-rc.1.2+branch.topic-foo.git.70.3aae11b"),
+        Arguments.of("0.1.1-rc.1.3+git.6.3aae11b", "0.1.1-rc.1.3+branch.topic-foo.git.70.3aae11b")
+      );
     }
   }
 
@@ -52,27 +58,28 @@ public class VersionSortTest {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-      var sha = "g3aae11c";
+      var sha = "3aae11c";
       return Stream.of(
-        Arguments.of("0.1.1-alpha.10.17129409589+6." + sha, "0.1.1-alpha.10+1.g3aae11d"),
-        Arguments.of("0.1.1-alpha.10.17129409589+6.g3aae11c", "0.1.1-alpha.2.1712940957+2." + sha),
-        Arguments.of("0.1.1-alpha.10.17129409589+6.g3aae11c", "0.1.1-alpha.6.1712940957+6." + sha),
-        Arguments.of("0.1.1-alpha.10.17129409589+6.g3aae11c", "0.1.1-alpha.6.17129409589"),
-        Arguments.of("0.1.1-alpha.0.17129409589+6.g3aae11c", "0.1.1-alpha.0.10+1.g3aae11d"),
-        Arguments.of("0.1.1-alpha.0.17129409589+6.g3aae11c", "0.1.1-alpha.0.17129409578+2." + sha),
-        Arguments.of("0.1.1-alpha.0.17129409589+6.g3aae11c", "0.1.1-alpha.0.17129409578+10" + sha),
-        Arguments.of("0.1.1-alpha.0.17129409589+6.g3aae11c", "0.1.1-alpha.0.17129409588"),
-        Arguments.of("0.1.1-rc.10.17129409589+6.g3aae11b", "0.1.1-alpha.0.10+1.g3aae11d"),
-        Arguments.of("0.1.1-rc.10.17129409589+6.g3aae11b", "0.1.1-alpha.0.17129409578+2." + sha),
-        Arguments.of("0.1.1-rc.10.17129409589+6.g3aae11b", "0.1.1-alpha.0.17129409578+10." + sha),
-        Arguments.of("0.1.1-rc.10.17129409589+6.g3aae11b", "0.1.1-alpha.0.17129409588"),
-        Arguments.of("0.1.1-rc.10.17129409589+6.g3aae11b", "0.1.1-rc.1.17129409588+6.g3aae11b"),
-        Arguments.of("0.1.1-rc.10.17129409589+6.g3aae11b", "0.1.1-rc.1.17129409588"),
+        Arguments.of("0.1.1-alpha.10.17129409589+git.6." + sha, "0.1.1-alpha.10+git.1.3aae11d"),
+        Arguments.of("0.1.1-alpha.10.17129409589+git.6.3aae11c", "0.1.1-alpha.2.1712940957+git.2." + sha),
+        Arguments.of("0.1.1-alpha.10.17129409589+git.6.3aae11c", "0.1.1-alpha.6.1712940957+git.6." + sha),
+        Arguments.of("0.1.1-alpha.10.17129409589+git.6.3aae11c", "0.1.1-alpha.6.17129409589"),
+        Arguments.of("0.1.1-alpha.0.17129409589+git.6.3aae11c", "0.1.1-alpha.0.10+git.1.3aae11d"),
+        Arguments.of("0.1.1-alpha.0.17129409589+git.6.3aae11c", "0.1.1-alpha.0.17129409578+git.2." + sha),
+        Arguments.of("0.1.1-alpha.0.17129409589+git.6.3aae11c", "0.1.1-alpha.0.17129409578+10" + sha),
+        Arguments.of("0.1.1-alpha.0.17129409589+git.6.3aae11c", "0.1.1-alpha.0.17129409588"),
+        Arguments.of("0.1.1-rc.10.17129409589+git.6.3aae11b", "0.1.1-alpha.0.10+git.1.3aae11d"),
+        Arguments.of("0.1.1-rc.10.17129409589+git.6.3aae11b", "0.1.1-alpha.0.17129409578+git.2." + sha),
+        Arguments.of("0.1.1-rc.10.17129409589+git.6.3aae11b", "0.1.1-alpha.0.17129409578+git.10." + sha),
+        Arguments.of("0.1.1-rc.10.17129409589+git.6.3aae11b", "0.1.1-alpha.0.17129409588"),
+        Arguments.of("0.1.1-rc.10.17129409589+git.6.3aae11b", "0.1.1-rc.1.17129409588+git.6.3aae11b"),
+        Arguments.of("0.1.1-rc.10.17129409589+git.6.3aae11b", "0.1.1-rc.1.17129409588+branch.topic-foo.git.6.3aae11b"),
+        Arguments.of("0.1.1-rc.10.17129409589+git.6.3aae11b", "0.1.1-rc.1.17129409588"),
         Arguments.of("0.1.1-rc.10", "0.1.1-rc.9"),
         Arguments.of("0.10.10", "0.9.10"),
         Arguments.of("0.10.10", "0.9.10-rc.1"),
         Arguments.of("0.9.10", "0.9.1"),
-        Arguments.of("1.1.1-rc.1.1+g3aae11b", "1.1.1-rc.1.0")
+        Arguments.of("1.1.1-rc.1.1+git.3aae11b", "1.1.1-rc.1.0")
       );
     }
   }

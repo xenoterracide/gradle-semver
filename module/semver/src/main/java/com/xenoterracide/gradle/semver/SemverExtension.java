@@ -5,9 +5,13 @@
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.git.GitExtension;
+import com.xenoterracide.gradle.git.GitRemoteForGradle;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.Transformer;
@@ -15,6 +19,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
+import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 /**
@@ -55,13 +60,49 @@ public class SemverExtension implements Provides<Semver> {
     return new SemverExtension(project).build();
   }
 
+  static Optional<GitRemoteForGradle> getOrigin(List<GitRemoteForGradle> remotes) {
+    return remotes
+      .stream()
+      .filter(remote -> Objects.equals(remote.getName(), "origin"))
+      .filter(remote -> remote.getHeadBranch().isPresent())
+      .findAny();
+  }
+
+  static Provider<String> getBranch(GitExtension gitExt) {
+    return gitExt
+      .getRemotes()
+      .map(remotes -> getOrigin(remotes).map(remote -> remote.getHeadBranch().get()))
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .zip(gitExt.getBranch(), (remoteBranch, localBranch) ->
+        Objects.equals(remoteBranch, localBranch) ? null : localBranch
+      );
+  }
+
+  static Function<GitRemoteForGradle, @Nullable Long> commonAncestorDistanceFor(GitExtension gitExt) {
+    return remote -> gitExt.commonAncestorDistanceFor(remote).orElse(null);
+  }
+
+  static Provider<Long> getDistance(GitExtension gitExt) {
+    return gitExt
+      .getRemotes()
+      .map(SemverExtension::getOrigin)
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .zip(gitExt.getBranch(), (remote, local) -> Objects.equals(remote.headBranch(), local) ? null : remote)
+      .map(commonAncestorDistanceFor(gitExt)::apply)
+      .orElse(gitExt.getDistance());
+  }
+
   Transformer<Semver, Semver> configureBuilder(GitExtension gitExt) {
     return semver -> {
       return new SemverBuilder(semver)
         .withDirtyOut(this.getCheckDirty().getOrElse(false))
-        .withDistance(gitExt.getDistance().get())
+        .withPreReleaseDistance(getDistance(gitExt).getOrElse(0L))
+        .withBuildDistance(gitExt.getDistance().getOrElse(0L))
         .withGitStatus(gitExt.getStatus().get())
         .withUniqueShort(gitExt.getUniqueShort().getOrNull())
+        .withBranch(getBranch(gitExt).getOrNull())
         .build();
     };
   }
@@ -86,13 +127,16 @@ public class SemverExtension implements Provides<Semver> {
   }
 
   /**
-   * {@link Provider} of {@link Semver}. For a distance of 1 away from tag or your HEAD branch
-   * {@code 0.1.1-alpha.0.1+.g3aae11e}. The longest example {@code 0.1.1-alpha.0.1+btopic-foo.g3aae11e.dirty}
+   * {@link Provider} of {@link Semver}. For a distance of 1 away from tag or your HEAD branch, but 40 commits on your
+   * deviated branch.
+   * {@code 0.1.1-alpha.0.1+git.1.3aae11e}. The longest example
+   * {@code 0.1.1-alpha.0.1+branch.topic-foo.git.40.3aae11e.dirty}
    *
    * @return semver provider
-   * @implSpec {@code <major>.<minor>.<patch>[-<preRelease.tag.distance>][+[b<branch>.]g<sha>[.dirty]]}
+   * @implSpec {@code
+   *   <major>.<minor>.<patch>[-<preRelease.tag.headBranchDistance>][+branch.<branch>.]git.<distance>.<sha>[.dirty]]}
    * @implNote The value will not be recalculated more than once per project per build. It is suggested to only use on
-   *   the root project. In the future this may be a single global calculation.
+   *   the root project.
    */
   @Override
   public Provider<Semver> getProvider() {

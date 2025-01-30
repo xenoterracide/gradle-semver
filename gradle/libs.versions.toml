@@ -1,7 +1,6 @@
-# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
-# SPDX-License-Identifier: MIT
 
 [versions]
 ep = "2.+"

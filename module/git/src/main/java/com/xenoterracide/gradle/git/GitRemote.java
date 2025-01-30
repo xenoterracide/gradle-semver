@@ -4,6 +4,8 @@
 
 package com.xenoterracide.gradle.git;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -11,12 +13,22 @@ import org.jspecify.annotations.Nullable;
  */
 public interface GitRemote {
   /**
-   * Gets the remote HEAD branch.
+   * Gets the remote HEAD branch. This removes the {@code refs/heads/} prefix.
    *
    * @return HEAD branch
    */
   @Nullable
-  String headBranch();
+  default String headBranch() {
+    return StringUtils.removeStart(this.headBranchRefName(), Constants.R_REMOTES + this.name() + "/");
+  }
+
+  /**
+   * Gets the remote HEAD branch ref name. This will look something like {@code refs/remotes/origin/main}.
+   *
+   * @return HEAD branch ref name
+   */
+  @Nullable
+  String headBranchRefName();
 
   /**
    * Gets the remote name; a common example is origin.
