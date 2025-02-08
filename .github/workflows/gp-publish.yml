@@ -20,6 +20,18 @@ jobs:
       ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
       ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          filter: "blob:none"
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: ./gradlew assemble
       - run: gh release create ${{ github.event.workflow_run.head_branch }} --generate-notes module/*/build/libs/*.jar --verify-tag
         env:
@@ -28,9 +40,6 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch,'v')
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions:
-      contents: read
-      packages: read
     env:
       IS_PUBLISHING: 1
       ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
