@@ -22,14 +22,20 @@ plugins {
 version = semver.provider.get()
 ```
 
-This is the simplest way to get your semver, but I don't recommend it because [Gradle isn't lazy with anything related to publishing](https://github.com/gradle/gradle/issues/29342). Even when it becomes lazy I doubt it'll be as lazy as you want. So I do the following, and then only set `IS_PUBLISHING` in my publishing build in CI. This avoids constant configuration cache busting as well as ensuring that IO is kept to a minimum. The provider should never have a null result under any circumstances; if it does that is a bug.
+This is the simplest way to get your semver, but I don't recommend it
+because [Gradle isn't lazy with anything related to publishing](https://github.com/gradle/gradle/issues/29342). Even
+when it becomes lazy I doubt it'll be as lazy as you want. So I do the following, and then only set `IS_PUBLISHING` in
+my publishing build in CI. This avoids constant configuration cache busting as well as ensuring that IO is kept to a
+minimum. The `semver.provider` should never have a `null` result under any circumstances; if it does that is a bug.
 
 ```kt
 import org.semver4j.Semver
 
-version = providers.environmentVariable("IS_PUBLISHING")
-  .map { semver.provider.get() }
-  .orElse(Semver.ZERO).get()
+version =
+  providers
+    .environmentVariable("IS_PUBLISHING")
+    .flatMap { semver.provider }
+    .getOrElse(Semver.ZERO)
 ```
 
 if you want you can expose whether your tree is dirty or not.
