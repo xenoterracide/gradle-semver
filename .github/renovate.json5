@@ -14,7 +14,6 @@
   packageRules: [
     {
       description: "Only allow major standard upgrades",
-      matchDepNames: ["renovatebot/pre-commit-hooks"],
       matchUpdateTypes: ["minor", "patch", "pin"],
       enabled: false,
     },
