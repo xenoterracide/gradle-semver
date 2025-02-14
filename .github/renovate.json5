@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: CC0-1.0
 
@@ -9,6 +9,14 @@
     {
       hostType: "maven",
       matchHost: "https://maven.pkg.github.com",
+    },
+  ],
+  packageRules: [
+    {
+      description: "Only allow major standard upgrades",
+      matchDepNames: ["renovatebot/pre-commit-hooks"],
+      matchUpdateTypes: ["minor", "patch", "pin"],
+      enabled: false,
     },
   ],
 }
