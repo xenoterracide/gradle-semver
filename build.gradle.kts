@@ -22,8 +22,7 @@ version =
   providers
     .environmentVariable("IS_PUBLISHING")
     .flatMap { semver.provider }
-    .orElse(Semver.ZERO)
-    .get()
+    .getOrElse(Semver.ZERO)
 
 tasks.dependencies {
   dependsOn(subprojects.map { it.tasks.dependencies })
