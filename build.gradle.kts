@@ -21,9 +21,8 @@ dependencyLocking {
 version =
   providers
     .environmentVariable("IS_PUBLISHING")
-    .map { semver.provider.get() }
-    .orElse(Semver.ZERO)
-    .get()
+    .flatMap { semver.provider }
+    .getOrElse(Semver.ZERO)
 
 tasks.dependencies {
   dependsOn(subprojects.map { it.tasks.dependencies })
