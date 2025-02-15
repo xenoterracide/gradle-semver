@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2023 - 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -9,5 +9,4 @@ plugins {
   id("our.javacompile")
   id("our.javatest")
   id("our.checkstyle")
-  id("our.spotbugs")
 }
