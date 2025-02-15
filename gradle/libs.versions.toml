@@ -55,11 +55,12 @@ maven-artifact = "org.apache.maven:maven-artifact:3.+"
 mockito = { module = "org.mockito:mockito-core", version = "5.+" }
 plugin-convention-coverage = "com.xenoterracide.gradle.convention:coverage:0.+"
 plugin-convention-publish = "com.xenoterracide.gradle.convention:publish:0.+"
+plugin-convention-spotbugs = "com.xenoterracide.gradle.convention:spotbugs:0.+"
 plugin-dependency-analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:2.+"
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:4.+"
 plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.+"
 plugin-semver = "com.xenoterracide.gradle:semver:0.+"
-plugin-spotbugs = "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.+"
+plugin-spotbugs = "com.github.spotbugs:com.github.spotbugs.gradle.plugin:6.+"
 semver = "org.semver4j:semver4j:5.+"
 slf4j-api = { module = "org.slf4j:slf4j-api" }
 slf4j-bom = "org.slf4j:slf4j-bom:2.+"
