@@ -14,13 +14,13 @@
   packageRules: [
     {
       description: "Only allow major standard upgrades",
-      matchDatasources: ["gradle", "gradle-wrapper", "npm"],
+      matchManagers: ["gradle", "gradle-wrapper", "npm"],
       matchUpdateTypes: ["minor", "patch", "pin"],
       enabled: false,
     },
     {
       description: "automerge",
-      matchDatasources: ["asdf"],
+      matchManagers: ["asdf"],
       automerge: true,
     },
   ],
