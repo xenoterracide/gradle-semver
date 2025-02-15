@@ -18,5 +18,10 @@
       matchUpdateTypes: ["minor", "patch", "pin"],
       enabled: false,
     },
+    {
+      description: "automerge",
+      matchDatasources: ["asdf"],
+      automerge: true,
+    },
   ],
 }
