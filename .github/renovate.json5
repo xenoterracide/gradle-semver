@@ -14,7 +14,7 @@
   packageRules: [
     {
       description: "Only allow major standard upgrades",
-      matchDatasources: ["maven", "npm"],
+      matchDatasources: ["gradle", "gradle-wrapper", "npm"],
       matchUpdateTypes: ["minor", "patch", "pin"],
       enabled: false,
     },
