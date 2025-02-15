@@ -19,7 +19,12 @@ e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
 shallow clone detected! git only has {} commits
 ```
 
-Shallow clones will not work properly with calculating the distance and thus you must not use them. The usual reason for doing a shallow clone is that repositories can grow quiet large, and it can be quite slow to download a 100Mb repository. What most people don't realize is that git is lazy and will fetch blobs as it needs them for a checkout if you do things correctly. `git add remote <origin> <https://...>` and then doing `git fetch --all --filter blob:none` followed by an operation like `git checkout <branch>` will not retrieve any files until you do the git checkout but it will have your full history. This will achieve the correct behavior on github.
+Shallow clones will not work properly with calculating the distance and thus you must not use them. The usual reason for
+doing a shallow clone is that repositories can grow quiet large, and it can be quite slow to download a 100Mb
+repository. What most people don't realize is that git is lazy and will fetch blobs as it needs them for a checkout if
+you do things correctly. `git add remote <origin> <https://...>` and then doing `git fetch --all --filter blob:none`
+followed by an operation like `git checkout <branch>` will not retrieve any files until you do the git checkout but it
+will have your full history. This will achieve the correct behavior on github.
 
 ```yml
 - uses: actions/checkout@v4
@@ -92,7 +97,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 ### Releasing
 
 ```sh
-npm run release --semver="0.10.0"
+git tag -m "v0.12.1" -a v0.12.1 && git push --tags
 ```
 
 ## License
