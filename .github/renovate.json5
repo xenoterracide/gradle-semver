@@ -19,6 +19,12 @@
       enabled: false,
     },
     {
+      matchPackageNames: ["com.gradle.develocity"],
+      matchManagers: ["gradle"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+    },
+    {
       matchManagers: ["asdf", "github-actions"],
       automerge: true,
     },
