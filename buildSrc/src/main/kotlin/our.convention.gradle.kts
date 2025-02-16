@@ -9,6 +9,7 @@ import org.gradle.accessors.dm.LibrariesForLibs
 plugins {
   id("com.autonomousapps.dependency-analysis")
   id("com.gradle.plugin-publish")
+  id("com.xenoterracide.gradle.convention.checkstyle")
   id("com.xenoterracide.gradle.convention.coverage")
   id("com.xenoterracide.gradle.convention.publish")
   id("com.xenoterracide.gradle.convention.spotbugs")

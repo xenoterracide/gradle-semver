@@ -8,5 +8,4 @@ plugins {
   id("our.convention")
   id("our.javacompile")
   id("our.javatest")
-  id("our.checkstyle")
 }

@@ -26,6 +26,7 @@ com.squareup.okio:okio:3.7.0=compileClasspath
 com.squareup.okio:okio:3.9.0=buildScriptClasspath,runtimeClasspath
 com.squareup:kotlinpoet-jvm:1.15.1=buildScriptClasspath,runtimeClasspath
 com.squareup:kotlinpoet:1.15.1=buildScriptClasspath,runtimeClasspath
+com.xenoterracide.gradle.convention:checkstyle:0.2.2=buildScriptClasspath,runtimeClasspath
 com.xenoterracide.gradle.convention:coverage:0.2.1=buildScriptClasspath,runtimeClasspath
 com.xenoterracide.gradle.convention:publish:0.2.1=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.xenoterracide.gradle.convention:spotbugs:0.2.1=buildScriptClasspath,runtimeClasspath

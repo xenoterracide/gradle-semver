@@ -53,9 +53,10 @@ junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api" }
 maven-artifact = "org.apache.maven:maven-artifact:3.+"
 mockito = { module = "org.mockito:mockito-core", version = "5.+" }
-plugin-convention-coverage = "com.xenoterracide.gradle.convention:coverage:0.+"
-plugin-convention-publish = "com.xenoterracide.gradle.convention:publish:0.+"
-plugin-convention-spotbugs = "com.xenoterracide.gradle.convention:spotbugs:0.+"
+plugin-convention-checkstyle = "com.xenoterracide.gradle.convention:checkstyle:0.2.+"
+plugin-convention-coverage = "com.xenoterracide.gradle.convention:coverage:0.2.+"
+plugin-convention-publish = "com.xenoterracide.gradle.convention:publish:0.2.+"
+plugin-convention-spotbugs = "com.xenoterracide.gradle.convention:spotbugs:0.2.+"
 plugin-dependency-analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:2.+"
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:4.+"
 plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.+"
