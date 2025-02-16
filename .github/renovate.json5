@@ -19,8 +19,12 @@
       enabled: false,
     },
     {
-      description: "automerge",
-      matchManagers: ["asdf"],
+      matchManagers: ["asdf", "github-actions"],
+      automerge: true,
+    },
+    {
+      matchManagers: ["npm"],
+      matchUpdateTypes: ["minor", "patch", "pin"],
       automerge: true,
     },
   ],
