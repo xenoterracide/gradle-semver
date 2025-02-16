@@ -19,8 +19,18 @@
       enabled: false,
     },
     {
-      description: "automerge",
-      matchManagers: ["asdf"],
+      matchPackageNames: ["com.gradle.develocity"],
+      matchManagers: ["gradle"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+    },
+    {
+      matchManagers: ["asdf", "github-actions"],
+      automerge: true,
+    },
+    {
+      matchManagers: ["npm"],
+      matchUpdateTypes: ["minor", "patch", "pin"],
       automerge: true,
     },
   ],
