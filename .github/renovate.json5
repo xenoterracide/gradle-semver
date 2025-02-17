@@ -16,7 +16,7 @@
   packageRules: [
     {
       description: "Only allow major standard upgrades",
-      matchManagers: ["gradle", "gradle-wrapper"],
+      matchManagers: ["gradle"],
       matchUpdateTypes: ["minor", "patch", "pin"],
       enabled: false,
     },
@@ -25,7 +25,7 @@
       automerge: true,
     },
     {
-      matchManagers: ["npm"],
+      matchManagers: ["npm", "gradle-wrapper"],
       matchUpdateTypes: ["minor", "patch", "pin"],
       automerge: true,
     },
