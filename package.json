@@ -14,8 +14,7 @@
     "prettier-plugin-toml": "^2.0.1"
   },
   "scripts": {
-    "merge": "make merge",
-    "postinstall": "git config core.hooksPath .config/git/hooks",
+    "postinstall": "pip install -r requirements.txt && git config core.hooksPath .config/git/hooks",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
   }
