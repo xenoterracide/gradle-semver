@@ -5,7 +5,7 @@
 name: update-java
 on:
   schedule:
-    - cron: "0 3 * * 3"
+    - cron: "0 3 * * *"
   push:
     branches:
       - ci/auto-update-java
@@ -45,7 +45,7 @@ jobs:
         id: git_status
       - uses: actions/setup-python@v5
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle/wrapper/') }}
-      - run: pip install reuse
+      - run: pip install -r requirements.txt
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle/wrapper/') }}
       - run: |
           reuse annotate --license 'Apache-2.0' --copyright 'Gradle, Inc' \

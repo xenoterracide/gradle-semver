@@ -16,8 +16,8 @@
   packageRules: [
     {
       // remember to sync with update-java
-      // every Wednesday at 4am
-      schedule: ["* 4 * * 3"],
+      // Run every day at 4am
+      schedule: ["* 4 * * *"],
       matchManagers: ["gradle", "gradle-wrapper"],
       enabled: false,
     },
