@@ -21,7 +21,7 @@
       enabled: false,
     },
     {
-      // Run every Monday
+      // Run every Wednesday
       schedule: ["* * * * 3"],
       matchManagers: ["asdf"],
       groupName: "asdf",
