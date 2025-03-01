@@ -5,7 +5,7 @@
 name: publish-to-github-packages
 on:
   workflow_run:
-    workflows: [build]
+    workflows: [full]
     types: [completed]
     branches: ["**"]
     tags: [v*]
