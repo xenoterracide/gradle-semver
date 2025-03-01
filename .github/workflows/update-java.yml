@@ -1,11 +1,11 @@
-# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
 name: update-java
 on:
   schedule:
-    - cron: "0 3 * * 0"
+    - cron: "0 3 * * 3"
   push:
     branches:
       - ci/auto-update-java
