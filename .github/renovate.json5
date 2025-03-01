@@ -19,7 +19,6 @@
       // every Wednesday at 4am
       schedule: ["0 4 * * 3"],
       matchManagers: ["gradle", "gradle-wrapper"],
-      matchUpdateTypes: ["minor", "patch", "pin"],
       enabled: false,
     },
     {
