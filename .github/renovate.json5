@@ -16,7 +16,7 @@
   packageRules: [
     {
       description: "Only allow major standard upgrades",
-      matchManagers: ["gradle"],
+      matchManagers: ["gradle", "gradle-wrapper"],
       matchUpdateTypes: ["minor", "patch", "pin"],
       enabled: false,
     },
