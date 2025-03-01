@@ -17,7 +17,7 @@
     {
       // remember to sync with update-java
       // every Wednesday at 4am
-      schedule: ["0 4 * * 3"],
+      schedule: ["* 4 * * 3"],
       matchManagers: ["gradle", "gradle-wrapper"],
       enabled: false,
     },
