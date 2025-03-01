@@ -28,7 +28,7 @@ build:
 	./gradlew build --console=plain
 
 .PHONY: merge
-merge: create-pr build watch-full merge-squash
+merge: merge-head create-pr build watch-full watch-publish merge-squash
 
 .PHONY: clean
 clean:
@@ -36,12 +36,6 @@ clean:
 
 .PHONY: cleaner
 cleaner: clean-build clean-gradle
-
-.PHONY: rollback
-rollback:
-	$(call check_defined, tags)
-	git tag --delete $(tags)
-	git push origin --delete $(tags)
 
 clean-cc: $(CONFIGURATION_CACHE)
 	- rm -rf $(CONFIGURATION_CACHE)
@@ -72,6 +66,9 @@ up-all-deps:
 create-pr:
 	gh pr create --body "" || exit 0
 
+merge-head:
+	git merge origin/HEAD
+
 merge-squash:
 	gh pr merge --squash --delete-branch --auto
 
@@ -84,4 +81,7 @@ watch:
 	@gh run watch $$($(call gh_head_run_id, $(workflow))) --exit-status
 
 watch-full:
-	@gh run watch $$($(call gh_head_run_id, "Full")) --exit-status
+	@gh run watch $$($(call gh_head_run_id, "full")) --exit-status
+
+watch-publish:
+	@gh run watch $$($(call gh_head_run_id, "publish")) --exit-status
