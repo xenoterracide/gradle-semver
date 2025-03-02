@@ -58,7 +58,7 @@ jobs:
         id: create_pr
         with:
           title: "chore(deps): java"
-          branch: topic/update-java
+          branch: deps/update-java
           token: ${{ secrets.GH_MERGE_PAT }}
       - run: gh pr merge --auto --squash ${{ steps.create_pr.outputs.pull-request-number }}
         if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
