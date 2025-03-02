@@ -2,8 +2,8 @@
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
 com.google.code.gson:gson:2.8.9=classpath
-org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:5.1.2=classpath
-org.gradle.kotlin:gradle-kotlin-dsl-plugins:5.1.2=classpath
+org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:5.2.0=classpath
+org.gradle.kotlin:gradle-kotlin-dsl-plugins:5.2.0=classpath
 org.jetbrains.intellij.deps:trove4j:1.0.20200330=classpath
 org.jetbrains.kotlin:kotlin-assignment:2.0.21=classpath
 org.jetbrains.kotlin:kotlin-build-statistics:2.0.21=classpath
