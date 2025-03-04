@@ -28,7 +28,7 @@ build:
 	./gradlew build --console=plain
 
 .PHONY: merge
-merge: merge-head create-pr build watch-full merge-squash
+merge: merge-head push create-pr build watch-full merge-squash
 
 .PHONY: clean
 clean:
@@ -65,6 +65,9 @@ up-all-deps:
 
 create-pr:
 	gh pr create --body "" || exit 0
+
+push:
+	git push
 
 merge-head:
 	git fetch --all --prune --prune-tags --tags --force
