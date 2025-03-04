@@ -67,6 +67,7 @@ create-pr:
 	gh pr create --body "" || exit 0
 
 merge-head:
+	git fetch --all --prune --prune-tags --tags --force
 	git merge origin/HEAD
 
 merge-squash:
