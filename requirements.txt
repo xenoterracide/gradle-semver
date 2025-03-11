@@ -40,7 +40,7 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-python-debian==0.1.49
+python-debian==1.0.1
     # via reuse
 reuse==5.0.2
     # via -r requirements.in
