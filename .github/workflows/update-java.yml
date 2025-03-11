@@ -22,16 +22,16 @@ jobs:
       ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
       ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
-          ref: ${{ github.event.workflow_run.head_branch}}
+          ref: ${{ github.ref }}
           filter: "blob:none"
           fetch-depth: 0
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v4.1.0
         with:
           gradle-version: current
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -43,7 +43,9 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
         name: git status
         id: git_status
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5.4.0
+        with:
+          python-version: "3"
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle/wrapper/') }}
       - run: pip install -r requirements.txt
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle/wrapper/') }}
@@ -54,7 +56,7 @@ jobs:
             --copyright-prefix spdx-string-symbol --merge-copyrights --force-dot-license gradle/wrapper/gradle-wrapper.properties
         name: reuse
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle-wrapper.jar') }}
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v7.0.8
         id: create_pr
         with:
           title: "chore(deps): java"

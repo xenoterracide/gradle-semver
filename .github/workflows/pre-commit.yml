@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
           ref: ${{ github.event.workflow_run.head_branch}}
           filter: "blob:none"
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5.4.0
         with:
           python-version: "3"
       - run: pip install -r requirements.txt
@@ -23,12 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
           ref: ${{ github.event.workflow_run.head_branch}}
           filter: "blob:none"
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.1.0
         with:
           cache: "npm"
       - run: npm ci
@@ -36,15 +36,15 @@ jobs:
   format-kotlin:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
           ref: ${{ github.event.workflow_run.head_branch}}
           filter: "blob:none"
           fetch-depth: 0
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
           java-version: 21
-      - uses: asdf-vm/actions/plugins-add@v3
+      - uses: asdf-vm/actions/plugins-add@v3.0.0
       - run: asdf install ktlint
       - run: ktlint '*.gradle.kts' '**/*.gradle.kts'
