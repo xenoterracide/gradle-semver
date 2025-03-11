@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
@@ -15,17 +15,17 @@ jobs:
       ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
       ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
           ref: ${{ github.event.workflow_run.head_branch}}
           filter: "blob:none"
           fetch-depth: 0
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v4.1.0
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: make ci-build
-      - uses: gradle/actions/dependency-submission@v4
+      - uses: gradle/actions/dependency-submission@v4.1.0
