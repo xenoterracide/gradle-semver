@@ -3,8 +3,8 @@
 # This file is expected to be part of source control.
 com.github.ben-manes.caffeine:caffeine:3.0.5=annotationProcessor,testAnnotationProcessor,testIntegrationAnnotationProcessor
 com.github.kevinstern:software-and-algorithms:1.0=annotationProcessor,testAnnotationProcessor,testIntegrationAnnotationProcessor
-com.github.spotbugs:spotbugs-annotations:4.9.2=spotbugs
-com.github.spotbugs:spotbugs:4.9.2=spotbugs
+com.github.spotbugs:spotbugs-annotations:4.9.3=spotbugs
+com.github.spotbugs:spotbugs:4.9.3=spotbugs
 com.github.stephenc.jcip:jcip-annotations:1.0-1=spotbugs
 com.google.auto.service:auto-service-annotations:1.0.1=annotationProcessor,testAnnotationProcessor,testIntegrationAnnotationProcessor
 com.google.auto.value:auto-value-annotations:1.9=annotationProcessor,testAnnotationProcessor,testIntegrationAnnotationProcessor
