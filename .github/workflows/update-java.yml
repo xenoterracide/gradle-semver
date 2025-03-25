@@ -43,7 +43,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
         name: git status
         id: git_status
-      - uses: actions/setup-python@v5.4.0
+      - uses: actions/setup-python@v5.5.0
         with:
           python-version: "3"
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle/wrapper/') }}
