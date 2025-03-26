@@ -3,7 +3,7 @@
 # This file is expected to be part of source control.
 com.autonomousapps:antlr:4.13.2.0=buildScriptClasspath,runtimeClasspath
 com.autonomousapps:asm-relocated:9.7.1.0=buildScriptClasspath,runtimeClasspath
-com.autonomousapps:dependency-analysis-gradle-plugin:2.13.1=buildScriptClasspath,compileClasspath,runtimeClasspath
+com.autonomousapps:dependency-analysis-gradle-plugin:2.13.2=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.autonomousapps:graph-support:0.5=buildScriptClasspath,runtimeClasspath
 com.autonomousapps:kotlin-editor-relocated:0.18.0=buildScriptClasspath,runtimeClasspath
 com.github.ben-manes.caffeine:caffeine:3.1.8=buildScriptClasspath,runtimeClasspath
