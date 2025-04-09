@@ -46,7 +46,7 @@ reuse==5.0.2
     # via -r requirements.in
 tomlkit==0.13.2
     # via reuse
-wheel==0.45.1
+wheel==0.46.1
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
