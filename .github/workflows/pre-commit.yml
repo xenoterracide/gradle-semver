@@ -28,7 +28,7 @@ jobs:
           ref: ${{ github.event.workflow_run.head_branch}}
           filter: "blob:none"
           fetch-depth: 0
-      - uses: actions/setup-node@v4.3.0
+      - uses: actions/setup-node@v4.4.0
         with:
           cache: "npm"
       - run: npm ci
