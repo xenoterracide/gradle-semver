@@ -32,7 +32,7 @@ license-expression==30.4.1
     # via reuse
 markupsafe==3.0.2
     # via jinja2
-packaging==24.2
+packaging==25.0
     # via build
 pip-tools==7.4.1
     # via -r requirements.in
