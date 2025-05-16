@@ -31,7 +31,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4.3.1
+      - uses: gradle/actions/setup-gradle@v4.4.0
         with:
           cache-read-only: true
       - run: make ci-full
