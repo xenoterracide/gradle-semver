@@ -22,7 +22,7 @@ chardet==5.2.0
     # via
     #   binaryornot
     #   python-debian
-click==8.2.0
+click==8.2.1
     # via
     #   pip-tools
     #   reuse
