@@ -24,8 +24,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4.4.0
+      - uses: gradle/actions/setup-gradle@v4.4.1
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: make ci-build
-      - uses: gradle/actions/dependency-submission@v4.4.0
+      - uses: gradle/actions/dependency-submission@v4.4.1
