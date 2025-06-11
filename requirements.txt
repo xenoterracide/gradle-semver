@@ -44,7 +44,7 @@ python-debian==0.1.49
     # via reuse
 reuse==5.0.2
     # via -r requirements.in
-tomlkit==0.13.2
+tomlkit==0.13.3
     # via reuse
 wheel==0.46.1
     # via pip-tools
