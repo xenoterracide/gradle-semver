@@ -8,5 +8,5 @@ io.vavr:vavr-match:0.10.6=classpath
 io.vavr:vavr:0.10.6=classpath
 org.apache.commons:commons-lang3:3.17.0=classpath
 org.jspecify:jspecify:1.0.0=classpath
-org.semver4j:semver4j:5.7.1=classpath
+org.semver4j:semver4j:5.8.0=classpath
 empty=
