@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -19,8 +19,7 @@ public final class CommitTools {
   private CommitTools() {}
 
   public static ObjectId commit(Git git) throws GitAPIException {
-    var commitFormat = "commit %d";
-    var message = String.format(commitFormat, NEXT_INT.getAsInt());
+    var message = "commit %d".formatted(NEXT_INT.getAsInt());
     var commit = git.commit().setMessage(message).call();
     return commit.toObjectId();
   }
