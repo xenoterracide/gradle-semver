@@ -28,7 +28,7 @@
     {
       // Run every Wednesday
       schedule: ["* * * * 3"],
-      matchManagers: ["npm", "pip_requirements", "asdf"],
+      matchManagers: ["asdf", "npm", "pip-compile"],
       groupName: "devDependencies",
       matchUpdateTypes: ["minor", "patch", "pin"],
       automerge: true,
