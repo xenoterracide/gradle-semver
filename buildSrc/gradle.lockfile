@@ -3,12 +3,12 @@
 # This file is expected to be part of source control.
 com.autonomousapps:antlr:4.13.2.0=buildScriptClasspath,runtimeClasspath
 com.autonomousapps:asm-relocated:9.7.1.0=buildScriptClasspath,runtimeClasspath
-com.autonomousapps:dependency-analysis-gradle-plugin:2.18.0=buildScriptClasspath,compileClasspath,runtimeClasspath
+com.autonomousapps:dependency-analysis-gradle-plugin:2.19.0=buildScriptClasspath,compileClasspath,runtimeClasspath
 com.autonomousapps:graph-support:0.6=buildScriptClasspath,runtimeClasspath
 com.autonomousapps:kotlin-editor-relocated:0.18.0=buildScriptClasspath,runtimeClasspath
 com.github.ben-manes.caffeine:caffeine:3.1.8=buildScriptClasspath,runtimeClasspath
-com.github.spotbugs.snom:spotbugs-gradle-plugin:6.2.0=buildScriptClasspath,runtimeClasspath
-com.github.spotbugs:com.github.spotbugs.gradle.plugin:6.2.0=buildScriptClasspath,runtimeClasspath
+com.github.spotbugs.snom:spotbugs-gradle-plugin:6.2.1=buildScriptClasspath,runtimeClasspath
+com.github.spotbugs:com.github.spotbugs.gradle.plugin:6.2.1=buildScriptClasspath,runtimeClasspath
 com.google.code.findbugs:jsr305:3.0.2=buildScriptClasspath,runtimeClasspath
 com.google.errorprone:error_prone_annotations:2.28.0=buildScriptClasspath,runtimeClasspath
 com.google.guava:failureaccess:1.0.2=buildScriptClasspath,runtimeClasspath
@@ -46,7 +46,7 @@ org.jetbrains.kotlin:kotlin-compiler-embeddable:2.0.21=kotlinBuildToolsApiClassp
 org.jetbrains.kotlin:kotlin-compiler-runner:2.0.21=kotlinBuildToolsApiClasspath
 org.jetbrains.kotlin:kotlin-daemon-client:2.0.21=kotlinBuildToolsApiClasspath
 org.jetbrains.kotlin:kotlin-daemon-embeddable:2.0.21=kotlinBuildToolsApiClasspath,kotlinCompilerClasspath
-org.jetbrains.kotlin:kotlin-metadata-jvm:2.0.21=buildScriptClasspath,runtimeClasspath
+org.jetbrains.kotlin:kotlin-metadata-jvm:2.1.21=buildScriptClasspath,runtimeClasspath
 org.jetbrains.kotlin:kotlin-reflect:1.6.10=kotlinBuildToolsApiClasspath,kotlinCompilerClasspath
 org.jetbrains.kotlin:kotlin-reflect:2.0.21=buildScriptClasspath,compileClasspath,runtimeClasspath
 org.jetbrains.kotlin:kotlin-sam-with-receiver-compiler-plugin-embeddable:2.0.21=kotlinCompilerPluginClasspathMain
