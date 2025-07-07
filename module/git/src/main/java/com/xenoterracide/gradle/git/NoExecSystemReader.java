@@ -8,6 +8,7 @@ import org.eclipse.jgit.util.SystemReader;
 import org.eclipse.jgit.util.SystemReader.Delegate;
 
 class NoExecSystemReader extends Delegate {
+
   static {
     getCreateAndSet();
   }
