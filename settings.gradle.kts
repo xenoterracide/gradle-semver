@@ -21,7 +21,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version ("3.19.1")
+  id("com.gradle.develocity") version ("4.0.2")
 }
 
 develocity {
