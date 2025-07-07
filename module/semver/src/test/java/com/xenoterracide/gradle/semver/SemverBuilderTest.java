@@ -158,8 +158,12 @@ class SemverBuilderTest {
     }
   }
 
-  record GitMetadataInfoNoBranch(long distance, GitStatus status, @Nullable String uniqueShort, @Nullable String tag)
-    implements GitMetadata {
+  record GitMetadataInfoNoBranch(
+    long distance,
+    GitStatus status,
+    @Nullable String uniqueShort,
+    @Nullable String tag
+  ) implements GitMetadata {
     @Override
     public @Nullable String branch() {
       return null;
@@ -188,8 +192,7 @@ class SemverBuilderTest {
     @Nullable String uniqueShort,
     @Nullable String tag,
     List<GitRemote> remotes
-  )
-    implements GitMetadata {
+  ) implements GitMetadata {
     static GitMetadata create(
       long distance,
       GitStatus status,

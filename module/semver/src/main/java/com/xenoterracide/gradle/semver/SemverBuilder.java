@@ -83,10 +83,13 @@ final class SemverBuilder {
 
   private void createPreRelease() {
     if (this.preReleaseDistance > 0) {
-      if (this.semver.getPreRelease().isEmpty()) { // 1.0 or notag
-        this.semver = this.semver.withIncPatch()
-          .withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.preReleaseDistance)));
-      } else { // rc.1
+      if (this.semver.getPreRelease().isEmpty()) {
+        // 1.0 or notag
+        this.semver = this.semver.withIncPatch().withPreRelease(
+          semverJoin(ALPHA, ZERO, Long.toString(this.preReleaseDistance))
+        );
+      } else {
+        // rc.1
         var preRelease = Stream.concat(
           this.semver.getPreRelease().stream(),
           Stream.of(Long.toString(this.preReleaseDistance))

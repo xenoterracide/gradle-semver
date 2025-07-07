@@ -26,8 +26,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 class GitPluginIntegrationTest {
 
-  static final String LOGGING =
-    """
+  static final String LOGGING = """
     logger.quiet("branch:" + git.branch.getOrNull())
     logger.quiet("commit:" + git.commit.getOrNull())
     logger.quiet("commitShort:" + git.uniqueShort.getOrNull())
@@ -35,8 +34,7 @@ class GitPluginIntegrationTest {
     logger.quiet("commitDistance:" + git.distance.getOrNull())
     logger.quiet("status:" + git.status.getOrNull())
     """;
-  static final String GROOVY_SCRIPT =
-    """
+  static final String GROOVY_SCRIPT = """
     plugins {
       id("com.xenoterracide.gradle.git")
     }
@@ -45,8 +43,7 @@ class GitPluginIntegrationTest {
     %s
     }
     """;
-  static final String KOTLIN_SCRIPT =
-    """
+  static final String KOTLIN_SCRIPT = """
     plugins {
       id("com.xenoterracide.gradle.git")
     }

@@ -40,7 +40,10 @@ public class GitExtension implements Provides<GitMetadata> {
 
     this.remotes = pf.providedList(
       this.provider.map(GitMetadata::remotes).map(remotes ->
-          remotes.stream().map(remote -> new GitRemoteForGradle(pf, remote)).collect(Collectors.toList())
+          remotes
+            .stream()
+            .map(remote -> new GitRemoteForGradle(pf, remote))
+            .collect(Collectors.toList())
         ),
       GitRemoteForGradle.class
     );

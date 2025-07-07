@@ -26,12 +26,10 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 class SemverPluginIntegrationTest {
 
-  static final String LOGGING =
-    """
+  static final String LOGGING = """
         logger.quiet("semver:" + semver.provider.get())
     """;
-  static final String GROOVY_SCRIPT =
-    """
+  static final String GROOVY_SCRIPT = """
     plugins {
       id("com.xenoterracide.gradle.semver")
     }
@@ -40,8 +38,7 @@ class SemverPluginIntegrationTest {
     %s
     }
     """;
-  static final String KOTLIN_SCRIPT =
-    """
+  static final String KOTLIN_SCRIPT = """
     plugins {
       id("com.xenoterracide.gradle.semver")
     }

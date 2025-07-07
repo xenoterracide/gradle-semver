@@ -119,7 +119,10 @@ public class GitMetadataImpl implements GitMetadata {
   }
 
   long shortCount() {
-    return this.git.tryCommand(git -> git.log().setMaxCount(5)).map(IterableTools::of).map(Stream::count).getOrElse(0L);
+    return this.git.tryCommand(git -> git.log().setMaxCount(5))
+      .map(IterableTools::of)
+      .map(Stream::count)
+      .getOrElse(0L);
   }
 
   @Override
