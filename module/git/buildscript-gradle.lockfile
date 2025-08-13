@@ -2,8 +2,8 @@
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
 com.fasterxml.woodstox:woodstox-core:7.1.0=classpath
-com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:8.3.8=classpath
-com.gradleup.shadow:shadow-gradle-plugin:8.3.8=classpath
+com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:8.3.9=classpath
+com.gradleup.shadow:shadow-gradle-plugin:8.3.9=classpath
 commons-io:commons-io:2.19.0=classpath
 org.apache.ant:ant-launcher:1.10.15=classpath
 org.apache.ant:ant:1.10.15=classpath
