@@ -15,9 +15,8 @@ e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
 
 ### Gradle Support
 
-These are the tested and guaranteed versions of Gradle and Java, actual releases may be different, e.g 1.x will start
-with a java 11 binary but could upgrade to requiring 17 at any time without notice; older versions may work, but are not
-supported.
+Gradle and Java versions are tested as follows. Older versions may work but are unsupported. Version 1.x starts with
+Java 11 but may require 17 without notice.
 
 | Version | Gradle | Java |
 | ------- | ------ | ---- |
