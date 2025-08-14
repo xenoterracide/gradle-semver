@@ -13,6 +13,16 @@ e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
 
 ## FAQ
 
+### Gradle Support
+
+Gradle and Java versions are tested as follows. Older versions may work but are unsupported. Version 1.x starts with
+Java 11 but may require 17 without notice.
+
+| Version | Gradle | Java |
+| ------- | ------ | ---- |
+| v0.13.x | 8.x    | 11.x |
+| v1.0.x  | 9.x    | 17.x |
+
 ### Shallow Clones
 
 ```
@@ -76,8 +86,8 @@ In order to get snapshots of dependencies, you must have a GitHub token in your 
 file should look like:
 
 ```properties
-ghUsername = <your username>
-ghPassword = <your token>
+ghUsername=<your username>
+ghPassword=<your token>
 ```
 
 You should generate your PAT
