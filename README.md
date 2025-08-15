@@ -18,10 +18,10 @@ e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
 Gradle and Java versions are tested as follows. Older versions may work but are unsupported. Version 1.x starts with
 Java 11 but may require 17 without notice.
 
-| Version | Gradle | Java |
-| ------- | ------ | ---- |
-| v0.13.x | 8.x    | 11.x |
-| v1.0.x  | 9.x    | 17.x |
+| Version | Gradle | Java | License                            |
+| ------- | ------ | ---- | ---------------------------------- |
+| v0.13.x | 8.x    | 11.x | Apache 2.0                         |
+| v1.0.x  | 9.x    | 17.x | GPLv3 with Classpath Exception 2.0 |
 
 ### Shallow Clones
 
@@ -112,7 +112,10 @@ git tag -m "v0.12.1" -a v0.12.1 && git push --tags
 
 ## License
 
-- Java: [Apache 2.0](https://choosealicense.com/licenses/apache-2.0/)
+All licenses are documented explicitly using SPDX identifiers in their file
+
+- Java: [GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
+  with [Classpath Exception](https://spdx.org/licenses/Classpath-exception-2.0.html)
 - Gradle Kotlin and Config Files: [MIT](https://choosealicense.com/licenses/mit/)
 - Documentation including Javadoc: [CC BY 4.0](https://choosealicense.com/licenses/cc-by-4.0/)
 
