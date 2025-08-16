@@ -4,7 +4,7 @@
 
 # Software
 "*.java":
-  - "reuse annotate --license 'Apache-2.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - "reuse annotate --license 'GPL-3.0-or-later WITH Classpath-exception-2.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - &prettier "prettier --cache --ignore-unknown --write"
 # Build Scripts
 "*.gradle.kts":
@@ -13,12 +13,18 @@
 "Makefile":
   - "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
 # Documentation
-"(*.md|*.adoc)":
+"*.{md,adoc}":
   - "reuse annotate --license 'CC-BY-NC-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
 # Trivial files
-"(*.xml|*.yml|*.yaml|*ignore|*.properties|*.toml|*.json5|.editorconfig|.gitattributes|.mailmap)":
-  - "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+"*.{xml,yml,yaml,properties,toml,json5}":
+  - &cc0 "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - *prettier
+".{editorconfig,gitattributes,mailmap}":
+  - *cc0
+  - *prettier
+".*ignore":
+  - *cc0
   - *prettier
 # Gradle Wrapper
 "gradle-wrapper.jar":
