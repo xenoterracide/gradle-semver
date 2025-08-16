@@ -7,10 +7,11 @@ on:
   workflow_run:
     workflows: [full]
     types: [completed]
+    tags: [v*]
 jobs:
   release-to-gh:
     timeout-minutes: 5
-    if: github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch,'v')
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5.0.0
         with:
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: ${{ github.event.workflow_run.head_sha }}
           filter: "blob:none"
           fetch-depth: 0
       - run: git remote set-head --auto origin
@@ -38,7 +39,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
   publish-to-portal:
-    if: github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch,'v')
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -48,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5.0.0
         with:
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: ${{ github.event.workflow_run.head_sha }}
           filter: "blob:none"
           fetch-depth: 0
       - uses: actions/setup-java@v4.7.1

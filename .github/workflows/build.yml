@@ -3,7 +3,22 @@
 # SPDX-License-Identifier: CC0-1.0
 
 name: build
-on: [push, workflow_call]
+on:
+  push:
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSES/**"
+      - "REUSE.toml"
+      - ".editorconfig"
+      - ".gitattributes"
+      - ".gitignore"
+      - ".mailmap"
+      - ".lintstagedrc*"
+      - ".prettier*"
+      - "git-conventional-commits.yaml"
+      - ".idea/**"
+      - ".vscode/**"
+  workflow_call:
 jobs:
   build:
     runs-on: ubuntu-latest
