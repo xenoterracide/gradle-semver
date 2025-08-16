@@ -10,6 +10,19 @@ on:
     branches:
       - ci/auto-update-java
       - ci/auto-update
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSES/**"
+      - "REUSE.toml"
+      - ".editorconfig"
+      - ".gitattributes"
+      - ".gitignore"
+      - ".mailmap"
+      - ".lintstagedrc*"
+      - ".prettier*"
+      - "git-conventional-commits.yaml"
+      - ".idea/**"
+      - ".vscode/**"
 
 jobs:
   update-java:

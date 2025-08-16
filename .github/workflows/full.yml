@@ -5,11 +5,25 @@
 name: full
 on:
   push:
-    branches: [main]
+    branches: &main_branch [main]
     tags:
       - v*
+    paths-ignore: &safe_paths
+      - "**/*.md"
+      - "LICENSES/**"
+      - "REUSE.toml"
+      - ".editorconfig"
+      - ".gitattributes"
+      - ".gitignore"
+      - ".mailmap"
+      - ".lintstagedrc*"
+      - ".prettier*"
+      - "git-conventional-commits.yaml"
+      - ".idea/**"
+      - ".vscode/**"
   pull_request:
-    branches: [main]
+    branches: *main_branch
+    paths-ignore: *safe_paths
   workflow_call:
 jobs:
   full:

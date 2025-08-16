@@ -25,9 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5.0.0
         with:
-          ref: ${{ github.event.workflow_run.head_branch}}
+          # Use head_sha because workflow_run on tags may have a null head_branch; head_sha is always set to the triggering commit.
+          ref: ${{ github.event.workflow_run.head_sha }}
           filter: "blob:none"
           fetch-depth: 0
+      # Ensure the remote default branch is set so tools relying on origin/HEAD behave consistently.
       - run: git remote set-head --auto origin
       - uses: actions/setup-java@v4.7.1
         with:
@@ -37,7 +39,6 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: ./gradlew publishAllPublicationsToGhRepository --scan --no-configuration-cache
-        if: steps.git_num_file_changes.outputs.stdout > 0
         env:
           ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
           ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
