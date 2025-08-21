@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
       # Ensure the remote default branch is set so tools relying on origin/HEAD behave consistently.
       - run: git remote set-head --auto origin
-      - uses: actions/setup-java@v4.7.1
+      - uses: actions/setup-java@v5.0.0
         with:
           distribution: temurin
           java-version: 21
