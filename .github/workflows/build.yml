@@ -5,23 +5,10 @@
 name: build
 on:
   push:
-    paths-ignore:
-      - "**/*.md"
-      - "LICENSES/**"
-      - "REUSE.toml"
-      - ".editorconfig"
-      - ".gitattributes"
-      - ".gitignore"
-      - ".mailmap"
-      - ".lintstagedrc*"
-      - ".prettier*"
-      - "git-conventional-commits.yaml"
-      - ".idea/**"
-      - ".vscode/**"
   workflow_call:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
       contents: write
