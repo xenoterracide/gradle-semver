@@ -5,11 +5,11 @@
 name: full
 on:
   push:
-    branches: &main_branch [main]
+    branches: &default [develop]
     tags:
       - v*
   pull_request:
-    branches: *main_branch
+    branches: *default
   workflow_call:
 jobs:
   full:
