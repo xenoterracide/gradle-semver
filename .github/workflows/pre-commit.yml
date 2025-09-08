@@ -1,6 +1,12 @@
 # SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
+checkoutstep: &checkout-step
+  uses: actions/checkout@v5.0.0
+  with:
+    ref: ${{ github.event.workflow_run.head_branch }}
+    filter: "blob:none"
+    fetch-depth: 0
 
 name: precommit
 on: [push, workflow_call]
@@ -9,11 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5.0.0
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          filter: "blob:none"
-          fetch-depth: 0
+      - *checkout-step
       - uses: actions/setup-python@v6.0.0
         with:
           python-version: "3"
@@ -23,11 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5.0.0
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          filter: "blob:none"
-          fetch-depth: 0
+      - *checkout-step
       - uses: actions/setup-node@v5.0.0
         with:
           cache: "npm"
@@ -36,11 +34,7 @@ jobs:
   format-kotlin:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5.0.0
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          filter: "blob:none"
-          fetch-depth: 0
+      - *checkout-step
       - uses: actions/setup-java@v5.0.0
         with:
           distribution: temurin
