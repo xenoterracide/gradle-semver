@@ -6,10 +6,11 @@ name: precommit
 on: [push, workflow_call]
 jobs:
   license:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5.0.0
+      - &checkout-step
+        uses: actions/checkout@v5.0.0
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           filter: "blob:none"
@@ -20,27 +21,19 @@ jobs:
       - run: pip install -r requirements.txt
       - run: reuse lint
   format:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5.0.0
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          filter: "blob:none"
-          fetch-depth: 0
+      - *checkout-step
       - uses: actions/setup-node@v5.0.0
         with:
           cache: "npm"
       - run: npm ci
       - run: npx prettier --ignore-unknown --check '**'
   format-kotlin:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5.0.0
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          filter: "blob:none"
-          fetch-depth: 0
+      - *checkout-step
       - uses: actions/setup-java@v5.0.0
         with:
           distribution: temurin
