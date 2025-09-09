@@ -31,7 +31,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4.4.2
+      - uses: gradle/actions/setup-gradle@v4.4.3
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: ./gradlew assemble
@@ -56,7 +56,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4.4.2
+      - uses: gradle/actions/setup-gradle@v4.4.3
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: ./gradlew publishPlugins --validate-only --no-configuration-cache
