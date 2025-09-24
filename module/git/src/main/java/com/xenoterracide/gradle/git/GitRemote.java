@@ -4,7 +4,7 @@
 
 package com.xenoterracide.gradle.git;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.eclipse.jgit.lib.Constants;
 import org.jspecify.annotations.Nullable;
 
@@ -19,7 +19,7 @@ public interface GitRemote {
    */
   @Nullable
   default String headBranch() {
-    return StringUtils.removeStart(this.headBranchRefName(), Constants.R_REMOTES + this.name() + "/");
+    return Strings.CS.removeStart(this.headBranchRefName(), Constants.R_REMOTES + this.name() + "/");
   }
 
   /**
