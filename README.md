@@ -76,29 +76,38 @@ add a way to export these to your `PATH` in your `~/.profile`
 ### Build Tools
 
 - [Gradle](https://docs.gradle.org/current/userguide/command_line_interface.html)
-- [NPM](https://docs.npmjs.com/about-npm)
-
-Run `npm ci && ./gradlew dependencies` to install dependencies.
+- [Yarn 4](https://yarnpkg.com/getting-started/install) (via Corepack)
 
 #### Fetching Dependencies
 
-In order to get snapshots of dependencies, you must have a GitHub token in your `~/.gradle/gradle.properties` file. This
-file should look like:
+In order to get snapshots of dependencies, you must have a GitHub token in your `~/.gradle/gradle.properties` file. This file should look like:
 
 ```properties
 ghUsername=<your username>
 ghPassword=<your token>
 ```
 
-You should generate your PAT
-as [Github Documents here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#authenticating-to-github-packages).
+You should generate your PAT as [Github Documents here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#authenticating-to-github-packages).
 
-> a personal access token (classic) with at least read:packages scope to install packages associated with other private
-> repositories (which GITHUB_TOKEN can't access).
+> a personal access token (classic) with at least `read:packages` scope to install packages associated with other private repositories (which `GITHUB_TOKEN` can't access).
 
 Then run.
 
-Run `npm ci && ./gradlew dependencies` to install dependencies.
+Yarn setup and manual postinstall:
+
+```sh
+# Enable Corepack, install Node dev tools, run postinstall, then verify Gradle deps
+corepack enable
+yarn install --immutable --inline-builds --check-resolutions
+yarn run -T postinstall
+./gradlew dependencies
+```
+
+If you need to run the postinstall step directly, the equivalent command is:
+
+```sh
+pip install -r requirements.txt && git config core.hooksPath .config/git/hooks
+```
 
 ### Committing
 
