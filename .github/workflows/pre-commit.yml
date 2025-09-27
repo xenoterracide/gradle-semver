@@ -27,9 +27,15 @@ jobs:
       - *checkout-step
       - uses: actions/setup-node@v5.0.0
         with:
-          cache: "npm"
-      - run: npm ci
-      - run: npx prettier --ignore-unknown --check '**'
+          node-version: 22
+          package-manager-cache: false
+      - run: corepack enable
+      - uses: actions/setup-node@v5.0.0
+        with:
+          node-version: 22
+          cache: "yarn"
+      - run: yarn install --immutable --inline-builds --check-resolutions
+      - run: yarn exec prettier --ignore-unknown --check '**'
   format-kotlin:
     runs-on: ubuntu-24.04
     steps:
