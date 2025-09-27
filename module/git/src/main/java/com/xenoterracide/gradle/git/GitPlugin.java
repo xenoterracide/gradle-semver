@@ -28,7 +28,7 @@ public class GitPlugin implements Plugin<Project> {
       .getGradle()
       .getSharedServices()
       .registerIfAbsent(GitService.class.getCanonicalName(), GitService.class, spec -> {
-        spec.getParameters().getGitDirectory().fileProvider(gitDir);
+        spec.getParameters().getGitDirectory().set(gitDir);
       });
 
     project.getExtensions().add(GIT, new GitExtension(gitService, new ProvidedFactory(project)));
