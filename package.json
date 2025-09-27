@@ -1,21 +1,19 @@
 {
   "name": "gradle-semver",
+  "packageManager": "yarn@4.10.3",
   "private": true,
-  "license": "Apache-2.0",
+  "license": "GPL-3.0-or-later WITH Classpath-exception-2.0",
   "devDependencies": {
-    "@prettier/plugin-xml": "^3.2.2",
-    "git-conventional-commits": "^2.6.5",
-    "lint-staged": "^16.1.2",
-    "pinst": "3",
-    "prettier": "^3.1.1",
-    "prettier-plugin-java": "^2.6.0",
+    "@prettier/plugin-xml": "^3.4.2",
+    "git-conventional-commits": "^2.8.0",
+    "lint-staged": "^16.2.1",
+    "prettier": "^3.6.2",
+    "prettier-plugin-java": "^2.7.5",
     "prettier-plugin-properties": "^0.3.0",
     "prettier-plugin-sh": "^0.18.0",
-    "prettier-plugin-toml": "^2.0.1"
+    "prettier-plugin-toml": "^2.0.6"
   },
   "scripts": {
-    "postinstall": "pip install -r requirements.txt && git config core.hooksPath .config/git/hooks",
-    "prepublishOnly": "pinst --disable",
-    "postpublish": "pinst --enable"
+    "postinstall": "pip install -r requirements.txt && git config core.hooksPath .config/git/hooks"
   }
 }
