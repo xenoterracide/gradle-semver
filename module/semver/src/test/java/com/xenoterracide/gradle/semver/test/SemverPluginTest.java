@@ -12,7 +12,6 @@ import java.io.File;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
@@ -21,11 +20,9 @@ import org.junit.jupiter.api.io.TempDir;
 class SemverPluginTest {
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
-  @NonNull
   File projectDir;
 
   Project project;
-  Git git;
 
   @BeforeEach
   void setupProject() throws Exception {
@@ -35,14 +32,15 @@ class SemverPluginTest {
     var msg2 = "two";
     var msg3 = "three";
 
-    git = Git.init().setDirectory(project.getProjectDir()).call();
-    var one = git.commit().setMessage(msg1).setAllowEmpty(true).call();
-    var two = git.commit().setMessage(msg2).setAllowEmpty(true).call();
-    var three = git.commit().setMessage(msg3).setAllowEmpty(true).call();
+    try (var git = Git.init().setDirectory(project.getProjectDir()).call()) {
+      var one = git.commit().setMessage(msg1).setAllowEmpty(true).call();
+      var two = git.commit().setMessage(msg2).setAllowEmpty(true).call();
+      var three = git.commit().setMessage(msg3).setAllowEmpty(true).call();
 
-    git.tag().setAnnotated(true).setMessage(msg1).setName("v0.1.1").setObjectId(one).call();
-    git.tag().setAnnotated(true).setMessage(msg2).setName("v0.1.2").setObjectId(two).call();
-    git.tag().setAnnotated(true).setMessage(msg3).setName("v0.1.3").setObjectId(three).call();
+      git.tag().setAnnotated(true).setMessage(msg1).setName("v0.1.1").setObjectId(one).call();
+      git.tag().setAnnotated(true).setMessage(msg2).setName("v0.1.2").setObjectId(two).call();
+      git.tag().setAnnotated(true).setMessage(msg3).setName("v0.1.3").setObjectId(three).call();
+    }
   }
 
   @Test
