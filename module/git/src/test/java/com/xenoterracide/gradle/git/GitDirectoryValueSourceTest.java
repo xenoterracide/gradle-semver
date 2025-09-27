@@ -18,13 +18,13 @@ import org.junit.jupiter.api.io.TempDir;
 
 class GitDirectoryValueSourceTest {
 
-  @TempDir(cleanup = CleanupMode.NEVER)
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File rootRepo;
 
-  @TempDir(cleanup = CleanupMode.NEVER)
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File moduleA;
 
-  @TempDir(cleanup = CleanupMode.NEVER)
+  @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File moduleB;
 
   @Test
