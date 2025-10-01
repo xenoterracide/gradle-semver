@@ -35,13 +35,14 @@ class SemverBuilderIntegrationTest {
 
   static final String MAIN = "main";
   static final String ORIGIN = "origin";
-  private static Logger log = Logging.getLogger(SemverBuilderIntegrationTest.class);
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File bareRepo;
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
+
+  private final Logger log = Logging.getLogger(this.getClass());
 
   static Supplier<Semver> versionSupplier(ProjectBuilder pb) {
     return () -> {
@@ -66,9 +67,10 @@ class SemverBuilderIntegrationTest {
         .redirectError(ProcessBuilder.Redirect.PIPE)
         .start();
 
-      var reader = new BufferedReader(new InputStreamReader(setHead.getErrorStream(), StandardCharsets.UTF_8));
-      setHead.waitFor();
-      log.warn("set-head: {}", reader.lines().toList());
+      try (var reader = new BufferedReader(new InputStreamReader(setHead.getErrorStream(), StandardCharsets.UTF_8))) {
+        setHead.waitFor();
+        log.warn("set-head: {}", reader.lines().toList());
+      }
 
       var vs = versionSupplier(pb);
       var size = 29;

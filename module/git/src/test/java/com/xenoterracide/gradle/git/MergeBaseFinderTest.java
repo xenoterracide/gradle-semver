@@ -74,19 +74,19 @@ class MergeBaseFinderTest {
       })
       .get();
     this.git = Try.withResources(() -> Git.cloneRepository().setDirectory(projectDir).setURI(uri).call()).of(g -> {
-        var p = new ProcessBuilder()
-          .directory(projectDir)
-          .command("git", "remote", "set-head", "--auto", "origin")
-          .start();
-        try (var input = p.inputReader()) {
-          log.warn("set-head: {}", input.lines().toList());
-        }
-        p.waitFor();
-        var remoteRef = Constants.R_REMOTES + "origin" + "/" + Constants.HEAD;
-        var file = g.getRepository().getDirectory().toPath().resolve(remoteRef).toFile();
-        log.warn("project: '{} with remoteRef: '{}' exists: {}", projectDir, file, file.exists());
-        return g;
-      })::get;
+      var p = new ProcessBuilder()
+        .directory(projectDir)
+        .command("git", "remote", "set-head", "--auto", "origin")
+        .start();
+      try (var input = p.inputReader()) {
+        log.warn("set-head: {}", input.lines().toList());
+      }
+      p.waitFor();
+      var remoteRef = Constants.R_REMOTES + "origin" + "/" + Constants.HEAD;
+      var file = g.getRepository().getDirectory().toPath().resolve(remoteRef).toFile();
+      log.warn("project: '{} with remoteRef: '{}' exists: {}", projectDir, file, file.exists());
+      return g;
+    })::get;
   }
 
   @Test
