@@ -41,15 +41,15 @@ public class GitRemoteForGradle implements GitRemote {
    */
   public Provider<String> getHeadBranch() {
     return this.headBranch.orElse(
-        this.pf.providedString(() -> {
-            Logging.getLogger(this.getClass()).warn(
-              "Git remote {} has no HEAD branch; run `git remote set-head {} --auto`",
-              this.name,
-              this.name
-            );
-            return null;
-          })
-      );
+      this.pf.providedString(() -> {
+        Logging.getLogger(this.getClass()).warn(
+          "Git remote {} has no HEAD branch; run `git remote set-head {} --auto`",
+          this.name,
+          this.name
+        );
+        return null;
+      })
+    );
   }
 
   Provider<String> getHeadBranchRefName() {
