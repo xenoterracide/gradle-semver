@@ -14,12 +14,14 @@ import org.jspecify.annotations.Nullable;
 
 public final class CommitTools {
 
-  public static final IntSupplier NEXT_INT = IntStream.iterate(0, i -> i + 1).iterator()::nextInt;
+  private static final ThreadLocal<IntSupplier> NEXT_INT = ThreadLocal.withInitial(() ->
+    IntStream.iterate(0, i -> i + 1).iterator()::nextInt
+  );
 
   private CommitTools() {}
 
   public static ObjectId commit(Git git) throws GitAPIException {
-    var message = "commit %d".formatted(NEXT_INT.getAsInt());
+    var message = "commit %d".formatted(NEXT_INT.get().getAsInt());
     var commit = git.commit().setMessage(message).call();
     return commit.toObjectId();
   }
