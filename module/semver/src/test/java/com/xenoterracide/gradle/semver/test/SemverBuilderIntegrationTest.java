@@ -35,7 +35,7 @@ class SemverBuilderIntegrationTest {
 
   static final String MAIN = "main";
   static final String ORIGIN = "origin";
-  private static final Logger log = Logging.getLogger(SemverBuilderIntegrationTest.class);
+  private final Logger log = Logging.getLogger(this.getClass());
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File bareRepo;
