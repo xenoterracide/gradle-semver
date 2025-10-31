@@ -5,7 +5,6 @@
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.kotlin.dsl.KotlinClosure2
 
 plugins {
   `java-gradle-plugin`
@@ -55,17 +54,6 @@ val available =
 tasks.withType<Test>().configureEach {
   jvmArgs("-XX:+EnableDynamicAgentLoading")
   useJUnitPlatform()
-  maxParallelForks =
-    Runtime
-      .getRuntime()
-      .availableProcessors()
-      .div(2)
-      .or(1)
-  systemProperties(
-    "junit.jupiter.execution.parallel.enabled" to "true",
-    "junit.jupiter.execution.parallel.mode.default" to "concurrent",
-    "junit.jupiter.execution.parallel.mode.classes.default" to "concurrent",
-  )
   reports {
     junitXml.required.set(false)
     html.required.set(false)

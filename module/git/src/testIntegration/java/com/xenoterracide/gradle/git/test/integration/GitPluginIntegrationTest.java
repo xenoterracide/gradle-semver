@@ -23,6 +23,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 class GitPluginIntegrationTest {
 
@@ -154,7 +155,7 @@ class GitPluginIntegrationTest {
   static class BuildScriptArgumentsProvider implements ArgumentsProvider {
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
         Arguments.of("build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
         Arguments.of("build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
