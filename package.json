@@ -1,6 +1,6 @@
 {
   "name": "gradle-semver",
-  "packageManager": "yarn@4.10.3",
+  "packageManager": "yarn@4.11.0",
   "private": true,
   "license": "GPL-3.0-or-later WITH Classpath-exception-2.0",
   "devDependencies": {
