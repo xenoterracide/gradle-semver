@@ -1,12 +1,12 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-com.xenoterracide.gradle.semver:com.xenoterracide.gradle.semver.gradle.plugin:0.14.0-alpha.0.53+branch.fbbc13b1af090e42d5f927c7d9bba6817fbd2d37.git.53.fbbc13b=classpath
-com.xenoterracide.gradle:git:0.14.0-alpha.0.53+branch.fbbc13b1af090e42d5f927c7d9bba6817fbd2d37.git.53.fbbc13b=classpath
-com.xenoterracide.gradle:semver:0.14.0-alpha.0.53+branch.fbbc13b1af090e42d5f927c7d9bba6817fbd2d37.git.53.fbbc13b=classpath
+com.xenoterracide.gradle.semver:com.xenoterracide.gradle.semver.gradle.plugin:0.14.0-alpha.0.55+branch.4683e1f4a2af1561339402f6d4f2b84c23bf79c3.git.55.4683e1f=classpath
+com.xenoterracide.gradle:git:0.14.0-alpha.0.55+branch.4683e1f4a2af1561339402f6d4f2b84c23bf79c3.git.55.4683e1f=classpath
+com.xenoterracide.gradle:semver:0.14.0-alpha.0.55+branch.4683e1f4a2af1561339402f6d4f2b84c23bf79c3.git.55.4683e1f=classpath
 io.vavr:vavr-match:0.10.7=classpath
 io.vavr:vavr:0.10.7=classpath
-org.apache.commons:commons-lang3:3.19.0=classpath
+org.apache.commons:commons-lang3:3.20.0=classpath
 org.jspecify:jspecify:1.0.0=classpath
 org.semver4j:semver4j:5.8.0=classpath
 empty=
