@@ -23,7 +23,7 @@ jobs:
     env:
       IS_PUBLISHING: 1
     steps:
-      - uses: actions/checkout@v5.0.1
+      - uses: actions/checkout@v6.0.0
         with:
           # Use head_sha because workflow_run on tags may have a null head_branch; head_sha is always set to the triggering commit.
           ref: ${{ github.event.workflow_run.head_sha }}
