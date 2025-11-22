@@ -69,7 +69,7 @@ jobs:
             --copyright-prefix spdx-string-symbol --merge-copyrights --force-dot-license gradle/wrapper/gradle-wrapper.properties
         name: reuse
         if: ${{ contains(steps.git_status.outputs.stdout, 'gradle-wrapper.jar') }}
-      - uses: peter-evans/create-pull-request@v7.0.8
+      - uses: peter-evans/create-pull-request@v7.0.9
         id: create_pr
         with:
           title: "chore(deps): java"
