@@ -1,9 +1,9 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-com.xenoterracide.gradle.semver:com.xenoterracide.gradle.semver.gradle.plugin:0.14.0-alpha.0.57+branch.5d6842241853c587a6d62c2563cf31d4e1943257.git.57.5d68422=classpath
-com.xenoterracide.gradle:git:0.14.0-alpha.0.57+branch.5d6842241853c587a6d62c2563cf31d4e1943257.git.57.5d68422=classpath
-com.xenoterracide.gradle:semver:0.14.0-alpha.0.57+branch.5d6842241853c587a6d62c2563cf31d4e1943257.git.57.5d68422=classpath
+com.xenoterracide.gradle.semver:com.xenoterracide.gradle.semver.gradle.plugin:0.14.0-alpha.0.61+branch.3f5967789bc6018a6fcab1d947bdce36912b3859.git.61.3f59677=classpath
+com.xenoterracide.gradle:git:0.14.0-alpha.0.61+branch.3f5967789bc6018a6fcab1d947bdce36912b3859.git.61.3f59677=classpath
+com.xenoterracide.gradle:semver:0.14.0-alpha.0.61+branch.3f5967789bc6018a6fcab1d947bdce36912b3859.git.61.3f59677=classpath
 io.vavr:vavr-match:0.10.7=classpath
 io.vavr:vavr:0.10.7=classpath
 org.apache.commons:commons-lang3:3.20.0=classpath
