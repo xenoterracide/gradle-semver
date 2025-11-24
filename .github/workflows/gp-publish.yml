@@ -51,6 +51,7 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha }}
           filter: "blob:none"
           fetch-depth: 0
+      - run: git remote set-head --auto origin
       - uses: actions/setup-java@v5.0.0
         with:
           distribution: temurin
