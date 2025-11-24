@@ -58,7 +58,7 @@ tasks.withType<Test>().configureEach {
     Runtime
       .getRuntime()
       .availableProcessors()
-      .div(4)
+      .div(2)
       .coerceAtLeast(1)
   systemProperties(
     "junit.jupiter.execution.parallel.enabled" to "true",
