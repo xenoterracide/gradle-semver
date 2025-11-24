@@ -21,7 +21,7 @@ Java 11 but may require 17 without notice.
 | Version | Gradle | Java | License                            |
 | ------- | ------ | ---- | ---------------------------------- |
 | v0.13.x | 8.x    | 11.x | Apache 2.0                         |
-| v1.0.x  | 9.x    | 17.x | GPLv3 with Classpath Exception 2.0 |
+| v0.14.x | 9.x    | 17.x | GPLv3 with Classpath Exception 2.0 |
 
 ### Shallow Clones
 
