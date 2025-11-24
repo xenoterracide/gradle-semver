@@ -171,6 +171,6 @@ public class SemverExtension implements Provides<Semver> {
    */
   @Override
   public String toString() {
-    return this.provider.get().toString();
+    return this.provider.getOrElse(Semver.ZERO).toString();
   }
 }
