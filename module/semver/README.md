@@ -19,7 +19,7 @@ plugins {
   id("com.xenoterracide.gradle.semver")
 }
 
-version = semver.provider.get()
+version = semver
 ```
 
 This is the simplest way to get your semver, but I don't recommend it
@@ -45,7 +45,7 @@ semver {
   checkDirty.set(true) // expensive since it invalidates the configuration cache every change
 }
 
-logger.quiet("semver " + semver.provider.get() // 0.1.1-alpha.0.1+branch.topic-foo.git.32.3aae11e.dirty
+logger.quiet("semver: " + semver) // 0.1.1-alpha.0.1+branch.topic-foo.git.32.3aae11e.dirty
 ```
 
 The plugin exposes a `Semver`. See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html).
