@@ -46,7 +46,9 @@ class SemverPluginTest {
   @Test
   void apply() {
     project.getPluginManager().apply(SemverPlugin.class);
-    var semver = project.getExtensions().getByType(SemverExtension.class).getProvider();
-    assertThat(semver.get()).hasToString("0.1.3");
+    var extension = project.getExtensions().getByType(SemverExtension.class);
+    var provider = extension.getProvider();
+    assertThat(provider.get()).hasToString("0.1.3");
+    assertThat(extension.toString()).isEqualTo(provider.get().toString());
   }
 }
