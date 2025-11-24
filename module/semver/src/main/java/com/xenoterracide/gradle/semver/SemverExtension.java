@@ -163,4 +163,14 @@ public class SemverExtension implements Provides<Semver> {
   public Property<String> getRemote() {
     return this.remote;
   }
+
+  /**
+   * Returns a string representation of the object, which is retrieved from the provider's value.
+   *
+   * @return the string representation of the object provided by the {@code provider}
+   */
+  @Override
+  public String toString() {
+    return this.provider.getOrElse(Semver.ZERO).toString();
+  }
 }
