@@ -54,10 +54,7 @@ val available =
 tasks.withType<Test>().configureEach {
   jvmArgs("-XX:+EnableDynamicAgentLoading")
   useJUnitPlatform()
-  maxParallelForks =
-    Runtime
-      .getRuntime()
-      .availableProcessors()
+  maxParallelForks = Runtime.getRuntime().availableProcessors()
 
   reports {
     html.required.set(false)
