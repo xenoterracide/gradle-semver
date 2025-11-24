@@ -13,7 +13,7 @@ plugins {
 }
 
 tasks.compileJava {
-  options.release = 11
+  options.release = 17
 }
 
 dependencyLocking {
