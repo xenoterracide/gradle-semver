@@ -6,6 +6,7 @@
 ep = "2.+"
 checker = "3.+"
 spring = "3.+"
+convention = "0.3.+"
 
 [libraries]
 api-guardian = { module = "org.apiguardian:apiguardian-api" }
@@ -53,11 +54,11 @@ junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api" }
 maven-artifact = "org.apache.maven:maven-artifact:3.+"
 mockito = { module = "org.mockito:mockito-core", version = "5.+" }
-plugin-convention-checkstyle = "com.xenoterracide.gradle.convention:checkstyle:0.2.+"
-plugin-convention-coverage = "com.xenoterracide.gradle.convention:coverage:0.2.+"
-plugin-convention-publish = "com.xenoterracide.gradle.convention:publish:0.2.+"
-plugin-convention-spotbugs = "com.xenoterracide.gradle.convention:spotbugs:0.2.+"
-plugin-dependency-analysis = "com.autonomousapps:dependency-analysis-gradle-plugin:2.+"
+plugin-convention-checkstyle = { module = "com.xenoterracide.gradle.convention:checkstyle", version.ref = "convention" }
+plugin-convention-coverage = { module = "com.xenoterracide.gradle.convention:coverage", version.ref = "convention" }
+plugin-convention-publish = { module = "com.xenoterracide.gradle.convention:publish", version.ref = "convention" }
+plugin-convention-spotbugs = { module = "com.xenoterracide.gradle.convention:spotbugs", version.ref = "convention" }
+plugin-dependency-analysis = { module = "com.autonomousapps.dependency-analysis:com.autonomousapps.dependency-analysis.gradle.plugin", version = "3.+" }
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:4.+"
 plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.+"
 plugin-semver = "com.xenoterracide.gradle:semver:0.+"
