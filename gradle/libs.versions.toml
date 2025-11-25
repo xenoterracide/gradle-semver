@@ -7,7 +7,7 @@ ep = "2.+"
 checker = "3.+"
 spring = "3.+"
 convention = "0.3.+"
-junit = "5.+"
+junit = "6.+"
 
 [libraries]
 api-guardian = { module = "org.apiguardian:apiguardian-api" }
