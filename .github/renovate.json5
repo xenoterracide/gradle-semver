@@ -27,7 +27,7 @@
     },
     {
       // remember to sync with update-java
-      // Run every day at 04:00 UTC (scheduled after update-java at 03:00)
+      // Runs during the 04:00 UTC hour daily (scheduled after update-java at 03:00)
       schedule: ["* 4 * * *"],
       matchManagers: ["gradle", "gradle-wrapper"],
       // Open PRs for MAJOR updates only; minor/patch handled by update-java
@@ -37,7 +37,7 @@
     {
       // Ensure Gradle plugin versions in settings files are considered
       // Match all Java update types; run weekly and not concurrently with dev deps
-      // Weekly on Wednesday at 05:00 UTC (devDependencies run at 04:00)
+      // Weekly on Wednesday during the 05:00 UTC hour (devDependencies window is 04:00)
       schedule: ["* 5 * * 3"],
       matchManagers: ["gradle"],
       matchFileNames: ["**/settings.gradle", "**/settings.gradle.kts"],
@@ -50,7 +50,7 @@
     },
     {
       // Run every Wednesday
-      // Single run at 04:00 UTC
+      // Window: 04:00 UTC hour on Wednesday (Renovate cron uses '*' for minutes)
       schedule: ["* 4 * * 3"],
       matchManagers: ["npm", "pip-compile", "asdf"],
       groupName: "devDependencies",
