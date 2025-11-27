@@ -16,6 +16,16 @@
   ],
   packageRules: [
     {
+      // Use pip-compile with PEP 621 pyproject at repo root
+      matchManagers: ["pip-compile"],
+      managerFilePatterns: ["^pyproject\\.toml$"],
+    },
+    {
+      // Disable legacy requirements manager; we use pip-compile with PEP 621
+      matchManagers: ["pip_requirements"],
+      enabled: false,
+    },
+    {
       // remember to sync with update-java
       // Run every day at 04:00 UTC (scheduled after update-java at 03:00)
       schedule: ["0 4 * * *"],
