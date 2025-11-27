@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024, 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: CC0-1.0
 
@@ -6,6 +6,7 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["config:recommended"],
   dependencyDashboard: true,
+  timezone: "UTC",
   automergeStrategy: "rebase",
   hostRules: [
     {
@@ -16,10 +17,22 @@
   packageRules: [
     {
       // remember to sync with update-java
-      // Run every day at 4am
-      schedule: ["* 4 * * *"],
+      // Run every day at 04:00 UTC (scheduled after update-java at 03:00)
+      schedule: ["0 4 * * *"],
       matchManagers: ["gradle", "gradle-wrapper"],
-      enabled: false,
+      // Open PRs for MAJOR updates only; minor/patch handled by update-java
+      matchUpdateTypes: ["major"],
+      automerge: false,
+    },
+    {
+      // Ensure Gradle plugin versions in settings files are considered
+      // Match all Java update types; run weekly and not concurrently with dev deps
+      // Weekly on Wednesday at 05:00 UTC (devDependencies run at 04:00)
+      schedule: ["0 5 * * 3"],
+      matchManagers: ["gradle"],
+      matchFileNames: ["**/settings.gradle", "**/settings.gradle.kts"],
+      matchUpdateTypes: ["major", "minor", "patch"],
+      automerge: true,
     },
     {
       matchManagers: ["github-actions"],
@@ -27,8 +40,9 @@
     },
     {
       // Run every Wednesday
-      schedule: ["* * * * 3"],
-      matchManagers: ["npm", "pip_requirements", "asdf"],
+      // Single run at 04:00 UTC
+      schedule: ["0 4 * * 3"],
+      matchManagers: ["npm", "pip-compile", "asdf"],
       groupName: "devDependencies",
       matchUpdateTypes: ["minor", "patch", "pin"],
       automerge: true,
