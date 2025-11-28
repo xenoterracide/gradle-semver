@@ -78,6 +78,42 @@ add a way to export these to your `PATH` in your `~/.profile`
 - [Gradle](https://docs.gradle.org/current/userguide/command_line_interface.html)
 - [Yarn 4](https://yarnpkg.com/getting-started/install) (via Corepack)
 
+### Running tests
+
+Run the full verification suite for this project by invoking the `check` task.
+
+From this project directory:
+
+```sh
+cd gradle-semver
+./gradlew check
+```
+
+Or from the monorepo root targeting this build:
+
+```sh
+./gradlew -p gradle-semver check
+```
+
+Notes:
+
+- This repository contains Gradle plugins; the `check` task includes unit tests and the integration test suite (`testIntegration`) configured via our shared test conventions.
+- Some builds (notably this one) may resolve artifacts from GitHub Packages. If you encounter authentication errors, provide credentials in `~/.gradle/gradle.properties`:
+
+  ```properties
+  ghUsername=<your username>
+  ghPassword=<your token with read:packages>
+  ```
+
+  or export environment variables for a one‑off run:
+
+  ```sh
+  export ORG_GRADLE_PROJECT_ghUsername="$GITHUB_ACTOR"
+  export ORG_GRADLE_PROJECT_ghPassword="$GITHUB_TOKEN"
+  ```
+
+- Zero‑tests fail‑fast: modules that apply our test conventions must include at least one test under `src/test/java` (or Kotlin equivalent) or the build will fail.
+
 #### Fetching Dependencies
 
 In order to get snapshots of dependencies, you must have a GitHub token in your `~/.gradle/gradle.properties` file. This file should look like:
