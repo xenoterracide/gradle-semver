@@ -4,33 +4,16 @@
 
 [versions]
 ep = "2.+"
-checker = "3.+"
-spring = "3.+"
 convention = "0.3.+"
 junit = "6.+"
 
 [libraries]
-api-guardian = { module = "org.apiguardian:apiguardian-api" }
 assertj = "org.assertj:assertj-core:3.+"
-autoservice = "com.google.auto.service:auto-service:1.+"
-checker-annotations = { module = "org.checkerframework:checker-qual", version.ref = "checker" }
-checker-core = { module = "org.checkerframework:checker", version.ref = "checker" }
-commons-io = "commons-io:commons-io:2.+"
 commons-lang = "org.apache.commons:commons-lang3:3.+"
-compile-testing = "com.google.testing.compile:compile-testing:0.+"
-equalsverifier = "nl.jqno.equalsverifier:equalsverifier:3.+"
 errorprone-annotations = { module = "com.google.errorprone:error_prone_annotations", version.ref = "ep" }
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "ep" }
 errorprone-nullaway = "com.uber.nullaway:nullaway:0.+"
-google-java-format = "com.google.googlejavaformat:google-java-format:+"
 guava = "com.google.guava:guava:+"
-immutables-bom = "org.immutables:bom:2.+"
-immutables-annotate = { module = "org.immutables:annotate" }
-immutables-annotations = { module = "org.immutables:value-annotations" }
-immutables-builder = { module = "org.immutables:builder" }
-immutables-core = { module = "org.immutables:value" }
-jakarta-annotation = { module = "jakarta.annotation:jakarta.annotation-api" }
-jetbrains-annotations = "org.jetbrains:annotations:+"
 java-tools = "com.xenoterracide:tools:0.+"
 jgit = "org.eclipse.jgit:org.eclipse.jgit:7.+"
 jspecify = "org.jspecify:jspecify:1.+"
@@ -39,9 +22,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-parameters = { module = "org.junit.jupiter:junit-jupiter-params" }
 junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-log4j-api = { module = "org.apache.logging.log4j:log4j-api" }
 maven-artifact = "org.apache.maven:maven-artifact:3.+"
-mockito = { module = "org.mockito:mockito-core", version = "5.+" }
 plugin-convention-checkstyle = { module = "com.xenoterracide.gradle.convention:checkstyle", version.ref = "convention" }
 plugin-convention-coverage = { module = "com.xenoterracide.gradle.convention:coverage", version.ref = "convention" }
 plugin-convention-publish = { module = "com.xenoterracide.gradle.convention:publish", version.ref = "convention" }
@@ -49,28 +30,16 @@ plugin-convention-spotbugs = { module = "com.xenoterracide.gradle.convention:spo
 plugin-dependency-analysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version = "3.+" }
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:4.+"
 plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.+"
-plugin-semver = "com.xenoterracide.gradle:semver:0.+"
-plugin-spotbugs = "com.github.spotbugs:com.github.spotbugs.gradle.plugin:6.+"
 semver = "org.semver4j:semver4j:5.+"
-slf4j-api = { module = "org.slf4j:slf4j-api" }
-slf4j-bom = "org.slf4j:slf4j-bom:2.+"
-slf4j-nop = { module = "org.slf4j:slf4j-nop" }
-slf4j-simple = { module = "org.slf4j:slf4j-simple" }
 spotbugs = "com.github.spotbugs:spotbugs:4.+"
-testcontainers = "org.testcontainers:junit-jupiter:1.+"
-uuid-creator = "com.github.f4b6a3:uuid-creator:6.+"
 vavr = "io.vavr:vavr:0.+"
 
 [bundles]
-compile = ["jakarta-annotation", "jspecify"]
-immutables = ["immutables-annotations", "immutables-builder", "immutables-annotate"]
 ep = ["errorprone-core", "errorprone-nullaway"]
 test-impl = ["junit-api", "assertj", "junit-parameters"]
 test-runtime = ["junit-engine", "junit-launcher"]
 
 [plugins]
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis" }
-gradle-plugin-publish = { id = "com.gradle.plugin-publish", version = "1.+" }
 shadow = { id = "com.gradleup.shadow", version = "8.+" }
 semver = { id = "com.xenoterracide.gradle.semver", version = "0.+" }
-spring-boot = { id = "org.springframework.boot", version.ref = "spring" }
