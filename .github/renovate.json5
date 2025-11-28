@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024, 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
 //
 // SPDX-License-Identifier: CC0-1.0
 
@@ -8,6 +8,7 @@
   dependencyDashboard: true,
   timezone: "UTC",
   automergeStrategy: "rebase",
+  // Managers config will be applied via packageRules below
   hostRules: [
     {
       hostType: "maven",
@@ -16,6 +17,8 @@
   ],
   packageRules: [
     {
+      // Runs during the 04:00 UTC hour daily (scheduled after update-java at 03:00)
+      schedule: ["* 3 * * *"],
       // Use pip-compile with PEP 621 pyproject at repo root
       matchManagers: ["pip-compile"],
       managerFilePatterns: ["^pyproject\\.toml$"],
@@ -30,7 +33,7 @@
       // Runs during the 04:00 UTC hour daily (scheduled after update-java at 03:00)
       schedule: ["* 4 * * *"],
       matchManagers: ["gradle", "gradle-wrapper"],
-      // Open PRs for MAJOR updates only; minor/patch handled by update-java
+      // Open PRs for MAJOR updates only; minor/patch are handled elsewhere
       matchUpdateTypes: ["major"],
       automerge: false,
     },
@@ -52,7 +55,7 @@
       // Run every Wednesday
       // Window: 04:00 UTC hour on Wednesday (Renovate cron uses '*' for minutes)
       schedule: ["* 4 * * 3"],
-      matchManagers: ["npm", "pip-compile", "asdf"],
+      matchManagers: ["npm", "asdf"],
       groupName: "devDependencies",
       matchUpdateTypes: ["minor", "patch", "pin"],
       automerge: true,
