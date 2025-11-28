@@ -17,7 +17,7 @@
   ],
   packageRules: [
     {
-      // Runs during the 04:00 UTC hour daily (scheduled after update-java at 03:00)
+      // Runs during the 03:00 UTC hour daily (scheduled after update-java at 03:00)
       schedule: ["* 3 * * *"],
       // Use pip-compile with PEP 621 pyproject at repo root
       matchManagers: ["pip-compile"],

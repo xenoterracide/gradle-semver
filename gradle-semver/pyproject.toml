@@ -6,7 +6,7 @@
 name = "gradle-semver-tools"
 version = "0.0.0"
 description = "Local tooling dependencies (managed via pip-compile)."
-dependencies = ["reuse>=6"]
+dependencies = ["reuse>=6", "pip-tools"]
 
 [build-system]
 requires = ["setuptools>=61"]
