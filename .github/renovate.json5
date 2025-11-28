@@ -42,7 +42,7 @@
       // Runs during the 04:00 UTC hour daily (scheduled after update-java at 03:00)
       schedule: ["* 4 * * *"],
       matchManagers: ["gradle"],
-      // Open PRs for MAJOR updates only; minor/patch are handled elsewhere
+      // Open PRs for MAJOR updates only; minor/patch updates are disabled for non-settings files
       matchUpdateTypes: ["major"],
       automerge: false,
     },
