@@ -10,7 +10,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - &checkout-step
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v6.0.1
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           filter: "blob:none"

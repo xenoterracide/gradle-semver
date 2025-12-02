@@ -22,7 +22,7 @@ jobs:
     env:
       IS_PUBLISHING: 1
     steps:
-      - uses: actions/checkout@v6.0.0
+      - uses: actions/checkout@v6.0.1
         with:
           # head sha is always the latest commit but head branch has the name we need for publishing
           ref: ${{ github.event.workflow_run.head_branch }}
