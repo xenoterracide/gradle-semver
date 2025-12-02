@@ -35,7 +35,7 @@ jobs:
       ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
       ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v6.0.0
+      - uses: actions/checkout@v6.0.1
         with:
           ref: ${{ github.ref }}
           filter: "blob:none"
