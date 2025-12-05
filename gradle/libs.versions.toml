@@ -30,7 +30,7 @@ plugin-convention-spotbugs = { module = "com.xenoterracide.gradle.convention:spo
 plugin-dependency-analysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version = "3.+" }
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:4.+"
 plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.+"
-semver = "org.semver4j:semver4j:5.+"
+semver = "org.semver4j:semver4j:6.+"
 spotbugs = "com.github.spotbugs:spotbugs:4.+"
 vavr = "io.vavr:vavr:0.+"
 
