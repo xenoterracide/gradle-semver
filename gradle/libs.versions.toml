@@ -4,7 +4,7 @@
 
 [versions]
 ep = "2.+"
-convention = "0.3.+"
+convention = "0.5.+"
 junit = "6.+"
 
 [libraries]

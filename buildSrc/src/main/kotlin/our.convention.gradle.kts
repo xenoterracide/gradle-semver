@@ -25,11 +25,11 @@ repositoryHost(GithubPublicRepositoryConfiguration())
 repositoryHost.namespace.set("xenoterracide")
 
 gradlePlugin {
-  website.set(repositoryHost.repository.wesiteUrl.map { it.toString() })
+  website.set(repositoryHost.repository.websiteUrl.map { it.toString() })
   vcsUrl.set(repositoryHost.repository.cloneUrl.map { it.toString() })
 }
 
 publicationLegal {
   inceptionYear.set(2024)
-  spdxLicenseIdentifiers.add("Apache-2.0")
+  spdxLicenseIdentifiers.add("GPL-3.0-or-later WITH Classpath-exception-2.0")
 }
