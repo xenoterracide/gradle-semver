@@ -26,6 +26,10 @@ java {
   }
 }
 
+tasks.compileJava {
+  options.release.set(17)
+}
+
 tasks.withType<Javadoc>().configureEach {
   dependsOn(tasks.classes)
   source(sourceSets.main.map { it.output.generatedSourcesDirs })
