@@ -12,10 +12,6 @@ plugins {
   alias(libs.plugins.shadow)
 }
 
-tasks.compileJava {
-  options.release = 17
-}
-
 dependencyLocking {
   lockAllConfigurations()
 }
