@@ -8,10 +8,6 @@ plugins {
   our.javalibrary
 }
 
-tasks.compileJava {
-  options.release = 17
-}
-
 dependencyLocking {
   lockAllConfigurations()
 }
