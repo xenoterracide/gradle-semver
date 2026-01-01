@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -72,11 +72,11 @@ class SemverPluginIntegrationTest {
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(testProjectDir)
-      .withArguments("logSemver", "--stacktrace")
+      .withArguments("version", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.1.0", "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).contains("0.1.0", "BUILD SUCCESSFUL");
   }
 
   @Test
@@ -86,39 +86,39 @@ class SemverPluginIntegrationTest {
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(noGitProjectDir)
-      .withArguments("logSemver", "--stacktrace")
+      .withArguments("version", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.0.0", "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).contains("0.0.0", "BUILD SUCCESSFUL");
   }
 
   @ParameterizedTest
   @ArgumentsSource(BuildScriptArgumentsProvider.class)
-  void configurationCache(String fileName, String buildScript) throws IOException {
+  void configurationCache(String task, String fileName, String buildScript) throws IOException {
     Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
     var build = GradleRunner.create()
       .withProjectDir(testProjectDir)
-      .withArguments("logSemver", "--configuration-cache", "--stacktrace")
+      .withArguments(task, "--configuration-cache", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.1.0", "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).contains("0.1.0", "BUILD SUCCESSFUL");
   }
 
   @ParameterizedTest
   @ArgumentsSource(BuildScriptArgumentsProvider.class)
-  void noGitDir(String fileName, String buildScript) throws IOException {
+  void noGitDir(String task, String fileName, String buildScript) throws IOException {
     Files.writeString(noGitProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = " + "'hello-world'");
     Files.writeString(noGitProjectDir.toPath().resolve(fileName), buildScript);
 
     var build = GradleRunner.create()
       .withProjectDir(noGitProjectDir)
-      .withArguments("logSemver", "--configuration-cache", "--stacktrace")
+      .withArguments(task, "--configuration-cache", "--stacktrace")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("semver:0.0.0", "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).contains("0.0.0", "BUILD SUCCESSFUL");
   }
 
   static class BuildScriptArgumentsProvider implements ArgumentsProvider {
@@ -126,8 +126,10 @@ class SemverPluginIntegrationTest {
     @Override
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
-        Arguments.of("build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
+        Arguments.of("version", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("version", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
+        Arguments.of("logSemver", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("logSemver", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
       );
     }
   }

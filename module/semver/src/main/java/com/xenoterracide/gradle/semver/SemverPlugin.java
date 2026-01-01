@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -7,6 +7,7 @@ package com.xenoterracide.gradle.semver;
 import com.xenoterracide.gradle.git.GitPlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.semver4j.Semver;
 
 /**
  * Pure Java, configuration cache safe semantic versioning with git plugin for gradle.
@@ -23,6 +24,14 @@ public class SemverPlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
     project.getPluginManager().apply(GitPlugin.class);
-    project.getExtensions().add(SEMVER, SemverExtension.forProject(project));
+
+    var semver = SemverExtension.forProject(project);
+
+    var tasks = project.getTasks();
+    tasks.register("version", task -> {
+      System.out.println(semver.getProvider().getOrElse(Semver.ZERO));
+    });
+
+    project.getExtensions().add(SEMVER, semver);
   }
 }
