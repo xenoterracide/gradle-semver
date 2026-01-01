@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: Copyright © 2025 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2025 - 2026 Caleb Cushing
 
 SPDX-License-Identifier: CC-BY-NC-4.0
 -->
@@ -9,8 +9,8 @@ SPDX-License-Identifier: CC-BY-NC-4.0
 A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
 
 _Plugin ID_: `"com.xenoterracide.gradle.semver"`
-_Plugin GAV_: `"com.xenoterracide.gradle:semver:0.14.+"
-_Version_: `0.14.+`
+_Plugin GAV_: `"com.xenoterracide.gradle:semver:0.15.+"
+_Version_: `0.15.+`
 
 ## Usage
 
@@ -49,3 +49,42 @@ logger.quiet("semver: " + semver) // 0.1.1-alpha.0.1+branch.topic-foo.git.32.3aa
 ```
 
 The plugin exposes a `Semver`. See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html).
+
+### Tasks
+
+#### `./gradlew semverVersion`
+
+Prints the semantic version computed by the `com.xenoterracide.gradle.semver` plugin.
+
+- Output is always a single line.
+- This value is derived from git metadata (tags, distance, branch, dirty status), _not_ from `project.version`.
+- In a repo without a usable git history/tag, it falls back to `0.0.0-alpha.0.0`.
+
+Examples:
+
+```sh
+./gradlew semverVersion --quiet
+# 0.1.0
+
+./gradlew semverVersion --quiet
+# 0.0.0-alpha.0.0
+```
+
+#### `./gradlew version`
+
+Prints `project.version`.
+
+This task is intentionally conservative because end users may or may not assign a value to `project.version`.
+
+- If `project.version` is unset (Gradle’s default `unspecified`), the task prints **nothing** (just a newline).
+- If `project.version` is set, it prints that value.
+
+For scripting, you usually want `--quiet`:
+
+```sh
+./gradlew version --quiet
+# (prints a newline only when project.version is unset)
+
+./gradlew -Pversion=1.2.3 version --quiet
+# 1.2.3
+```
