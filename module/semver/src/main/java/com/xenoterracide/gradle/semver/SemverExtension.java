@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import org.gradle.api.Incubating;
 import org.gradle.api.Project;
 import org.gradle.api.Transformer;
-import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -36,10 +34,8 @@ public class SemverExtension implements Provides<Semver> {
 
   // CHECKSTYLE.ON: FinalClass
 
-  private final Logger log = Logging.getLogger(this.getClass());
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
-  private final Property<String> remote;
   private final Project project;
 
   /**
@@ -53,7 +49,6 @@ public class SemverExtension implements Provides<Semver> {
     var pf = new ProvidedFactory(project);
     this.provider = pf.property(Semver.class);
     this.checkDirty = pf.propertyBoolean();
-    this.remote = pf.propertyString();
   }
 
   static SemverExtension forProject(Project project) {
@@ -95,20 +90,28 @@ public class SemverExtension implements Provides<Semver> {
   }
 
   Transformer<Semver, Semver> configureBuilder(GitExtension gitExt) {
+    var checkDirty = this.getCheckDirty();
+    var preReleaseDistance = getDistance(gitExt);
+    var buildDistance = gitExt.getDistance();
+    var gitStatus = gitExt.getStatus();
+    var uniqueShort = gitExt.getUniqueShort();
+    var branch = getBranch(gitExt);
+
     return semver -> {
       return new SemverBuilder(semver)
-        .withDirtyOut(this.getCheckDirty().getOrElse(false))
-        .withPreReleaseDistance(getDistance(gitExt).getOrElse(0L))
-        .withBuildDistance(gitExt.getDistance().getOrElse(0L))
-        .withGitStatus(gitExt.getStatus().get())
-        .withUniqueShort(gitExt.getUniqueShort().getOrNull())
-        .withBranch(getBranch(gitExt).getOrNull())
+        .withDirtyOut(checkDirty.getOrElse(false))
+        .withPreReleaseDistance(preReleaseDistance.getOrElse(0L))
+        .withBuildDistance(buildDistance.getOrElse(0L))
+        .withGitStatus(gitStatus.get())
+        .withUniqueShort(uniqueShort.getOrNull())
+        .withBranch(branch.getOrNull())
         .build();
     };
   }
 
   SemverExtension build() {
     var gitExt = this.project.getExtensions().getByType(GitExtension.class);
+    var projectName = this.project.getName();
 
     var semverProvider = gitExt
       .getTag()
@@ -116,7 +119,7 @@ public class SemverExtension implements Provides<Semver> {
       .orElse(Semver.ZERO)
       .map(this.configureBuilder(gitExt))
       .map(semver -> {
-        this.log.info("semver {} {}", this.project.getName(), semver);
+        Logging.getLogger(SemverExtension.class).info("semver {} {}", projectName, semver);
         return semver;
       });
 
@@ -151,17 +154,6 @@ public class SemverExtension implements Provides<Semver> {
    */
   public Property<Boolean> getCheckDirty() {
     return this.checkDirty;
-  }
-
-  /**
-   * Remote to use for head branch configuration.
-   *
-   * @return remote configuration property
-   * @implNote The plugin defaults to "origin"
-   */
-  @Incubating
-  public Property<String> getRemote() {
-    return this.remote;
   }
 
   /**

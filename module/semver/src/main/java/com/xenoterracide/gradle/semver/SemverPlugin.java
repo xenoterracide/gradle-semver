@@ -29,11 +29,10 @@ public class SemverPlugin implements Plugin<Project> {
     project.getExtensions().add(SEMVER, semver);
 
     var tasks = project.getTasks();
-    tasks.register("version", config -> {
-      config.setGroup("Publishing");
-      config.setDescription("Prints the current semantic version");
-      var provider = semver.getProvider();
-      config.getActions().add(t -> System.out.println(provider.getOrElse(Semver.ZERO)));
+    tasks.register("version", PrintVersionTask.class, task -> {
+      task.setGroup("Publishing");
+      task.setDescription("Prints the current semantic version");
+      task.getVersionText().set(semver.getProvider().map(Object::toString).orElse(Semver.ZERO.toString()));
     });
   }
 }

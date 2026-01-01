@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -68,7 +68,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Callable, Class)
    */
-  public Provider<Long> providedLong(Provider<Long> callable) {
+  public Provider<Long> providedLong(Provider<@Nullable Long> callable) {
     return this.provided(callable, Long.class);
   }
 

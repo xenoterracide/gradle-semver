@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -7,7 +7,6 @@ package com.xenoterracide.gradle.git;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.eclipse.jgit.api.Git;
 import org.gradle.api.Incubating;
 import org.gradle.api.provider.Provider;
 
@@ -17,6 +16,7 @@ import org.gradle.api.provider.Provider;
 public class GitExtension implements Provides<GitMetadata> {
 
   private final Provider<GitMetadata> provider;
+  private final Provider<org.eclipse.jgit.api.Git> git;
   private final Provider<String> uniqueShort;
   private final Provider<String> tag;
   private final Provider<Long> distance;
@@ -24,17 +24,16 @@ public class GitExtension implements Provides<GitMetadata> {
   private final Provider<String> branch;
   private final Provider<String> commit;
   private final Provider<List<GitRemoteForGradle>> remotes;
-  private final Provider<Git> git;
 
   @SuppressWarnings("NullAway")
   // false positive https://github.com/uber/NullAway/issues/1123
   GitExtension(Provider<GitService> gitService, ProvidedFactory pf) {
     this.git = gitService.flatMap(GitService::getProvider);
-    this.provider = gitService.map(GitService::getProvider).map(git -> new GitMetadataImpl(git::getOrNull));
+    this.provider = this.git.map(g -> new GitMetadataImpl(() -> g));
     this.branch = pf.providedString(this.provider.map(GitMetadata::branch));
     this.uniqueShort = pf.providedString(this.provider.map(GitMetadata::uniqueShort));
     this.tag = pf.providedString(this.provider.map(GitMetadata::tag));
-    this.distance = pf.providedLong(this.provider.map(GitMetadata::distance));
+    this.distance = pf.providedLong(this.provider.map(GitMetadata::distance).map(Long::valueOf).orElse(0L));
     this.status = pf.provided(this.provider.map(GitMetadata::status), GitStatus.class);
     this.commit = pf.providedString(this.provider.map(GitMetadata::commit));
 

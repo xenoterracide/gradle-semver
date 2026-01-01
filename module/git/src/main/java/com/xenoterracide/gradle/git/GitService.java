@@ -1,10 +1,11 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
 package com.xenoterracide.gradle.git;
 
 import io.vavr.control.Try;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.file.Directory;
@@ -12,7 +13,6 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.services.BuildService;
 import org.gradle.api.services.BuildServiceParameters;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Build Service for Git. Primary goal is to allow for lazy initialization of the Git object and keeping it open for
