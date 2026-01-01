@@ -6,13 +6,13 @@ package com.xenoterracide.gradle.git;
 
 import io.vavr.control.Try;
 import javax.inject.Inject;
-import org.jspecify.annotations.Nullable;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.services.BuildService;
 import org.gradle.api.services.BuildServiceParameters;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Build Service for Git. Primary goal is to allow for lazy initialization of the Git object and keeping it open for
