@@ -26,12 +26,14 @@ public class SemverPlugin implements Plugin<Project> {
     project.getPluginManager().apply(GitPlugin.class);
 
     var semver = SemverExtension.forProject(project);
+    project.getExtensions().add(SEMVER, semver);
 
     var tasks = project.getTasks();
-    tasks.register("version", task -> {
-      System.out.println(semver.getProvider().getOrElse(Semver.ZERO));
+    tasks.register("version", config -> {
+      config.setGroup("Publishing");
+      config.setDescription("Prints the current semantic version");
+      var provider = semver.getProvider();
+      config.getActions().add(t -> System.out.println(provider.getOrElse(Semver.ZERO)));
     });
-
-    project.getExtensions().add(SEMVER, semver);
   }
 }
