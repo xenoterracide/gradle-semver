@@ -110,11 +110,11 @@ class SemverPluginIntegrationTest {
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
         // semver plugin outputs
-        Arguments.of("semverVersion", "0.1.0", "build.gradle", SCRIPT),
-        Arguments.of("semverVersion", "0.1.0", "build.gradle.kts", SCRIPT),
+        Arguments.of("semverVersion", "0.1.0", "build.gradle"),
+        Arguments.of("semverVersion", "0.1.0", "build.gradle.kts"),
         // project.version outputs (default is unset in the test projects, so `--quiet` yields only a newline)
-        Arguments.of("version", "\n", "build.gradle", SCRIPT),
-        Arguments.of("version", "\n", "build.gradle.kts", SCRIPT)
+        Arguments.of("version", "\n", "build.gradle"),
+        Arguments.of("version", "\n", "build.gradle.kts")
       );
     }
   }
@@ -125,11 +125,11 @@ class SemverPluginIntegrationTest {
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
         // semver plugin fallback outputs
-        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle", SCRIPT),
-        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle.kts", SCRIPT),
+        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle"),
+        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle.kts"),
         // project.version outputs (default is unset in the test projects, so `--quiet` yields only a newline)
-        Arguments.of("version", "\n", "build.gradle", SCRIPT),
-        Arguments.of("version", "\n", "build.gradle.kts", SCRIPT)
+        Arguments.of("version", "\n", "build.gradle"),
+        Arguments.of("version", "\n", "build.gradle.kts")
       );
     }
   }
