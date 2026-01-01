@@ -118,7 +118,7 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    var expected = "semverVersion".equals(task) || "logSemver".equals(task) ? "0.0.0-alpha.0.0" : expectedVersion;
+    var expected = "semverVersion".equals(task) || "logSemver".equals(task) ? "0.0.0" : expectedVersion;
 
     assertThat(build.getOutput()).contains(expected, "BUILD SUCCESSFUL");
   }
