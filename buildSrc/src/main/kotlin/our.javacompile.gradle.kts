@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2023 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -68,6 +68,7 @@ tasks.withType<JavaCompile>().configureEach {
   options.errorprone {
     disable(
       "InvalidInlineTag", // https://github.com/google/error-prone/issues/4308
+      "InjectOnConstructorOfAbstractClass", // gradle abuses Inject
       "MultipleNullnessAnnotations", // https://github.com/google/error-prone/issues/4334
     )
     disableWarningsInGeneratedCode.set(true)

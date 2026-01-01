@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -97,6 +97,9 @@ final class SemverBuilder {
         this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
       }
     }
+
+    // When starting at 0.0.0, we always emit an alpha prerelease (including distance 0)
+    // so the "no repo" fallback is `0.0.0-alpha.0.0`.
     if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
       this.semver = this.semver.withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.preReleaseDistance)));
     }

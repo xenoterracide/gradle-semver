@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -44,8 +44,8 @@ public class GitMetadataImpl implements GitMetadata {
   // this is not a regex but a glob (`man glob`)
   private static final String VERSION_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
   private static final String GIT_SEPARATOR = "/";
+  private static final String SHALLOW_CLONE_DETECTED = "shallow clone detected";
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-
   private final TryGit git;
 
   GitMetadataImpl(TryGit git) {
@@ -129,9 +129,12 @@ public class GitMetadataImpl implements GitMetadata {
   public long distance() {
     var shortCount = this.shortCount();
     if (shortCount < 4) {
-      this.log.warn("shallow clone detected! git only has {} commits", shortCount);
+      this.log.warn(SHALLOW_CLONE_DETECTED);
     }
-    return new DistanceCalculator(this.git).apply(Constants.HEAD);
+    return Try.of(() -> new DistanceCalculator(this.git).apply(Constants.HEAD))
+      .recover(NoSuchElementException.class, e -> 0L)
+      .recover(RepositoryNotFoundException.class, e -> 0L)
+      .getOrElseThrow(ExceptionTools::toRuntime);
   }
 
   @Override

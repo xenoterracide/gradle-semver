@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -50,5 +50,12 @@ class SemverPluginTest {
     var provider = extension.getProvider();
     assertThat(provider.get()).hasToString("0.1.3");
     assertThat(extension.toString()).isEqualTo(provider.get().toString());
+  }
+
+  @Test
+  void versionTask() {
+    project.getPluginManager().apply(SemverPlugin.class);
+    assertThat(project.getTasks().findByName("semverVersion")).isNotNull();
+    assertThat(project.getTasks().findByName("version")).isNotNull();
   }
 }
