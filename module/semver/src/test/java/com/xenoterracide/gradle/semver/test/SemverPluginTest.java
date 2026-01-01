@@ -55,7 +55,7 @@ class SemverPluginTest {
   @Test
   void versionTask() {
     project.getPluginManager().apply(SemverPlugin.class);
-    var task = project.getTasks().getByName("version");
-    assertThat(task).isNotNull();
+    assertThat(project.getTasks().findByName("semverVersion")).isNotNull();
+    assertThat(project.getTasks().findByName("version")).isNotNull();
   }
 }

@@ -72,7 +72,7 @@ class SemverPluginIntegrationTest {
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(testProjectDir)
-      .withArguments("version", "--stacktrace")
+      .withArguments("semverVersion", "--stacktrace")
       .withPluginClasspath()
       .build();
 
@@ -86,7 +86,7 @@ class SemverPluginIntegrationTest {
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(noGitProjectDir)
-      .withArguments("version", "--stacktrace")
+      .withArguments("semverVersion", "--stacktrace")
       .withPluginClasspath()
       .build();
 
@@ -95,7 +95,7 @@ class SemverPluginIntegrationTest {
 
   @ParameterizedTest
   @ArgumentsSource(BuildScriptArgumentsProvider.class)
-  void configurationCache(String task, String fileName, String buildScript) throws IOException {
+  void configurationCache(String task, String expectedVersion, String fileName, String buildScript) throws IOException {
     Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
     var build = GradleRunner.create()
       .withProjectDir(testProjectDir)
@@ -103,12 +103,12 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("0.1.0", "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).contains(expectedVersion, "BUILD SUCCESSFUL");
   }
 
   @ParameterizedTest
   @ArgumentsSource(BuildScriptArgumentsProvider.class)
-  void noGitDir(String task, String fileName, String buildScript) throws IOException {
+  void noGitDir(String task, String expectedVersion, String fileName, String buildScript) throws IOException {
     Files.writeString(noGitProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = " + "'hello-world'");
     Files.writeString(noGitProjectDir.toPath().resolve(fileName), buildScript);
 
@@ -118,7 +118,9 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("0.0.0", "BUILD SUCCESSFUL");
+    var expected = "semverVersion".equals(task) || "logSemver".equals(task) ? "0.0.0-alpha.0.0" : expectedVersion;
+
+    assertThat(build.getOutput()).contains(expected, "BUILD SUCCESSFUL");
   }
 
   static class BuildScriptArgumentsProvider implements ArgumentsProvider {
@@ -126,10 +128,15 @@ class SemverPluginIntegrationTest {
     @Override
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
-        Arguments.of("version", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("version", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
-        Arguments.of("logSemver", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("logSemver", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
+        // semver plugin outputs
+        Arguments.of("semverVersion", "0.1.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("semverVersion", "0.1.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
+        // project.version outputs (default is `unspecified` in the test projects)
+        Arguments.of("version", "unspecified", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("version", "unspecified", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
+        // user-defined task exercising semver extension access
+        Arguments.of("logSemver", "0.1.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("logSemver", "0.1.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
       );
     }
   }

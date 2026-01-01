@@ -14,6 +14,7 @@ import org.semver4j.Semver;
  */
 public class SemverPlugin implements Plugin<Project> {
 
+  private static final String GROUP = "Help";
   private static final String SEMVER = "semver";
 
   /**
@@ -29,10 +30,17 @@ public class SemverPlugin implements Plugin<Project> {
     project.getExtensions().add(SEMVER, semver);
 
     var tasks = project.getTasks();
-    tasks.register("version", PrintVersionTask.class, task -> {
-      task.setGroup("Publishing");
-      task.setDescription("Prints the current semantic version");
+
+    tasks.register("semverVersion", PrintVersionTask.class, task -> {
+      task.setGroup(GROUP);
+      task.setDescription("Prints the semantic version computed by the semver plugin");
       task.getVersionText().set(semver.getProvider().map(Object::toString).orElse(Semver.ZERO.toString()));
+    });
+
+    tasks.register("version", PrintVersionTask.class, task -> {
+      task.setGroup(GROUP);
+      task.setDescription("Prints project.version");
+      task.getVersionText().set(project.provider(() -> project.getVersion().toString()));
     });
   }
 }
