@@ -134,7 +134,7 @@ public class GitMetadataImpl implements GitMetadata {
     return Try.of(() -> new DistanceCalculator(this.git).apply(Constants.HEAD))
       .recover(NoSuchElementException.class, e -> 0L)
       .recover(RepositoryNotFoundException.class, e -> 0L)
-      .getOrElse(0L);
+      .getOrElseThrow(ExceptionTools::toRuntime);
   }
 
   @Override
