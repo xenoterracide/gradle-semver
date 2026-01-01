@@ -1,5 +1,6 @@
 <!--
-SPDX-FileCopyrightText: Copyright © 2024, 2025 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2024 2025 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
 
 SPDX-License-Identifier: CC-BY-NC-4.0
 -->
@@ -18,10 +19,10 @@ e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
 Gradle and Java versions are tested as follows. Older versions may work but are unsupported. Version 1.x starts with
 Java 11 but may require 17 without notice.
 
-| Version | Gradle | Java | License                            |
-| ------- | ------ | ---- | ---------------------------------- |
-| v0.13.x | 8.x    | 11.x | Apache 2.0                         |
-| v0.14.x | 9.x    | 17.x | GPLv3 with Classpath Exception 2.0 |
+| Version    | Gradle | Java | License                            |
+| ---------- | ------ | ---- | ---------------------------------- |
+| <= v0.13.x | 8.x    | 11.x | Apache 2.0                         |
+| >= v0.14.x | 9.x    | 17.x | GPLv3 with Classpath Exception 2.0 |
 
 ### Shallow Clones
 
