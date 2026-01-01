@@ -5,7 +5,7 @@
 package com.xenoterracide.gradle.git;
 
 import io.vavr.control.Try;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import javax.inject.Inject;
 import org.eclipse.jgit.api.Git;
 import org.gradle.api.file.Directory;
