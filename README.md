@@ -1,6 +1,5 @@
 <!--
-SPDX-FileCopyrightText: Copyright © 2024 2025 Caleb Cushing
-SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 
 SPDX-License-Identifier: CC-BY-NC-4.0
 -->
@@ -133,4 +132,4 @@ All licenses are documented explicitly using SPDX identifiers in their file
 - Gradle Kotlin and Config Files: [MIT](https://choosealicense.com/licenses/mit/)
 - Documentation including Javadoc: [CC BY 4.0](https://choosealicense.com/licenses/cc-by-4.0/)
 
-Copyright © 2024 - 2025 Caleb Cushing
+Copyright © 2024 - 2026 Caleb Cushing
