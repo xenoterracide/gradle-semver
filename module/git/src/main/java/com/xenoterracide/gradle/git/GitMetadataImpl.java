@@ -130,7 +130,6 @@ public class GitMetadataImpl implements GitMetadata {
     var shortCount = this.shortCount();
     if (shortCount < 4) {
       this.log.warn(SHALLOW_CLONE_DETECTED);
-      System.err.println(SHALLOW_CLONE_DETECTED);
     }
     return Try.of(() -> new DistanceCalculator(this.git).apply(Constants.HEAD))
       .recover(NoSuchElementException.class, e -> 0L)
