@@ -27,26 +27,9 @@ import org.junit.jupiter.params.support.ParameterDeclarations;
 
 class SemverPluginIntegrationTest {
 
-  static final String LOGGING = """
-        logger.quiet("semver:" + semver.provider.get())
-        logger.quiet("semver:" + semver)
-    """;
-  static final String GROOVY_SCRIPT = """
+  static final String SCRIPT = """
     plugins {
       id("com.xenoterracide.gradle.semver")
-    }
-
-      task logSemver {
-    %s
-    }
-    """;
-  static final String KOTLIN_SCRIPT = """
-    plugins {
-      id("com.xenoterracide.gradle.semver")
-    }
-
-      tasks.register("logSemver") {
-    %s
     }
     """;
 
@@ -68,7 +51,7 @@ class SemverPluginIntegrationTest {
   @Test
   @Disabled("enable for local debugging only")
   void debug() throws IOException {
-    Files.writeString(testProjectDir.toPath().resolve("build.gradle"), String.format(GROOVY_SCRIPT, LOGGING));
+    Files.writeString(testProjectDir.toPath().resolve("build.gradle"), SCRIPT);
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(testProjectDir)
@@ -82,7 +65,7 @@ class SemverPluginIntegrationTest {
   @Test
   @Disabled("enable for local debugging only")
   void noGitDirDebug() throws IOException {
-    Files.writeString(noGitProjectDir.toPath().resolve("build.gradle"), String.format(GROOVY_SCRIPT, LOGGING));
+    Files.writeString(noGitProjectDir.toPath().resolve("build.gradle"), SCRIPT);
     var build = GradleRunner.create()
       .withDebug(true)
       .withProjectDir(noGitProjectDir)
@@ -95,30 +78,30 @@ class SemverPluginIntegrationTest {
 
   @ParameterizedTest
   @ArgumentsSource(NormalRepoArgumentsProvider.class)
-  void configurationCache(String task, String expectedVersion, String fileName, String buildScript) throws IOException {
-    Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
+  void configurationCache(String task, String expectedVersion, String fileName) throws IOException {
+    Files.writeString(testProjectDir.toPath().resolve(fileName), SCRIPT);
     var build = GradleRunner.create()
       .withProjectDir(testProjectDir)
-      .withArguments(task, "--configuration-cache", "--stacktrace")
+      .withArguments(task, "--configuration-cache", "--stacktrace", "--quiet")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains(expectedVersion, "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).isEqualToIgnoringNewLines(expectedVersion);
   }
 
   @ParameterizedTest
   @ArgumentsSource(NoGitDirArgumentsProvider.class)
-  void noGitDir(String task, String expectedVersion, String fileName, String buildScript) throws IOException {
+  void noGitDir(String task, String expectedVersion, String fileName) throws IOException {
     Files.writeString(noGitProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = " + "'hello-world'");
-    Files.writeString(noGitProjectDir.toPath().resolve(fileName), buildScript);
+    Files.writeString(noGitProjectDir.toPath().resolve(fileName), SCRIPT);
 
     var build = GradleRunner.create()
       .withProjectDir(noGitProjectDir)
-      .withArguments(task, "--configuration-cache", "--stacktrace")
+      .withArguments(task, "--configuration-cache", "--stacktrace", "--quiet")
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains(expectedVersion, "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).isEqualToIgnoringNewLines(expectedVersion);
   }
 
   static class NormalRepoArgumentsProvider implements ArgumentsProvider {
@@ -127,14 +110,11 @@ class SemverPluginIntegrationTest {
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
         // semver plugin outputs
-        Arguments.of("semverVersion", "0.1.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("semverVersion", "0.1.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
-        // project.version outputs (default is `unspecified` in the test projects)
-        Arguments.of("version", "unspecified", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("version", "unspecified", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
-        // user-defined task exercising semver extension access
-        Arguments.of("logSemver", "0.1.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("logSemver", "0.1.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
+        Arguments.of("semverVersion", "0.1.0", "build.gradle", SCRIPT),
+        Arguments.of("semverVersion", "0.1.0", "build.gradle.kts", SCRIPT),
+        // project.version outputs (default is unset in the test projects, so `--quiet` yields only a newline)
+        Arguments.of("version", "\n", "build.gradle", SCRIPT),
+        Arguments.of("version", "\n", "build.gradle.kts", SCRIPT)
       );
     }
   }
@@ -145,14 +125,11 @@ class SemverPluginIntegrationTest {
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
         // semver plugin fallback outputs
-        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
-        // project.version outputs (default is `unspecified` in the test projects)
-        Arguments.of("version", "unspecified", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("version", "unspecified", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
-        // user-defined task exercising semver extension access
-        Arguments.of("logSemver", "0.0.0-alpha.0.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
-        Arguments.of("logSemver", "0.0.0-alpha.0.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
+        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle", SCRIPT),
+        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle.kts", SCRIPT),
+        // project.version outputs (default is unset in the test projects, so `--quiet` yields only a newline)
+        Arguments.of("version", "\n", "build.gradle", SCRIPT),
+        Arguments.of("version", "\n", "build.gradle.kts", SCRIPT)
       );
     }
   }

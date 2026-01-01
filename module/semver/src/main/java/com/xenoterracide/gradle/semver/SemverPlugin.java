@@ -30,6 +30,10 @@ public class SemverPlugin implements Plugin<Project> {
     project.getExtensions().add(SEMVER, semver);
 
     var tasks = project.getTasks();
+    var versionProvider = project.provider(() -> {
+      var v = project.getVersion().toString();
+      return "unspecified".equals(v) ? "" : v;
+    });
 
     tasks.register("semverVersion", PrintVersionTask.class, task -> {
       task.setGroup(GROUP);
@@ -40,7 +44,7 @@ public class SemverPlugin implements Plugin<Project> {
     tasks.register("version", PrintVersionTask.class, task -> {
       task.setGroup(GROUP);
       task.setDescription("Prints project.version");
-      task.getVersionText().set(project.provider(() -> project.getVersion().toString()));
+      task.getVersionText().set(versionProvider);
     });
   }
 }
