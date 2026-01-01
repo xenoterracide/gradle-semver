@@ -33,7 +33,7 @@ public class GitExtension implements Provides<GitMetadata> {
     this.branch = pf.providedString(this.provider.map(GitMetadata::branch));
     this.uniqueShort = pf.providedString(this.provider.map(GitMetadata::uniqueShort));
     this.tag = pf.providedString(this.provider.map(GitMetadata::tag));
-    this.distance = pf.providedLong(this.provider.map(GitMetadata::distance).map(Long::valueOf).orElse(0L));
+    this.distance = pf.providedLong(this.provider.map(GitMetadata::distance).orElse(0L));
     this.status = pf.provided(this.provider.map(GitMetadata::status), GitStatus.class);
     this.commit = pf.providedString(this.provider.map(GitMetadata::commit));
 
