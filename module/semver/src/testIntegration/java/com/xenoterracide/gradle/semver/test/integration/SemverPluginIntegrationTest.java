@@ -90,11 +90,11 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).contains("0.0.0", "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).contains("0.0.0-alpha.0.0", "BUILD SUCCESSFUL");
   }
 
   @ParameterizedTest
-  @ArgumentsSource(BuildScriptArgumentsProvider.class)
+  @ArgumentsSource(NormalRepoArgumentsProvider.class)
   void configurationCache(String task, String expectedVersion, String fileName, String buildScript) throws IOException {
     Files.writeString(testProjectDir.toPath().resolve(fileName), buildScript);
     var build = GradleRunner.create()
@@ -107,7 +107,7 @@ class SemverPluginIntegrationTest {
   }
 
   @ParameterizedTest
-  @ArgumentsSource(BuildScriptArgumentsProvider.class)
+  @ArgumentsSource(NoGitDirArgumentsProvider.class)
   void noGitDir(String task, String expectedVersion, String fileName, String buildScript) throws IOException {
     Files.writeString(noGitProjectDir.toPath().resolve("settings.gradle"), "rootProject.name = " + "'hello-world'");
     Files.writeString(noGitProjectDir.toPath().resolve(fileName), buildScript);
@@ -118,12 +118,10 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    var expected = "semverVersion".equals(task) || "logSemver".equals(task) ? "0.0.0" : expectedVersion;
-
-    assertThat(build.getOutput()).contains(expected, "BUILD SUCCESSFUL");
+    assertThat(build.getOutput()).contains(expectedVersion, "BUILD SUCCESSFUL");
   }
 
-  static class BuildScriptArgumentsProvider implements ArgumentsProvider {
+  static class NormalRepoArgumentsProvider implements ArgumentsProvider {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
@@ -137,6 +135,24 @@ class SemverPluginIntegrationTest {
         // user-defined task exercising semver extension access
         Arguments.of("logSemver", "0.1.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
         Arguments.of("logSemver", "0.1.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
+      );
+    }
+  }
+
+  static class NoGitDirArgumentsProvider implements ArgumentsProvider {
+
+    @Override
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
+      return Stream.of(
+        // semver plugin fallback outputs
+        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
+        // project.version outputs (default is `unspecified` in the test projects)
+        Arguments.of("version", "unspecified", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("version", "unspecified", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING)),
+        // user-defined task exercising semver extension access
+        Arguments.of("logSemver", "0.0.0-alpha.0.0", "build.gradle", String.format(GROOVY_SCRIPT, LOGGING)),
+        Arguments.of("logSemver", "0.0.0-alpha.0.0", "build.gradle.kts", String.format(KOTLIN_SCRIPT, LOGGING))
       );
     }
   }

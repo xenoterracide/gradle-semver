@@ -96,11 +96,12 @@ final class SemverBuilder {
         ).collect(Collectors.joining(SEMVER_DELIMITER));
         this.semver = this.semver.withClearedPreRelease().withPreRelease(preRelease);
       }
+    }
 
-      // If starting at 0.0.0, ensure we still emit an alpha prerelease when there is distance.
-      if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
-        this.semver = this.semver.withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.preReleaseDistance)));
-      }
+    // When starting at 0.0.0, we always emit an alpha prerelease (including distance 0)
+    // so the "no repo" fallback is `0.0.0-alpha.0.0`.
+    if (this.semver.getMajor() == 0 && this.semver.getMinor() == 0 && this.semver.getPatch() == 0) {
+      this.semver = this.semver.withPreRelease(semverJoin(ALPHA, ZERO, Long.toString(this.preReleaseDistance)));
     }
   }
 
