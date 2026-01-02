@@ -29,7 +29,7 @@ plugin-convention-publish = { module = "com.xenoterracide.gradle.convention:publ
 plugin-convention-spotbugs = { module = "com.xenoterracide.gradle.convention:spotbugs", version.ref = "convention" }
 plugin-dependency-analysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version = "3.+" }
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:4.+"
-plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.+"
+plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:2.+"
 semver = "org.semver4j:semver4j:6.+"
 spotbugs = "com.github.spotbugs:spotbugs:4.+"
 vavr = "io.vavr:vavr:0.+"
@@ -41,5 +41,5 @@ test-runtime = ["junit-engine", "junit-launcher"]
 
 [plugins]
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis" }
-shadow = { id = "com.gradleup.shadow", version = "8.+" }
+shadow = { id = "com.gradleup.shadow", version = "9.+" }
 semver = { id = "com.xenoterracide.gradle.semver", version = "0.+" }
