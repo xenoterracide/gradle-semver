@@ -18,9 +18,6 @@ final class SemverBuilder {
   private static final String SEMVER_DELIMITER = ".";
   private static final String ZERO = "0";
 
-  // private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
-  // private RemoteForHeadBranch remoteForHeadBranch = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
-  // private String remote = "origin";
   private Semver semver;
   private boolean dirtyOut;
   private long preReleaseDistance;
@@ -36,50 +33,6 @@ final class SemverBuilder {
   static String semverJoin(String... parts) {
     return String.join(SEMVER_DELIMITER, parts);
   }
-
-  /*
-  boolean doesNotHaveHeadBranch() {
-    return this.gitMetadata.remotes().stream().map(GitRemote::headBranch).noneMatch(Objects::nonNull);
-  }
-
-  String getHeadBranch() {
-    var matchesRemote =
-      this.gitMetadata.remotes()
-        .stream()
-        .filter(PredicateTools.is(GitRemote::name, Predicate.isEqual(this.remote)))
-        .map(GitRemote::headBranch)
-        .filter(Objects::nonNull)
-        .findAny();
-    switch (this.remoteForHeadBranch) {
-      case CONFIGURED_ORIGIN_OR_THROW:
-        return matchesRemote.orElseThrow();
-      case CONFIGURED_ORIGIN_OR_FIRST:
-        return matchesRemote.orElseGet(() ->
-          this.gitMetadata.remotes()
-            .stream()
-            .map(GitRemote::headBranch)
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElseThrow()
-        );
-      default:
-        throw new IllegalStateException("remoteForHeadBranch: " + this.remoteForHeadBranch);
-    }
-  }
-
-  boolean branchMatchesHeadBranch() {
-    var headBranch = StringUtils.removeStart(this.getHeadBranch(), Constants.R_REMOTES);
-    return this.gitMetadata.branch();
-  }
-
-
-  Optional<String> getBranch() {
-    if (this.branchOutput == BranchOutput.ALWAYS) return Optional.ofNullable(this.gitMetadata.branch());
-    if (this.branchOutput == BranchOutput.NONE || this.doesNotHaveHeadBranch()) return Optional.empty();
-
-    return Optional.ofNullable(this.gitMetadata.branch());
-  }
-   */
 
   private void createPreRelease() {
     if (this.preReleaseDistance > 0) {
@@ -105,8 +58,23 @@ final class SemverBuilder {
     }
   }
 
+  /**
+   * Creates semver build metadata (e.g. {@code +git.<distance>.<sha>}).
+   *
+   * <p>This build metadata must be keyed off distance from the nearest tag (i.e. {@code git describe
+   * --long}), not off the prerelease distance.</p>
+   *
+   * <p>This matters because prerelease distance may be configured to represent distance from the HEAD
+   * branch merge-base (for non-head branches). In that case, prereleaseDistance can be 0 while tag
+   * distance is &gt; 0, but the build metadata must still reflect the commits-since-tag count.</p>
+   *
+   * @implNote Using prereleaseDistance here can incorrectly drop build metadata for repositories at
+   *     {@code vX.Y.Z-rc.1-3-g<sha>}.
+   * @return the build metadata string (without the leading {@code +}), or empty if no build
+   *     metadata should be emitted
+   */
   private Optional<String> createBuild() {
-    if (this.preReleaseDistance > 0) {
+    if (this.buildDistance > 0) {
       var optSha = Optional.ofNullable(this.uniqueShort);
 
       return optSha.map(sha -> {
@@ -132,22 +100,6 @@ final class SemverBuilder {
     return this;
   }
 
-  /*
-  SemverBuilder withBranchOutput(BranchOutput branchOutput) {
-    this.branchOutput = branchOutput;
-    return this;
-  }
-
-  SemverBuilder withRemote(String remote) {
-    this.remote = remote;
-    return this;
-  }
-
-  SemverBuilder withRemoteForHeadBranchConfig(RemoteForHeadBranch remoteForHeadBranch) {
-    this.remoteForHeadBranch = remoteForHeadBranch;
-    return this;
-  }
-*/
   SemverBuilder withUniqueShort(@Nullable String uniqueShort) {
     this.uniqueShort = uniqueShort;
     return this;
@@ -160,11 +112,6 @@ final class SemverBuilder {
 
   SemverBuilder withBuildDistance(long distance) {
     this.buildDistance = distance;
-    return this;
-  }
-
-  SemverBuilder withRemoteDistance(long remoteDistance) {
-    this.preReleaseDistance = remoteDistance;
     return this;
   }
 
