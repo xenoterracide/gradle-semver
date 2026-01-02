@@ -18,9 +18,6 @@ final class SemverBuilder {
   private static final String SEMVER_DELIMITER = ".";
   private static final String ZERO = "0";
 
-  // private BranchOutput branchOutput = BranchOutput.NON_HEAD_BRANCH_OR_THROW;
-  // private RemoteForHeadBranch remoteForHeadBranch = RemoteForHeadBranch.CONFIGURED_ORIGIN_OR_THROW;
-  // private String remote = "origin";
   private Semver semver;
   private boolean dirtyOut;
   private long preReleaseDistance;
