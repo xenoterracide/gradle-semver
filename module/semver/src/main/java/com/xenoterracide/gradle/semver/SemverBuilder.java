@@ -37,50 +37,6 @@ final class SemverBuilder {
     return String.join(SEMVER_DELIMITER, parts);
   }
 
-  /*
-  boolean doesNotHaveHeadBranch() {
-    return this.gitMetadata.remotes().stream().map(GitRemote::headBranch).noneMatch(Objects::nonNull);
-  }
-
-  String getHeadBranch() {
-    var matchesRemote =
-      this.gitMetadata.remotes()
-        .stream()
-        .filter(PredicateTools.is(GitRemote::name, Predicate.isEqual(this.remote)))
-        .map(GitRemote::headBranch)
-        .filter(Objects::nonNull)
-        .findAny();
-    switch (this.remoteForHeadBranch) {
-      case CONFIGURED_ORIGIN_OR_THROW:
-        return matchesRemote.orElseThrow();
-      case CONFIGURED_ORIGIN_OR_FIRST:
-        return matchesRemote.orElseGet(() ->
-          this.gitMetadata.remotes()
-            .stream()
-            .map(GitRemote::headBranch)
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElseThrow()
-        );
-      default:
-        throw new IllegalStateException("remoteForHeadBranch: " + this.remoteForHeadBranch);
-    }
-  }
-
-  boolean branchMatchesHeadBranch() {
-    var headBranch = StringUtils.removeStart(this.getHeadBranch(), Constants.R_REMOTES);
-    return this.gitMetadata.branch();
-  }
-
-
-  Optional<String> getBranch() {
-    if (this.branchOutput == BranchOutput.ALWAYS) return Optional.ofNullable(this.gitMetadata.branch());
-    if (this.branchOutput == BranchOutput.NONE || this.doesNotHaveHeadBranch()) return Optional.empty();
-
-    return Optional.ofNullable(this.gitMetadata.branch());
-  }
-   */
-
   private void createPreRelease() {
     if (this.preReleaseDistance > 0) {
       if (this.semver.getPreRelease().isEmpty()) {
@@ -106,6 +62,17 @@ final class SemverBuilder {
   }
 
   private Optional<String> createBuild() {
+    // IMPORTANT:
+    // `+git.<distance>.<sha>` must be keyed off *distance from the nearest tag* (i.e. `git describe --long`),
+    // not off the prerelease distance.
+    //
+    // Why? Our prerelease distance can be configured to represent *distance from HEAD branch* (merge-base)
+    // for non-head branches, where it is valid (and expected) for prereleaseDistance to be 0 while the
+    // tag distance is > 0. In that case we still want to emit build metadata that reflects the true
+    // commits-since-tag count.
+    //
+    // If we used prereleaseDistance here, then a repo at `vX.Y.Z-rc.1-3-g<sha>` on the head branch could
+    // incorrectly produce `X.Y.Z-rc.1` (dropping `.3+git.3.<sha>`), which is exactly the bug we fixed.
     if (this.buildDistance > 0) {
       var optSha = Optional.ofNullable(this.uniqueShort);
 
@@ -132,22 +99,6 @@ final class SemverBuilder {
     return this;
   }
 
-  /*
-  SemverBuilder withBranchOutput(BranchOutput branchOutput) {
-    this.branchOutput = branchOutput;
-    return this;
-  }
-
-  SemverBuilder withRemote(String remote) {
-    this.remote = remote;
-    return this;
-  }
-
-  SemverBuilder withRemoteForHeadBranchConfig(RemoteForHeadBranch remoteForHeadBranch) {
-    this.remoteForHeadBranch = remoteForHeadBranch;
-    return this;
-  }
-*/
   SemverBuilder withUniqueShort(@Nullable String uniqueShort) {
     this.uniqueShort = uniqueShort;
     return this;
@@ -160,11 +111,6 @@ final class SemverBuilder {
 
   SemverBuilder withBuildDistance(long distance) {
     this.buildDistance = distance;
-    return this;
-  }
-
-  SemverBuilder withRemoteDistance(long remoteDistance) {
-    this.preReleaseDistance = remoteDistance;
     return this;
   }
 
