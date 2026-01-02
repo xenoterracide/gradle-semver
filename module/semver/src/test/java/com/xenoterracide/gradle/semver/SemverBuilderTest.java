@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -37,8 +37,9 @@ class SemverBuilderTest {
     @Nullable String greaterThan
   ) {
     var tag = gitMetadata.tag();
-    var parsed = tag != null ? Semver.parse(tag.substring(1)) : Semver.ZERO;
+    var parsed = tag != null ? Semver.parse(tag.startsWith("v") ? tag.substring(1) : tag) : Semver.ZERO;
     assertThat(parsed).isNotNull();
+
     var semv = new SemverBuilder(parsed)
       .withBranch(gitMetadata.branch())
       .withPreReleaseDistance(gitMetadata.distance())

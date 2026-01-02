@@ -91,22 +91,23 @@ public class SemverExtension implements Provides<Semver> {
 
   Transformer<Semver, Semver> configureBuilder(GitExtension gitExt) {
     var checkDirty = this.getCheckDirty();
-    var preReleaseDistance = getDistance(gitExt);
-    var buildDistance = gitExt.getDistance();
+    // Distance from nearest tag (i.e. `git describe` distance).
+    var tagDistance = gitExt.getDistance();
+    // Distance to common ancestor with HEAD branch (0 on HEAD branch; >0 on diverged branches).
+    var headBranchDistance = getDistance(gitExt);
     var gitStatus = gitExt.getStatus();
     var uniqueShort = gitExt.getUniqueShort();
     var branch = getBranch(gitExt);
 
-    return semver -> {
-      return new SemverBuilder(semver)
+    return semver ->
+      new SemverBuilder(semver)
         .withDirtyOut(checkDirty.getOrElse(false))
-        .withPreReleaseDistance(preReleaseDistance.getOrElse(0L))
-        .withBuildDistance(buildDistance.getOrElse(0L))
+        .withPreReleaseDistance(headBranchDistance.getOrElse(0L))
+        .withBuildDistance(tagDistance.getOrElse(0L))
         .withGitStatus(gitStatus.get())
         .withUniqueShort(uniqueShort.getOrNull())
         .withBranch(branch.getOrNull())
         .build();
-    };
   }
 
   SemverExtension build() {

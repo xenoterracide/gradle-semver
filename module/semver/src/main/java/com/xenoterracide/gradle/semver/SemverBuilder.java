@@ -106,7 +106,7 @@ final class SemverBuilder {
   }
 
   private Optional<String> createBuild() {
-    if (this.preReleaseDistance > 0) {
+    if (this.buildDistance > 0) {
       var optSha = Optional.ofNullable(this.uniqueShort);
 
       return optSha.map(sha -> {
