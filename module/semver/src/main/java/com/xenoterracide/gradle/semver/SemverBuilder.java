@@ -59,16 +59,19 @@ final class SemverBuilder {
   }
 
   /**
-   * @implNote `+git.<distance>.<sha>` must be keyed off *distance from the nearest tag* (i.e. `git describe --long`),
-   *   not off the prerelease distance.
-   *   <p>
-   *   Why? Our prerelease distance can be configured to represent *distance from HEAD branch* (merge-base)
-   *   for non-head branches, where it is valid (and expected) for prereleaseDistance to be 0 while the
-   *   tag distance is > 0. In that case we still want to emit build metadata that reflects the true
-   *   commits-since-tag count.
-   *   <p>
-   *   If we used prereleaseDistance here, then a repo at `vX.Y.Z-rc.1-3-g<sha>` on the head branch could
-   *   incorrectly produce `X.Y.Z-rc.1` (dropping `.3+git.3.<sha>`), which is exactly the bug we fixed.
+   * Creates semver build metadata (e.g. {@code +git.<distance>.<sha>}).
+   *
+   * <p>This build metadata must be keyed off distance from the nearest tag (i.e. {@code git describe
+   * --long}), not off the prerelease distance.</p>
+   *
+   * <p>This matters because prerelease distance may be configured to represent distance from the HEAD
+   * branch merge-base (for non-head branches). In that case, prereleaseDistance can be 0 while tag
+   * distance is &gt; 0, but the build metadata must still reflect the commits-since-tag count.</p>
+   *
+   * @implNote Using prereleaseDistance here can incorrectly drop build metadata for repositories at
+   *     {@code vX.Y.Z-rc.1-3-g<sha>}.
+   * @return the build metadata string (without the leading {@code +}), or empty if no build
+   *     metadata should be emitted
    */
   private Optional<String> createBuild() {
     if (this.buildDistance > 0) {
