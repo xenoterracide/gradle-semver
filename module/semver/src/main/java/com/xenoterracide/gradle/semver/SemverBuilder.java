@@ -58,18 +58,19 @@ final class SemverBuilder {
     }
   }
 
+  /**
+   * @implNote `+git.<distance>.<sha>` must be keyed off *distance from the nearest tag* (i.e. `git describe --long`),
+   *   not off the prerelease distance.
+   *   <p>
+   *   Why? Our prerelease distance can be configured to represent *distance from HEAD branch* (merge-base)
+   *   for non-head branches, where it is valid (and expected) for prereleaseDistance to be 0 while the
+   *   tag distance is > 0. In that case we still want to emit build metadata that reflects the true
+   *   commits-since-tag count.
+   *   <p>
+   *   If we used prereleaseDistance here, then a repo at `vX.Y.Z-rc.1-3-g<sha>` on the head branch could
+   *   incorrectly produce `X.Y.Z-rc.1` (dropping `.3+git.3.<sha>`), which is exactly the bug we fixed.
+   */
   private Optional<String> createBuild() {
-    // IMPORTANT:
-    // `+git.<distance>.<sha>` must be keyed off *distance from the nearest tag* (i.e. `git describe --long`),
-    // not off the prerelease distance.
-    //
-    // Why? Our prerelease distance can be configured to represent *distance from HEAD branch* (merge-base)
-    // for non-head branches, where it is valid (and expected) for prereleaseDistance to be 0 while the
-    // tag distance is > 0. In that case we still want to emit build metadata that reflects the true
-    // commits-since-tag count.
-    //
-    // If we used prereleaseDistance here, then a repo at `vX.Y.Z-rc.1-3-g<sha>` on the head branch could
-    // incorrectly produce `X.Y.Z-rc.1` (dropping `.3+git.3.<sha>`), which is exactly the bug we fixed.
     if (this.buildDistance > 0) {
       var optSha = Optional.ofNullable(this.uniqueShort);
 
