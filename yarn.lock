@@ -232,10 +232,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dot-properties@npm:^1.0.0":
-  version: 1.1.0
-  resolution: "dot-properties@npm:1.1.0"
-  checksum: 10c0/0285b2cd32381140794680b2ce3bf8cfea741cb7f8a1e0af3d65e700f868c6c7564dcc00d72691a253d02d8033e9f26d475cbe77444185be5655c459e472e970
+"dot-properties@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "dot-properties@npm:1.1.1"
+  checksum: 10c0/2007ef4a8b5afdc21bf457e01c6e1bef58d63359d273294d059ec7a2af1fb44c49be09492dc4ab843540d8c013893ac63a039aed79d0cda47b3ebd5b0f538f99
   languageName: node
   linkType: hard
 
@@ -466,24 +466,24 @@ __metadata:
   linkType: hard
 
 "prettier-plugin-java@npm:^2.7.5":
-  version: 2.7.7
-  resolution: "prettier-plugin-java@npm:2.7.7"
+  version: 2.8.0
+  resolution: "prettier-plugin-java@npm:2.8.0"
   dependencies:
     java-parser: "npm:3.0.1"
   peerDependencies:
     prettier: ^3.0.0
-  checksum: 10c0/0acf9ab0dcb39739f9dd80c880cc9d703d73abf62b807d213258d2424ffc7d6617be4d95dfed25e0af5856a13fc3e0b16c694e150e202d2a180d9c6c5d7f5bd8
+  checksum: 10c0/ab0fc0f724b229f3f2b7f9309e666d57874a74bc28ecbcd77fd1d02209f739e6f41355b40df4d9af8104892f9276512dda6ade0e97f0db0ccb1bc42e7fdb0b99
   languageName: node
   linkType: hard
 
 "prettier-plugin-properties@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "prettier-plugin-properties@npm:0.3.0"
+  version: 0.3.1
+  resolution: "prettier-plugin-properties@npm:0.3.1"
   dependencies:
-    dot-properties: "npm:^1.0.0"
+    dot-properties: "npm:^1.1.0"
   peerDependencies:
     prettier: ">= 2.3.0"
-  checksum: 10c0/7595ff3248281e6b9ba483b655102ee65842769231704cf435982dfaccb33590b5a010b7cc5a984c65c97087f09f520c8ea1040f5479f7dc7b3200b390ddfe12
+  checksum: 10c0/ae769939aba21ba16ad4ea414035c49608e5f76ce0ea56bef2de7d3ad073c49315b048a8f9401ac4638b3dbc8d841b7b51f15a9f0946c7cf4df2872ca59e1f37
   languageName: node
   linkType: hard
 
