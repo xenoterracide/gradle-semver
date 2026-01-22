@@ -1,0 +1,311 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
+
+set -eu
+
+# Auto-generate commit messages using GitHub Copilot CLI.
+#
+# Runs in prepare-commit-msg so the message is present before commit-msg validation
+# (git-conventional-commits) runs.
+#
+# Safety / behavior:
+# - By default, skips in CI (Copilot CLI auth is interactive and not reliably available in CI).
+#   You can override this for controlled automation (e.g., a dependency update bot) by setting:
+#     COPILOT_COMMITMSG_ALLOW_CI=1
+# - Skips merge/squash/rebase commits.
+# - Skips if the message already contains non-comment content.
+# - Uses Yarn to execute the locally installed Copilot CLI.
+# - Writes a conventional-commit subject (<= 72 chars) and an optional wrapped body (<= 72 cols).
+#
+# Debug:
+# - Set COPILOT_COMMITMSG_DEBUG=1 to print high-level decisions to stderr and keep Copilot stderr.
+# - Set COPILOT_COMMITMSG_ECHO_IGNORED=1 to print ignored Copilot output lines to stderr.
+#
+# Model selection:
+# - Set COPILOT_COMMITMSG_MODEL to pick a model for this hook.
+# - Some models may require enabling in interactive mode before they can be used.
+# - If a selected model isn't enabled, the hook will fall back automatically.
+#
+# Tuning:
+# - Set COPILOT_COMMITMSG_MAX_BODY_LINES (default: 12) to cap message verbosity.
+# - Set COPILOT_COMMITMSG_INCLUDE_CONVENTION_CONFIG=0 to avoid including git-conventional-commits.yaml in the prompt.
+# - Set COPILOT_COMMITMSG_REQUIRE_CONVENTION_CONFIG=1 to require git-conventional-commits.yaml (errors if missing).
+# - Set COPILOT_COMMITMSG_FAIL_ON_INVALID=0 to keep the old permissive fallback behavior.
+# - Set COPILOT_COMMITMSG_DUMP_INVALID_LINES=N (default: 20) to control how many Copilot output lines to print on failure.
+
+log() {
+  [ -n "${COPILOT_COMMITMSG_DEBUG:-}" ] && printf '%s\n' "$*" 1>&2
+  return 0
+}
+
+# Robust CI detection (different CIs set different vars)
+IS_CI=""
+if [ -n "${CI:-}" ] || [ -n "${GITHUB_ACTIONS:-}" ] || [ -n "${BUILD_NUMBER:-}" ] || [ -n "${JENKINS_HOME:-}" ]; then
+  IS_CI=1
+fi
+
+if [ -n "${IS_CI:-}" ] && [ "${COPILOT_COMMITMSG_ALLOW_CI:-0}" != "1" ]; then
+  log "prepare-commit-msg: skipping in CI (set COPILOT_COMMITMSG_ALLOW_CI=1 to override)"
+  exit 0
+fi
+
+MSG_FILE="$1"
+COMMIT_SOURCE="${2:-}"
+# SHA is unused, but is part of the hook contract.
+# SHA="${3:-}"
+
+# Skip special commit types
+case "$COMMIT_SOURCE" in
+  merge | squash | rebase)
+    log "prepare-commit-msg: skipping commit source=$COMMIT_SOURCE"
+    exit 0
+    ;;
+esac
+
+# If user provided -m/-F or a template, don't clobber it.
+# "commit" means -c/-C/--amend
+if [ "$COMMIT_SOURCE" = "message" ] || [ "$COMMIT_SOURCE" = "template" ] || [ "$COMMIT_SOURCE" = "commit" ]; then
+  log "prepare-commit-msg: skipping explicit message source=$COMMIT_SOURCE"
+  exit 0
+fi
+
+# If message already has non-comment content, do nothing.
+# (Git puts comments starting with '#')
+if grep -q '^[[:space:]]*[^#[:space:]]' "$MSG_FILE" 2> /dev/null; then
+  log "prepare-commit-msg: message already has content"
+  exit 0
+fi
+
+# Only run if there are staged changes.
+if git diff --cached --quiet --exit-code; then
+  log "prepare-commit-msg: no staged changes"
+  exit 0
+fi
+
+# Collect context from staged diff.
+STAGED_FILES=$(git diff --cached --name-only | head -n 200)
+STAGED_DIFF=$(git diff --cached | head -n 600)
+
+MAX_BODY_LINES="${COPILOT_COMMITMSG_MAX_BODY_LINES:-12}"
+INCLUDE_CONVENTION_CONFIG="${COPILOT_COMMITMSG_INCLUDE_CONVENTION_CONFIG:-1}"
+REQUIRE_CONVENTION_CONFIG="${COPILOT_COMMITMSG_REQUIRE_CONVENTION_CONFIG:-0}"
+FAIL_ON_INVALID="${COPILOT_COMMITMSG_FAIL_ON_INVALID:-1}"
+DUMP_INVALID_LINES="${COPILOT_COMMITMSG_DUMP_INVALID_LINES:-20}"
+
+# Source of truth for allowed types is git-conventional-commits.yaml.
+# We don't parse YAML here; we just:
+# - include the file contents in the prompt when present
+# - use a canonical fallback list when the file is missing (e.g., if someone copies the hook)
+ALLOWED_TYPES="ci feat fix perf refactor style test build ops docs chore merge revert"
+
+CONVENTION_CONFIG_SNIPPET=""
+if [ -f "git-conventional-commits.yaml" ]; then
+  if [ "$INCLUDE_CONVENTION_CONFIG" != "0" ]; then
+    # Keep bounded: include only the first ~200 lines / 8KB.
+    CONVENTION_CONFIG_SNIPPET=$(sed -n '1,200p' git-conventional-commits.yaml | head -c 8192)
+  fi
+else
+  if [ "$REQUIRE_CONVENTION_CONFIG" = "1" ]; then
+    printf '%s\n' "prepare-commit-msg: ERROR: git-conventional-commits.yaml is required but missing" 1>&2
+    exit 1
+  fi
+fi
+
+# Build regex alternatives from allowed types (space-separated -> a|b|c)
+ALLOWED_TYPES_ALT=$(printf '%s' "$ALLOWED_TYPES" | tr ' ' '|')
+
+PROMPT="You are writing a git commit message for a human developer.
+
+You MUST follow this exact template:
+
+<type>(<scope>): <summary>
+
+<body>
+
+Rules:
+- Output plain text only. No markdown fences.
+- First line MUST be a valid Conventional Commit subject.
+- Keep the FIRST line <= 72 characters.
+- Use a specific scope when possible.
+- Body:
+  - Provide 2-6 bullet points.
+  - Explain WHAT changed and WHY.
+  - Wrap body lines to <= 72 characters.
+  - Do not repeat the subject.
+
+IMPORTANT: Use ONLY these commit types: $ALLOWED_TYPES
+If unsure, choose 'chore'.
+"
+
+if [ -n "$CONVENTION_CONFIG_SNIPPET" ]; then
+  PROMPT="$PROMPT
+Project commit convention (git-conventional-commits.yaml):
+---
+$CONVENTION_CONFIG_SNIPPET
+---
+"
+fi
+
+PROMPT="$PROMPT
+Staged files:
+${STAGED_FILES}
+
+Staged diff (truncated):
+${STAGED_DIFF}
+"
+
+log "prepare-commit-msg: invoking copilot (staged files: $(printf '%s\n' "$STAGED_FILES" | wc -l | tr -d ' '))"
+
+# Choose the model for commit-msg generation.
+COPILOT_MODEL="${COPILOT_COMMITMSG_MODEL:-gpt-5.1-codex-mini}"
+# Fallback model used when the requested model can't run or produces unusable output.
+# Prefer a stronger model here to improve message quality.
+COPILOT_FALLBACK_MODEL="${COPILOT_COMMITMSG_FALLBACK_MODEL:-gpt-5.1-codex}"
+log "prepare-commit-msg: copilot model=$COPILOT_MODEL (fallback=$COPILOT_FALLBACK_MODEL)"
+
+run_copilot() {
+  _model="$1"
+  _out_file="$2"
+  _err_file="$3"
+
+  if [ -n "${COPILOT_COMMITMSG_DEBUG:-}" ]; then
+    # Keep stderr visible for diagnostics.
+    yarn exec copilot --model "$_model" -s -p "$PROMPT" > "$_out_file" 2> "$_err_file" || return $?
+  else
+    yarn exec copilot --model "$_model" -s -p "$PROMPT" > "$_out_file" 2> "$_err_file" || return $?
+  fi
+}
+
+TMP_OUT=$(mktemp)
+TMP_ERR=$(mktemp)
+
+# First attempt with requested model.
+run_copilot "$COPILOT_MODEL" "$TMP_OUT" "$TMP_ERR" || true
+COPILOT_OUT=$(cat "$TMP_OUT")
+COPILOT_ERR=$(cat "$TMP_ERR")
+
+# If the CLI indicates the model must be enabled in interactive mode, fall back.
+# (We keep this check broad to handle phrasing changes.)
+if printf '%s\n%s' "$COPILOT_OUT" "$COPILOT_ERR" | grep -qi 'enable this model'; then
+  log "prepare-commit-msg: model '$COPILOT_MODEL' not enabled; falling back to '$COPILOT_FALLBACK_MODEL'"
+  run_copilot "$COPILOT_FALLBACK_MODEL" "$TMP_OUT" "$TMP_ERR" || true
+  COPILOT_OUT=$(cat "$TMP_OUT")
+  COPILOT_ERR=$(cat "$TMP_ERR")
+fi
+
+# If we got no output at all (or only errors), retry once with fallback to reduce generic fallbacks.
+if [ -z "${COPILOT_OUT:-}" ]; then
+  # Some failures only appear on stderr.
+  if [ -n "${COPILOT_ERR:-}" ] && [ -n "${COPILOT_COMMITMSG_DEBUG:-}" ]; then
+    printf '%s\n' "copilot(commit-msg): stderr: $COPILOT_ERR" 1>&2
+  fi
+
+  log "prepare-commit-msg: empty output; retrying with fallback model '$COPILOT_FALLBACK_MODEL'"
+  run_copilot "$COPILOT_FALLBACK_MODEL" "$TMP_OUT" "$TMP_ERR" || true
+  COPILOT_OUT=$(cat "$TMP_OUT")
+  COPILOT_ERR=$(cat "$TMP_ERR")
+fi
+
+rm -f "$TMP_OUT" "$TMP_ERR"
+
+# Helper: strip CRLF
+COPILOT_OUT=$(printf '%s' "$COPILOT_OUT" | sed -e 's/\r$//')
+
+# Find the first line anywhere in the output that looks like a conventional-commit subject.
+# Accept common prefixes like "Subject:".
+# Note: avoid awk escape warnings by not escaping parentheses in the -v regex string.
+SUBJECT_CANDIDATE=$(
+  printf '%s\n' "$COPILOT_OUT" \
+    | sed -E 's/^Subject:[[:space:]]*//I' \
+    | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' \
+    | awk -v types="$ALLOWED_TYPES_ALT" '
+      BEGIN{
+        # Match either: type(scope): ... OR type: ...
+        # Scope group must be optional.
+        re="^(" types ")(([(][^)]*[)]))?: .+";
+      }
+      {
+        line=$0
+        if (line ~ /^$/) next
+        if (line ~ re) { print line; exit }
+        if (ENVIRON["COPILOT_COMMITMSG_ECHO_IGNORED"] != "") {
+          printf("%s\n", "copilot(commit-msg): ignored: " line) > "/dev/stderr"
+        }
+      }
+    ' \
+    | head -n 1
+)
+
+# Strip common leading assistant phrases if they appear (defensive).
+SUBJECT_CANDIDATE=$(printf '%s' "$SUBJECT_CANDIDATE" | sed -E "s/^(I'll|I will|Sure,?|Here's|Proposed|Suggested)[: -]+//I")
+
+# If Copilot didn't provide a usable subject, either:
+# - fail fast (default) so commit is blocked and user can regenerate/adjust
+# - or fall back to a heuristic subject (legacy behavior)
+if [ -z "${SUBJECT_CANDIDATE:-}" ]; then
+  if [ "$FAIL_ON_INVALID" = "1" ]; then
+    # Print diagnostics without leaking diffs (Copilot output only).
+    printf '%s\n' "prepare-commit-msg: ERROR: Copilot did not output a valid Conventional Commit subject." 1>&2
+    printf '%s\n' "prepare-commit-msg: Copilot output (first ${DUMP_INVALID_LINES} lines):" 1>&2
+    printf '%s\n' "$COPILOT_OUT" | sed -n "1,${DUMP_INVALID_LINES}p" | sed 's/^/  | /' 1>&2
+
+    # Write an explicit placeholder into the commit message so it's obvious if a user
+    # ends up in an editor (and so validation fails loudly).
+    {
+      printf '%s\n\n' "INVALID_COMMIT_MESSAGE: regenerate (copilot hook failed)"
+      printf '%s\n' "# Re-run commit, or set COPILOT_COMMITMSG_DEBUG=1 COPILOT_COMMITMSG_ECHO_IGNORED=1"
+      printf '%s\n' "# (Set COPILOT_COMMITMSG_FAIL_ON_INVALID=0 to allow heuristic fallback.)"
+    } > "$MSG_FILE"
+
+    exit 1
+  fi
+
+  log "prepare-commit-msg: copilot did not yield a conventional subject; using fallback"
+  if printf '%s\n' "$STAGED_FILES" | grep -Eq '(^|/)(README\.md|.*\.md)$'; then
+    SUBJECT_CANDIDATE="docs: update documentation"
+  elif printf '%s\n' "$STAGED_FILES" | grep -Eq '(^|/)\.github/'; then
+    SUBJECT_CANDIDATE="ci: update workflows"
+  elif printf '%s\n' "$STAGED_FILES" | grep -Eq '\.gradle\.kts$|^gradle/|^settings\.gradle\.kts$|^build\.gradle\.kts$'; then
+    SUBJECT_CANDIDATE="build: update build"
+  else
+    SUBJECT_CANDIDATE="chore: update"
+  fi
+fi
+
+# Hard enforce subject <= 72 chars (git convention). If too long, truncate.
+SUBJECT=$(printf '%s' "$SUBJECT_CANDIDATE" | cut -c1-72)
+
+# Body: prefer everything after the first blank line
+BODY=$(printf '%s\n' "$COPILOT_OUT" | awk 'BEGIN{blank=0} NR==1{next} /^$/{blank=1; next} blank{print}')
+
+# If no blank-line-separated body, fallback to remaining non-empty lines excluding the subject.
+if [ -z "${BODY:-}" ]; then
+  BODY=$(printf '%s\n' "$COPILOT_OUT" | sed -e '1d' | awk 'NF')
+fi
+
+# Remove obvious meta chatter lines.
+BODY=$(printf '%s\n' "$BODY" | grep -viE "^(i'll|i will|sure|here's|proposed|suggested|i inspected|let's)\\b" || true)
+
+# Cap body lines before wrapping, keeping blank lines.
+BODY=$(printf '%s\n' "$BODY" | awk -v max="$MAX_BODY_LINES" 'BEGIN{n=0} {print} NF{n++} (n>=max){exit}')
+
+# Wrap body lines to 72 columns while preserving blank lines.
+WRAPPED_BODY=""
+if [ -n "${BODY:-}" ]; then
+  WRAPPED_BODY=$(printf '%s\n' "$BODY" | fold -s -w 72)
+fi
+
+# Compose final message: subject, blank line, body (if any).
+if [ -n "${WRAPPED_BODY:-}" ]; then
+  {
+    printf '%s\n\n' "$SUBJECT"
+    printf '%s\n' "$WRAPPED_BODY"
+  } > "$MSG_FILE"
+else
+  printf '%s\n' "$SUBJECT" > "$MSG_FILE"
+fi
+
+log "prepare-commit-msg: wrote message (subject length: $(printf '%s' "$SUBJECT" | wc -c | tr -d ' '))"

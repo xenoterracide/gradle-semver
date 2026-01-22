@@ -47,6 +47,89 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@github/copilot-darwin-arm64@npm:0.0.390":
+  version: 0.0.390
+  resolution: "@github/copilot-darwin-arm64@npm:0.0.390"
+  bin:
+    copilot-darwin-arm64: copilot
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@github/copilot-darwin-x64@npm:0.0.390":
+  version: 0.0.390
+  resolution: "@github/copilot-darwin-x64@npm:0.0.390"
+  bin:
+    copilot-darwin-x64: copilot
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@github/copilot-linux-arm64@npm:0.0.390":
+  version: 0.0.390
+  resolution: "@github/copilot-linux-arm64@npm:0.0.390"
+  bin:
+    copilot-linux-arm64: copilot
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@github/copilot-linux-x64@npm:0.0.390":
+  version: 0.0.390
+  resolution: "@github/copilot-linux-x64@npm:0.0.390"
+  bin:
+    copilot-linux-x64: copilot
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@github/copilot-win32-arm64@npm:0.0.390":
+  version: 0.0.390
+  resolution: "@github/copilot-win32-arm64@npm:0.0.390"
+  bin:
+    copilot-win32-arm64: copilot.exe
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@github/copilot-win32-x64@npm:0.0.390":
+  version: 0.0.390
+  resolution: "@github/copilot-win32-x64@npm:0.0.390"
+  bin:
+    copilot-win32-x64: copilot.exe
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@github/copilot@npm:^0.0.390":
+  version: 0.0.390
+  resolution: "@github/copilot@npm:0.0.390"
+  dependencies:
+    "@github/copilot-darwin-arm64": "npm:0.0.390"
+    "@github/copilot-darwin-x64": "npm:0.0.390"
+    "@github/copilot-linux-arm64": "npm:0.0.390"
+    "@github/copilot-linux-x64": "npm:0.0.390"
+    "@github/copilot-win32-arm64": "npm:0.0.390"
+    "@github/copilot-win32-x64": "npm:0.0.390"
+  dependenciesMeta:
+    "@github/copilot-darwin-arm64":
+      optional: true
+    "@github/copilot-darwin-x64":
+      optional: true
+    "@github/copilot-linux-arm64":
+      optional: true
+    "@github/copilot-linux-x64":
+      optional: true
+    "@github/copilot-win32-arm64":
+      optional: true
+    "@github/copilot-win32-x64":
+      optional: true
+  bin:
+    copilot: npm-loader.js
+  checksum: 10c0/80dc422734924a74c641117f0d74b64cc8118901d7e5fb1464f830d2acbdd01c81b8158144a2d018ab102bf139513a8262290d7be376fdbaaee9f847638b7cde
+  languageName: node
+  linkType: hard
+
 "@prettier/plugin-xml@npm:^3.4.2":
   version: 3.4.2
   resolution: "@prettier/plugin-xml@npm:3.4.2"
@@ -313,6 +396,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "gradle-semver@workspace:."
   dependencies:
+    "@github/copilot": "npm:^0.0.390"
     "@prettier/plugin-xml": "npm:^3.4.2"
     git-conventional-commits: "npm:^2.8.0"
     lint-staged: "npm:^16.2.1"
