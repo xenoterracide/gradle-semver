@@ -15,7 +15,7 @@ jobs:
           ref: ${{ github.event.workflow_run.head_branch }}
           filter: "blob:none"
           fetch-depth: 0
-      - uses: actions/setup-python@v6.1.0
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: "3"
       - run: pip install -r requirements.txt
