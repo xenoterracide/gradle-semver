@@ -4,6 +4,7 @@
   "private": true,
   "license": "GPL-3.0-or-later WITH Classpath-exception-2.0",
   "devDependencies": {
+    "@github/copilot": "^0.0.390",
     "@prettier/plugin-xml": "^3.4.2",
     "git-conventional-commits": "^2.8.0",
     "lint-staged": "^16.2.1",
@@ -14,6 +15,8 @@
     "prettier-plugin-toml": "^2.0.6"
   },
   "scripts": {
-    "postinstall": "pip install -r requirements.txt && git config core.hooksPath .config/git/hooks"
+    "test": "./gradlew check",
+    "postinstall": "pip install -r requirements.txt && git config core.hooksPath .config/git/hooks",
+    "setup": "yarn postinstall"
   }
 }
