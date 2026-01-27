@@ -243,51 +243,54 @@ SUBJECT_CANDIDATE=$(
 SUBJECT_CANDIDATE=$(printf '%s' "$SUBJECT_CANDIDATE" | sed -E "s/^(I'll|I will|Sure,?|Here's|Proposed|Suggested)[: -]+//I")
 
 # If Copilot didn't provide a usable subject, either:
-# - fail fast (default) so commit is blocked and user can regenerate/adjust
-# - or fall back to a heuristic subject (legacy behavior)
+# - produce an error message (default) so the user sees it in the editor
+# - or fall back to a heuristic subject (if FAIL_ON_INVALID=0)
 if [ -z "${SUBJECT_CANDIDATE:-}" ]; then
-  if [ "$FAIL_ON_INVALID" = "1" ]; then
-    # Print diagnostics without leaking diffs (Copilot output only).
-    printf '%s\n' "prepare-commit-msg: ERROR: Copilot did not output a valid Conventional Commit subject." 1>&2
-    printf '%s\n' "prepare-commit-msg: Copilot output (first ${DUMP_INVALID_LINES} lines):" 1>&2
-    printf '%s\n' "$COPILOT_OUT" | sed -n "1,${DUMP_INVALID_LINES}p" | sed 's/^/  | /' 1>&2
+  if [ "${COPILOT_COMMITMSG_FAIL_ON_INVALID:-1}" = "1" ]; then
+    log "prepare-commit-msg: copilot failed to yield a valid subject; using error fallback"
+    SUBJECT="error(copilot): failed to generate message"
 
-    # Write an explicit placeholder into the commit message so it's obvious if a user
-    # ends up in an editor (and so validation fails loudly).
+    # Collect whatever we have for the body
     {
-      printf '%s\n\n' "INVALID_COMMIT_MESSAGE: regenerate (copilot hook failed)"
-      printf '%s\n' "# Re-run commit, or set COPILOT_COMMITMSG_DEBUG=1 COPILOT_COMMITMSG_ECHO_IGNORED=1"
-      printf '%s\n' "# (Set COPILOT_COMMITMSG_FAIL_ON_INVALID=0 to allow heuristic fallback.)"
-    } > "$MSG_FILE"
-
-    exit 1
-  fi
-
-  log "prepare-commit-msg: copilot did not yield a conventional subject; using fallback"
-  if printf '%s\n' "$STAGED_FILES" | grep -Eq '(^|/)(README\.md|.*\.md)$'; then
-    SUBJECT_CANDIDATE="docs: update documentation"
-  elif printf '%s\n' "$STAGED_FILES" | grep -Eq '(^|/)\.github/'; then
-    SUBJECT_CANDIDATE="ci: update workflows"
-  elif printf '%s\n' "$STAGED_FILES" | grep -Eq '\.gradle\.kts$|^gradle/|^settings\.gradle\.kts$|^build\.gradle\.kts$'; then
-    SUBJECT_CANDIDATE="build: update build"
+      printf 'Copilot failed to generate a conventional commit message.\n\n'
+      if [ -n "${COPILOT_OUT:-}" ]; then
+        printf 'Output:\n%s\n\n' "$COPILOT_OUT"
+      fi
+      if [ -n "${COPILOT_ERR:-}" ]; then
+        printf 'Errors:\n%s\n' "$COPILOT_ERR"
+      fi
+    } > "$MSG_FILE.tmp"
+    BODY=$(cat "$MSG_FILE.tmp")
+    rm "$MSG_FILE.tmp"
   else
-    SUBJECT_CANDIDATE="chore: update"
+    log "prepare-commit-msg: copilot did not yield a conventional subject; using heuristic fallback"
+    if printf '%s\n' "$STAGED_FILES" | grep -Eq '(^|/)(README\.md|.*\.md)$'; then
+      SUBJECT_CANDIDATE="docs: update documentation"
+    elif printf '%s\n' "$STAGED_FILES" | grep -Eq '(^|/)\.github/'; then
+      SUBJECT_CANDIDATE="ci: update workflows"
+    elif printf '%s\n' "$STAGED_FILES" | grep -Eq '\.gradle\.kts$|^gradle/|^settings\.gradle\.kts$|^build\.gradle\.kts$'; then
+      SUBJECT_CANDIDATE="build: update build"
+    else
+      SUBJECT_CANDIDATE="chore: update"
+    fi
+    SUBJECT=$(printf '%s' "$SUBJECT_CANDIDATE" | cut -c1-72)
+    BODY=""
   fi
+else
+  # Hard enforce subject <= 72 chars (git convention). If too long, truncate.
+  SUBJECT=$(printf '%s' "$SUBJECT_CANDIDATE" | cut -c1-72)
+
+  # Body: prefer everything after the first blank line
+  BODY=$(printf '%s\n' "$COPILOT_OUT" | awk 'BEGIN{blank=0} NR==1{next} /^$/{blank=1; next} blank{print}')
+
+  # If no blank-line-separated body, fallback to remaining non-empty lines excluding the subject.
+  if [ -z "${BODY:-}" ]; then
+    BODY=$(printf '%s\n' "$COPILOT_OUT" | sed -e '1d' | awk 'NF')
+  fi
+
+  # Remove obvious meta chatter lines.
+  BODY=$(printf '%s\n' "$BODY" | grep -viE "^(i'll|i will|sure|here's|proposed|suggested|i inspected|let's)\\b" || true)
 fi
-
-# Hard enforce subject <= 72 chars (git convention). If too long, truncate.
-SUBJECT=$(printf '%s' "$SUBJECT_CANDIDATE" | cut -c1-72)
-
-# Body: prefer everything after the first blank line
-BODY=$(printf '%s\n' "$COPILOT_OUT" | awk 'BEGIN{blank=0} NR==1{next} /^$/{blank=1; next} blank{print}')
-
-# If no blank-line-separated body, fallback to remaining non-empty lines excluding the subject.
-if [ -z "${BODY:-}" ]; then
-  BODY=$(printf '%s\n' "$COPILOT_OUT" | sed -e '1d' | awk 'NF')
-fi
-
-# Remove obvious meta chatter lines.
-BODY=$(printf '%s\n' "$BODY" | grep -viE "^(i'll|i will|sure|here's|proposed|suggested|i inspected|let's)\\b" || true)
 
 # Cap body lines before wrapping, keeping blank lines.
 BODY=$(printf '%s\n' "$BODY" | awk -v max="$MAX_BODY_LINES" 'BEGIN{n=0} {print} NF{n++} (n>=max){exit}')
