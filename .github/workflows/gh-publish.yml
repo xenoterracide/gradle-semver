@@ -34,7 +34,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v5.0.0
+      - uses: gradle/actions/setup-gradle@v5.0.1
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: ./gradlew publishAllPublicationsToGhRepository --scan --no-configuration-cache
