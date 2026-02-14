@@ -9,8 +9,8 @@ SPDX-License-Identifier: CC-BY-NC-4.0
 A semantic versioning plugin that derives the version from git tags and commits and is configuration cache safe.
 
 _Plugin ID_: `"com.xenoterracide.gradle.semver"`
-_Plugin GAV_: `"com.xenoterracide.gradle:semver:0.15.+"
-_Version_: `0.15.+`
+_Plugin GAV_: `"com.xenoterracide.gradle:semver:0.16.+"
+_Version_: `0.16.+`
 
 ## Usage
 
@@ -87,4 +87,18 @@ For scripting, you usually want `--quiet`:
 
 ./gradlew -Pversion=1.2.3 version --quiet
 # 1.2.3
+```
+
+## GitHub
+
+Depending on your workflow recent changes to github might require your checkout action to change
+
+```yml
+- uses: actions/checkout@v6.0.2
+  with:
+    ref: ${{ github.ref_name }}
+    filter: "blob:none"
+    fetch-depth: 0
+    fetch-tags: true
+- run: git remote set-head --auto origin
 ```
