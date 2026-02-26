@@ -26,6 +26,7 @@ maven-artifact = "org.apache.maven:maven-artifact:3.+"
 plugin-convention-checkstyle = { module = "com.xenoterracide.gradle.convention:checkstyle", version.ref = "convention" }
 plugin-convention-compile = { module = "com.xenoterracide.gradle.convention:compile", version.ref = "convention" }
 plugin-convention-coverage = { module = "com.xenoterracide.gradle.convention:coverage", version.ref = "convention" }
+plugin-convention-javadoc = { module = "com.xenoterracide.gradle.convention:javadoc", version.ref = "convention" }
 plugin-convention-publish = { module = "com.xenoterracide.gradle.convention:publish", version.ref = "convention" }
 plugin-convention-spotbugs = { module = "com.xenoterracide.gradle.convention:spotbugs", version.ref = "convention" }
 plugin-convention-test = { module = "com.xenoterracide.gradle.convention:test", version.ref = "convention" }

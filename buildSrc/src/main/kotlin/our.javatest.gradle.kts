@@ -2,12 +2,30 @@
 //
 // SPDX-License-Identifier: MIT
 
+import org.gradle.accessors.dm.LibrariesForLibs
+
 plugins {
   id("com.xenoterracide.gradle.convention.test")
   `java-gradle-plugin`
 }
 
-tasks.withType<Test>().configureEach {
-  // Allow configuration cache when using TestKit
-  jvmArgs("-XX:+EnableDynamicAgentLoading")
+val libs = the<LibrariesForLibs>()
+
+dependencies {
+  gradleTestKit()
+}
+
+testing {
+  suites {
+    val testIntegration by registering(JvmTestSuite::class) {
+      gradlePlugin.testSourceSet(sources)
+      dependencies {
+        runtimeOnly(project())
+      }
+    }
+  }
+}
+
+tasks.check {
+  dependsOn(testing.suites.named("testIntegration"))
 }
