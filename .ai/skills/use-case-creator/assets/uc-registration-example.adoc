@@ -1,0 +1,182 @@
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
+//
+// SPDX-License-Identifier: CC-BY-NC-4.0
+
+= UC-001: User Registration via Identity Provider
+
+== Metadata
+
+[cols="1,3"]
+|===
+| Primary Actor | Anonymous <<Person>> with Identity Provider credentials
+| Scope | Security Module - Registration Context
+| Level | User Goal
+| Trigger | User initiates registration through an Identity Provider
+|===
+
+== Stakeholders and Interests
+
+*<<Person>>*::
+  Wants seamless registration without creating new passwords.
+  Expects to be recognized on return visits regardless of which IdP they used.
+
+*System Owner*::
+  Needs accurate user tracking without duplication.
+  Must support multiple IdPs without vendor lock-in.
+
+*Security Auditor*::
+  Requires clear audit trail.
+  Needs verification that identities are validated by trusted providers.
+
+== Preconditions
+
+* <<Person>> has valid credentials with a supported Identity Provider
+* Identity Provider is configured and accessible
+
+== Postconditions
+
+=== Success Guarantee
+
+* <<User>> created with unique identifier
+* <<IdentityProviderUser>> created linking <<User>> to external identity
+* Domain events published for user registration and identity linkage
+* Personal <<Account>> created (see <<account-creation,open issue>>)
+
+=== Minimal Guarantee
+
+* No duplicate <<User,Users>> created for same identity
+* Failed attempts logged for audit
+
+== Main Success Scenario
+
+. [[step-initiate,User initiates registration via Identity Provider]] *User initiates registration via Identity Provider* +
+  _User clicks "Sign up with..." button for chosen provider_
+
+. [[step-authenticate,System authenticates user through Identity Provider]] *System authenticates user through Identity Provider* +
+  _User completes login at provider; System receives identity token containing
+  issuer, subject identifier, email, and profile information_
+
+. [[step-validate,System validates identity is new]] *System validates identity is new* +
+  _System queries whether identity (issuer + subject) already exists_
+
+. [[step-create,System creates User and links Identity Provider identity]] *System creates User and links Identity Provider identity* +
+  _New <<User>> created; <<IdentityProviderUser>> record created with issuer, subject, and profile information from provider_
+
+. [[step-create-account,System creates personal Account]] *System creates personal Account* +
+  _New <<Account>> created for the <<User>>; <<User>> added as owner (see open issue)_
+
+. [[step-publish,System publishes registration events]] *System publishes registration events* +
+  _User registered and identity linked events emitted for downstream processing_
+
+. [[step-complete,System signs in user and opens application]] *System signs in user and opens application* +
+  _User authenticated and redirected to application_
+
+== Extensions (Alternative Flows)
+
+=== During <<step-validate>>: User Already Exists
+
+*Condition:* Identity (issuer + subject) found in system
+
+*Steps:*
+. System treats this as sign-in rather than registration
+. System updates cached profile information if changed
+. Resume at <<step-complete>>
+
+=== During <<step-authenticate>>: Auth0 Account Linking Enabled
+
+*Condition:* Auth0 has linked multiple identities to a primary account
+
+*Steps:*
+. Auth0 returns the primary subject identifier regardless of which IdP was used
+. System identifies user by the primary identity
+. Audit log records the specific IdP used for traceability
+. Continue with <<step-validate>> (typically finds existing user)
+
+=== During <<step-validate>>: Email Exists with Different Identity
+
+*Condition:* Identity not found, but email address exists with different identity
+
+*Steps:*
+. System presents options to user:
+** "Link these accounts" (if they own both identities)
+** "Create separate account"
+** "I need help"
+. If "Link accounts" selected: invoke UC-003 (Account Linking)
+. If "Create separate": continue with <<step-create-account>>
+. If "Help": redirect to support flow, *ENDS*
+
+=== During <<step-authenticate>>: Identity Provider Unavailable
+
+*Condition:* Identity Provider returns error or is unreachable
+
+*Steps:*
+. System logs error details for troubleshooting
+. Display user-friendly message: "Unable to connect to [provider name]"
+. Offer alternative registration methods if available
+. *ENDS* (failed)
+
+=== During <<step-authenticate>>: Required Claims Missing
+
+*Condition:* Identity token missing required claims (issuer or subject)
+
+*Steps:*
+. System logs security event
+. Reject registration attempt
+. Display error: "Incomplete identity information received"
+. *ENDS* (failed)
+
+=== During <<step-authenticate>>: Email Not Verified
+
+*Condition:* Email verification status from provider is false
+
+*Steps:*
+. System records unverified email status
+. May restrict certain features until email verified
+. Continue with <<step-create>> (<<User>> still created)
+
+== Technology and Data Variations
+
+=== Identity Providers Supported
+* Auth0 (OIDC)
+* Google (OIDC)
+* Microsoft/Azure AD (OIDC)
+* GitHub (OIDC)
+* Any OIDC-compliant provider
+
+=== Token Formats
+* JWT (JSON Web Token)
+* Opaque token (via userinfo endpoint)
+
+=== Profile Information
+* Email address (not used as identity key - users can change emails)
+* Email verification status
+* Display name
+* Profile picture URL
+
+== Special Requirements
+
+* Issuer (provider identifier) stored as normalized URI
+* Subject identifier stored exactly as provided (case-sensitive, immutable)
+* Email addresses are not identity keys
+* All provider interactions logged for security audit
+* Idempotent registration (same identity cannot create duplicate accounts)
+
+== Frequency of Occurrence
+
+Expected to be primary user acquisition path.
+Estimated: 100-1000 registrations per day initially.
+
+== Open Issues
+
+* [[account-creation]] Should registration auto-create a personal <<Account>>, or should that be a separate use case?
+* Auth0 Account Linking vs. domain-level linking?
+* Identity migration policy (changing providers or tenants)?
+* Stale registration cleanup (incomplete onboarding)?
+* Manual account linking for support staff?
+* Should we create a <<Person>> record separately from <<User>>, or treat them as the same concept for now?
+
+== Related Use Cases
+
+* UC-002: User Login via Identity Provider
+* UC-003: Account Linking (multiple IdPs)
+* UC-004: Profile Update
