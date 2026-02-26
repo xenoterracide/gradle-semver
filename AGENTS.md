@@ -8,7 +8,7 @@ SPDX-License-Identifier: CC-BY-NC-4.0
 
 - `./gradlew check` must pass if `*.kts`, `*.java`, or `checkstyle/*.xml` has changed
 - `yarn ug` updates gradle dependencies
-- `gh` can be used if authenticated and available.
+- `gh` can be used if authenticated and available, to open PR's, check PR comments, and review build status
 - formatting and license application is handled via `yarn lint-staged`
 
 # Quality
