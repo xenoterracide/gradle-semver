@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -55,11 +55,12 @@ tasks.withType<JavaCompile>().configureEach {
 // Configure Javadoc to accept custom tags
 tasks.withType<Javadoc>().configureEach {
   (options as StandardJavadocDocletOptions).apply {
-    addMultilineStringsOption("tag").value = listOf(
-      "apiSpec:a:API Spec:",
-      "apiNote:a:API Note:",
-      "implSpec:a:Implementation Spec:",
-      "implNote:a:Implementation Note:",
-    )
+    addMultilineStringsOption("tag").value =
+      listOf(
+        "apiSpec:a:API Spec:",
+        "apiNote:a:API Note:",
+        "implSpec:a:Implementation Spec:",
+        "implNote:a:Implementation Note:",
+      )
   }
 }
