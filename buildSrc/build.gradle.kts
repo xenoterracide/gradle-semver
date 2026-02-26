@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2023 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -18,6 +18,9 @@ dependencies {
   implementation(libs.plugin.dependency.analysis)
 
   runtimeOnly(libs.plugin.convention.checkstyle)
+  runtimeOnly(libs.plugin.convention.compile)
   runtimeOnly(libs.plugin.convention.coverage)
+  runtimeOnly(libs.plugin.convention.javadoc)
   runtimeOnly(libs.plugin.convention.spotbugs)
+  runtimeOnly(libs.plugin.convention.test)
 }

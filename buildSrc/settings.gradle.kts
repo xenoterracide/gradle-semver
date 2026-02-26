@@ -1,4 +1,5 @@
-// © Copyright 2023-2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023-2026 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
 
 rootProject.name = "buildSrc"
