@@ -11,12 +11,17 @@ plugins {
 
 val libs = the<LibrariesForLibs>()
 
-dependencies {
-  gradleTestKit()
-}
-
 testing {
   suites {
+    withType<JvmTestSuite>().configureEach {
+      dependencies {
+        implementation(gradleTestKit())
+        implementation(platform(libs.junit.bom))
+        implementation.bundle(libs.bundles.test.impl)
+        runtimeOnly.bundle(libs.bundles.test.runtime)
+      }
+    }
+
     val testIntegration by registering(JvmTestSuite::class) {
       gradlePlugin.testSourceSet(sources)
       dependencies {

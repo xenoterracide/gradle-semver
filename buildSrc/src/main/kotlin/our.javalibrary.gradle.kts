@@ -6,4 +6,5 @@ plugins {
   `java-library`
   id("our.bom")
   id("our.convention")
+  id("our.javatest")
 }
