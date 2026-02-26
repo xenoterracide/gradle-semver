@@ -1,0 +1,64 @@
+// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+//
+// SPDX-License-Identifier: CC0-1.0
+
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  dependencyDashboard: true,
+  timezone: "UTC",
+  automergeStrategy: "rebase",
+  // Managers config will be applied via packageRules below
+  hostRules: [
+    {
+      hostType: "maven",
+      matchHost: "https://maven.pkg.github.com",
+    },
+  ],
+  packageRules: [
+    {
+      // Runs during the 03:00 UTC hour daily (scheduled after update-java at 03:00)
+      schedule: ["* 3 * * *"],
+      // Use pip-compile with PEP 621 pyproject at repo root
+      matchManagers: ["pip-compile"],
+      managerFilePatterns: ["^pyproject\\.toml$"],
+    },
+    {
+      // Disable legacy requirements manager; we use pip-compile with PEP 621
+      matchManagers: ["pip_requirements"],
+      enabled: false,
+    },
+    {
+      // remember to sync with update-java
+      // Runs during the 04:00 UTC hour daily (scheduled after update-java at 03:00)
+      schedule: ["* 4 * * *"],
+      matchManagers: ["gradle", "gradle-wrapper"],
+      // Open PRs for MAJOR updates only; minor/patch are handled elsewhere
+      matchUpdateTypes: ["major"],
+      automerge: false,
+    },
+    {
+      // Ensure Gradle plugin versions in settings files are considered
+      // Match all Java update types; run weekly and not concurrently with dev deps
+      // Weekly on Wednesday during the 05:00 UTC hour (devDependencies window is 04:00)
+      schedule: ["* 5 * * 3"],
+      matchManagers: ["gradle"],
+      matchFileNames: ["**/settings.gradle", "**/settings.gradle.kts"],
+      matchUpdateTypes: ["major", "minor", "patch"],
+      automerge: true,
+    },
+    {
+      matchManagers: ["github-actions"],
+      automerge: true,
+    },
+    {
+      // Run every Wednesday
+      // Window: 04:00 UTC hour on Wednesday (Renovate cron uses '*' for minutes)
+      schedule: ["* 4 * * 3"],
+      matchManagers: ["npm", "asdf"],
+      groupName: "devDependencies",
+      matchUpdateTypes: ["minor", "patch", "pin"],
+      automerge: true,
+    },
+  ],
+}
