@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "./gradlew check",
-    "postinstall": "pip install -r requirements.txt && git config core.hooksPath .config/git/hooks",
+    "contributor": "pip install -r requirements.txt --require-hashes && git config core.hooksPath .config/git/hooks",
     "setup": "yarn postinstall"
   }
 }
