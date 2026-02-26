@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
 [versions]
 ep = "2.+"
-convention = "0.16.+"
+convention = "0.17.+"
 junit = "6.+"
 
 [libraries]
