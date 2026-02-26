@@ -11,7 +11,6 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Property, e.g. {@link ObjectFactory} and {@link ProviderFactory} wrapper.
@@ -44,7 +43,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Callable, Class)
    */
-  public Provider<@Nullable String> providedString(Callable<@Nullable String> callable) {
+  public Provider<String> providedString(Callable<String> callable) {
     return this.provided(callable, String.class);
   }
 
@@ -68,7 +67,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Callable, Class)
    */
-  public Provider<Long> providedLong(Provider<@Nullable Long> callable) {
+  public Provider<Long> providedLong(Provider<Long> callable) {
     return this.provided(callable, Long.class);
   }
 
@@ -104,7 +103,7 @@ public final class ProvidedFactory {
    * @return provider
    * @see #provided(Provider, Class)
    */
-  public <T> Provider<T> provided(Callable<@Nullable T> callable, Class<T> type) {
+  public <T> Provider<T> provided(Callable<T> callable, Class<T> type) {
     return this.provided(this.providerFactory.provider(callable), type);
   }
 
@@ -124,7 +123,7 @@ public final class ProvidedFactory {
    *   {@link Property#disallowChanges()} to ensure they are immutable and only created as a sort of cached
    *   {@link Provider}.
    */
-  public <T> Provider<T> provided(Provider<@Nullable T> provider, Class<T> type) {
+  public <T> Provider<T> provided(Provider<T> provider, Class<T> type) {
     var prop = this.objectFactory.property(type);
     prop.set(provider);
     prop.finalizeValueOnRead();
@@ -148,7 +147,7 @@ public final class ProvidedFactory {
    * @return the new property
    * @see #property(Class)
    */
-  public Property<@Nullable String> propertyString() {
+  public Property<String> propertyString() {
     return this.property(String.class);
   }
 

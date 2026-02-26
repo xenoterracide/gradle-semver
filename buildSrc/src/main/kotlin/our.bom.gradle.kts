@@ -1,4 +1,5 @@
-// © Copyright 2023-2024 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2023-2026 Caleb Cushing
+//
 // SPDX-License-Identifier: MIT
 
 import org.gradle.accessors.dm.LibrariesForLibs
@@ -20,8 +21,6 @@ configurations.configureEach {
   exclude(group = "com.googlecode.javaewah", module = "JavaEWAH")
 
   resolutionStrategy {
-    // we really want to do a full timestamp based lock, but this'll have to do for now
-    // cacheChangingModulesFor(5, TimeUnit.MINUTES)
     componentSelection {
       all {
         if (!candidate.group.matches(Regex("^com.xenoterracide.*"))) {

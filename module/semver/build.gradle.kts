@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -23,6 +23,9 @@ testing {
   suites {
     withType<JvmTestSuite>().configureEach {
       dependencies {
+        implementation(libs.assertj)
+        implementation(libs.junit.api)
+        implementation(libs.junit.parameters)
         implementation(testFixtures(projects.git))
         implementation(libs.jgit)
       }
