@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
+[ -n "$CI" ] && exit 0
+
+yarn lint-staged
