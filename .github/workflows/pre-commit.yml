@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
@@ -6,40 +6,13 @@ name: precommit
 on: [push, workflow_call]
 jobs:
   license:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - &checkout-step
-        uses: actions/checkout@v6.0.2
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          filter: "blob:none"
-          fetch-depth: 0
-      - uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3"
-      - run: pip install -r requirements.txt
-      - run: reuse lint
+    uses: xenoterracide/github/.github/workflows/license.yml@4638b8c9a7a42c42d70da79ed3491a301433a6a1
   format:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - *checkout-step
-      - uses: actions/setup-node@v6.2.0
-        with:
-          node-version: 24
-          package-manager-cache: false
-      - run: corepack enable
-      - uses: actions/setup-node@v6.2.0
-        with:
-          node-version: 24
-          cache: "yarn"
-      - run: yarn install --immutable --inline-builds --check-resolutions
-      - run: yarn exec prettier --ignore-unknown --check '**'
+    uses: xenoterracide/github/.github/workflows/format.yml@4638b8c9a7a42c42d70da79ed3491a301433a6a1
   format-kotlin:
     runs-on: ubuntu-24.04
     steps:
-      - *checkout-step
+      - uses: actions/checkout@v6.0.2
       - uses: actions/setup-java@v5.2.0
         with:
           distribution: temurin
