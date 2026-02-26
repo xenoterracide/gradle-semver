@@ -1,6 +1,6 @@
 import org.semver4j.Semver
 
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -46,6 +46,7 @@ dependencyAnalysis {
       }
       onUnusedDependencies {
         exclude(libs.junit.parameters)
+        exclude("org.junit.jupiter:junit-jupiter")
       }
       ignoreSourceSet("testIntegration")
     }

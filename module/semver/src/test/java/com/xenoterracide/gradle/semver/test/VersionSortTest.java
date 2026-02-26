@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -13,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.semver4j.Semver;
 
 /**
@@ -42,7 +41,7 @@ public class VersionSortTest {
   static class MavenVersionList implements ArgumentsProvider {
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
       var version = "0.1.1-alpha.0.";
       var sha = "g3aae11c";
       return Stream.of(
@@ -58,7 +57,7 @@ public class VersionSortTest {
   static class RcVersionList implements ArgumentsProvider {
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
       var sha = "3aae11c";
       return Stream.of(
         Arguments.of("0.1.1-alpha.10.17129409589+git.6." + sha, "0.1.1-alpha.10+git.1.3aae11d"),

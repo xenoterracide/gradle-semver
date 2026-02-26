@@ -4,7 +4,7 @@
 
 [versions]
 ep = "2.+"
-convention = "0.5.+"
+convention = "0.16.+"
 junit = "6.+"
 
 [libraries]
@@ -24,9 +24,11 @@ junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 maven-artifact = "org.apache.maven:maven-artifact:3.+"
 plugin-convention-checkstyle = { module = "com.xenoterracide.gradle.convention:checkstyle", version.ref = "convention" }
+plugin-convention-compile = { module = "com.xenoterracide.gradle.convention:compile", version.ref = "convention" }
 plugin-convention-coverage = { module = "com.xenoterracide.gradle.convention:coverage", version.ref = "convention" }
 plugin-convention-publish = { module = "com.xenoterracide.gradle.convention:publish", version.ref = "convention" }
 plugin-convention-spotbugs = { module = "com.xenoterracide.gradle.convention:spotbugs", version.ref = "convention" }
+plugin-convention-test = { module = "com.xenoterracide.gradle.convention:test", version.ref = "convention" }
 plugin-dependency-analysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version = "3.+" }
 plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:5.+"
 plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:2.+"
