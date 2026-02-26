@@ -32,7 +32,7 @@ plugin-errorprone = "net.ltgt.gradle:gradle-errorprone-plugin:5.+"
 plugin-gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:2.+"
 semver = "org.semver4j:semver4j:6.+"
 spotbugs = "com.github.spotbugs:spotbugs:4.+"
-vavr = "io.vavr:vavr:0.+"
+vavr = "io.vavr:vavr:1.+"
 
 [bundles]
 ep = ["errorprone-core", "errorprone-nullaway"]
