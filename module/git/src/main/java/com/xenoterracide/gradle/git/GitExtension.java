@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -135,6 +135,18 @@ public class GitExtension implements Provides<GitMetadata> {
    * @return the distance
    */
   public Optional<Long> commonAncestorDistanceFor(GitRemoteForGradle remote) {
+    var oObjectId = new MergeBaseFinder(this.git.get().getRepository()).find(remote);
+    return oObjectId.map(oid -> new DistanceCalculator(this.git::get).apply(oid.getName()));
+  }
+
+  /**
+   * Overloaded method that accepts a {@link GitRemote} for convenience.
+   *
+   * @param remote
+   *   the remote
+   * @return the distance
+   */
+  public Optional<Long> commonAncestorDistanceFor(GitRemote remote) {
     var oObjectId = new MergeBaseFinder(this.git.get().getRepository()).find(remote);
     return oObjectId.map(oid -> new DistanceCalculator(this.git::get).apply(oid.getName()));
   }

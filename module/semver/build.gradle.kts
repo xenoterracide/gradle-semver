@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: MIT
 
@@ -17,6 +17,7 @@ dependencies {
   api(projects.git)
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang) { version { require("[3.8,4)") } }
+  implementation(libs.jgit)
 }
 
 testing {
