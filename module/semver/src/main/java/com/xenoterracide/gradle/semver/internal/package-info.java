@@ -5,4 +5,5 @@
 /**
  * Internal state machine implementation for semantic version calculation.
  */
+@org.jspecify.annotations.NullMarked
 package com.xenoterracide.gradle.semver.internal;
