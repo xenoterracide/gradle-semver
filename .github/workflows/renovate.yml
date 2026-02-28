@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: renovate
+on:
+  schedule:
+    # Run every day at 02:00 UTC (before update-java at 03:00)
+    - cron: "0 2 * * *"
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  renovate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@v41.0.22
+        with:
+          configurationFile: .github/renovate.json5
+          # Use GH_MERGE_PAT (or create a dedicated RENOVATE_PAT secret)
+          token: ${{ secrets.GH_MERGE_PAT }}
+        env:
+          # These env vars are passed to Gradle when Renovate runs ./gradlew
+          # for lockfile updates, allowing it to authenticate with GitHub Packages
+          ORG_GRADLE_PROJECT_ghUsername: ${{ github.actor }}
+          ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: enable debug logging if needed
+          # LOG_LEVEL: debug
