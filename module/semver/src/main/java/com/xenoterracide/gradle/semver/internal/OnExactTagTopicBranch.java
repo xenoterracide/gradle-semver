@@ -12,9 +12,9 @@ import org.semver4j.Semver;
  *
  * <p>This can happen if a topic branch is created but has no new commits
  * beyond the tag. The metadata indicates we're on a topic branch for
- * traceability.
+ * traceability.</p>
  *
- * <p>Examples:
+ * <p>Examples:</p>
  * <ul>
  *   <li>v1.0.0 on feature-x (0 new commits) → {@code 1.0.0+branch.feature-x.git.0.abc123}</li>
  * </ul>

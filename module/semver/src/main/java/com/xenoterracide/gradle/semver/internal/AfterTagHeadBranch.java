@@ -12,17 +12,18 @@ import org.semver4j.Semver;
 /**
  * State: HEAD is after a tag (distance > 0), on the HEAD branch (main/develop).
  *
- * <p>Examples:
+ * <p>Examples:</p>
  * <ul>
  *   <li>5 commits after v1.0.0 on develop → {@code 1.0.1-alpha.0.5}</li>
  *   <li>1 commit after v0.1.1-rc.1 → {@code 0.1.1-rc.1.1}</li>
  * </ul>
  *
- * <p>No build metadata is added on the HEAD branch to keep versions clean.
+ * <p>No build metadata is added on the HEAD branch to keep versions clean.</p>
  */
 public final class AfterTagHeadBranch implements VersionState {
 
   @Override
+  // CHECKSTYLE.OFF: MethodLength
   public Semver calculate(GitContext ctx) {
     @Nullable
     String baseVersion = ctx.baseVersion();
@@ -50,4 +51,5 @@ public final class AfterTagHeadBranch implements VersionState {
       return semver.withClearedPreRelease().withPreRelease(prerelease);
     }
   }
+  // CHECKSTYLE.ON: MethodLength
 }

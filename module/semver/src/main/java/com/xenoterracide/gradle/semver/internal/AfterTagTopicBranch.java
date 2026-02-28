@@ -12,14 +12,16 @@ import org.semver4j.Semver;
 /**
  * State: HEAD is after a tag, on a topic branch (not HEAD branch).
  *
- * <p>Examples:
+ * <p>Examples:</p>
  * <ul>
- *   <li>3 commits on feature-x, which branched 5 commits after v1.0.0 → {@code 1.0.1-alpha.0.3+branch.feature-x.git.3.abc123}</li>
- *   <li>On feature-x with 1 commit after v0.1.1-rc.1 → {@code 0.1.1-rc.1.1+branch.feature-x.git.1.abc123}</li>
+ *   <li>3 commits on feature-x, which branched 5 commits after v1.0.0 →
+ *       {@code 1.0.1-alpha.0.3+branch.feature-x.git.3.abc123}</li>
+ *   <li>On feature-x with 1 commit after v0.1.1-rc.1 →
+ *       {@code 0.1.1-rc.1.1+branch.feature-x.git.1.abc123}</li>
  * </ul>
  *
  * <p>The prerelease uses distance from merge base (commits on topic branch only),
- * and metadata includes branch name and the same distance.
+ * and metadata includes branch name and the same distance.</p>
  */
 public final class AfterTagTopicBranch implements VersionState {
 
