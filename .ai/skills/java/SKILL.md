@@ -22,6 +22,7 @@ Use for writing Java code.
 - prefer immutable data structures over mutable ones.
   - `var strings = List.of("foo");` over `var strings = new ArrayList<String>(); strings.add("foo");`
 - avoid `private` except with fields. prefer the default "package protected" unless must be `public` or is useful for subclasses.
+  - this allows methods to be exposed for testing but not outside of the package.
 - prefer `final` for fields unless they need to be mutable
 - prefer `record` classes for simple data carriers.
 - prefer builder pattern over complex constructors with immutables library `@Builder` and a static factory. e.g.
