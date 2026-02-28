@@ -23,9 +23,9 @@ plugins {
 val libs = the<LibrariesForLibs>()
 
 dependencies {
-  spotbugs(libs.spotbugs)
-  errorprone(libs.bundles.ep)
   compileOnly(libs.errorprone.annotations)
+  errorprone(libs.bundles.ep)
+  spotbugs(libs.spotbugs)
 }
 
 repositoryHost(GithubPublicRepositoryConfiguration())
