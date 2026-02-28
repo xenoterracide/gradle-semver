@@ -8,11 +8,9 @@
   dependencyDashboard: true,
   timezone: "UTC",
   automergeStrategy: "rebase",
-  // NOTE: Gradle builds with private GitHub Packages repos require authentication.
-  // The Renovate hosted app cannot pass custom env vars (ORG_GRADLE_PROJECT_*)
-  // needed by your Gradle build. To fully support Gradle lockfile updates,
-  // you may need to self-host Renovate or use a GitHub Action workflow
-  // that triggers on Renovate PRs to update lockfiles separately.
+  // NOTE: This config is designed to work with the GitHub Actions workflow in
+  // .github/workflows/renovate.yml. The workflow passes ORG_GRADLE_PROJECT_*
+  // environment variables that Gradle needs to authenticate with GitHub Packages.
   hostRules: [
     {
       hostType: "maven",
