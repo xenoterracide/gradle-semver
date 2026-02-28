@@ -12,13 +12,15 @@ import org.semver4j.Semver;
  * the appropriate semantic version for that state.
  */
 // CHECKSTYLE.OFF: LeftCurly
-public sealed interface VersionState permits
-  OnExactTagHeadBranch,
-  OnExactTagTopicBranch,
-  AfterTagHeadBranch,
-  AfterTagTopicBranch,
-  NoTagHeadBranch,
-  NoTagTopicBranch {
+public sealed interface VersionState
+  permits
+    OnExactTagHeadBranch,
+    OnExactTagTopicBranch,
+    AfterTagHeadBranch,
+    AfterTagTopicBranch,
+    NoTagHeadBranch,
+    NoTagTopicBranch
+{
   // CHECKSTYLE.ON: LeftCurly
   /**
    * Calculates the semantic version for this state.

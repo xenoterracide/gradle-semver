@@ -12,5 +12,9 @@ SPDX-License-Identifier: CC0-1.0
     <module name="RecordComponentNumber">
       <property name="max" value="99" />
     </module>
+    <!-- Disable LeftCurly check for sealed interface with permits - conflicts with prettier -->
+    <module name="LeftCurly">
+      <property name="option" value="nlow" />
+    </module>
   </module>
 </module>
