@@ -36,7 +36,6 @@ public record GitContext(
   boolean isDirty,
   boolean isShallowClone
 ) {
-
   /**
    * Creates a builder for GitContext.
    *
