@@ -27,7 +27,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v5.0.2
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - run: ./gradlew version build --console=plain
+      - run: ./gradlew build --console=plain
         env:
           ORG_GRADLE_PROJECT_ghUsername: ${{ github.actor }}
           ORG_GRADLE_PROJECT_ghPassword: ${{ github.token }}
