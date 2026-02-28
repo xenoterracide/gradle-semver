@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-buildscript { dependencyLocking { lockAllConfigurations() } }
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
   our.convention
+  alias(libs.plugins.shadow)
 }
 
 dependencies {
@@ -14,11 +15,21 @@ dependencies {
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang) { version { require("[3.8,4)") } }
   implementation(libs.jgit)
+  shadow(libs.jgit)
 
   annotationProcessor(platform(libs.immutables.bom))
   annotationProcessor(libs.immutables.core)
   compileOnly(platform(libs.immutables.bom))
   compileOnly(libs.bundles.immutables)
+}
+
+tasks.withType<ShadowJar>().configureEach {
+  archiveClassifier.set("")
+  relocate("org.eclipse.jgit", "com.xenoterracide.gradle.semver.jgit")
+  dependencies {
+    include { it.moduleGroup == "org.eclipse.jgit" }
+  }
+  minimize()
 }
 
 testing {
