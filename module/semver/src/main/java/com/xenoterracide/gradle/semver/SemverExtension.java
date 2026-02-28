@@ -139,19 +139,20 @@ public class SemverExtension implements Provides<Semver> {
     // Shallow clone detection could be added here
     var isShallowClone = false;
 
-    return GitContext.builder()
-      .nearestTag(tag)
-      .distanceFromTag(distanceFromTag)
-      .isOnTagExact(isOnTagExact)
-      .currentBranch(currentBranch)
-      .headBranch(headBranch)
-      .isHeadBranch(isHeadBranch)
-      .distanceFromMergeBase(distanceFromMergeBase)
-      .shortSha(shortSha)
-      .fullSha(fullSha)
-      .isDirty(isDirty)
-      .isShallowClone(isShallowClone)
-      .build();
+    // Use constructor directly as the Immutables builder doesn't support @Nullable parameters
+    return new GitContext(
+      tag,
+      distanceFromTag,
+      isOnTagExact,
+      currentBranch,
+      headBranch,
+      isHeadBranch,
+      distanceFromMergeBase,
+      shortSha,
+      fullSha,
+      isDirty,
+      isShallowClone
+    );
   }
 
   // CHECKSTYLE.ON: MethodLength
