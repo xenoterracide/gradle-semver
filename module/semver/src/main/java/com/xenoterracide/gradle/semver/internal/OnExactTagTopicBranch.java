@@ -4,7 +4,6 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
-import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 /**
@@ -23,8 +22,7 @@ public final class OnExactTagTopicBranch implements VersionState {
 
   @Override
   public Semver calculate(GitContext ctx) {
-    @Nullable
-    String baseVersion = ctx.baseVersion();
+    var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("OnExactTagTopicBranch requires a tag but baseVersion is null");
     }
@@ -36,7 +34,7 @@ public final class OnExactTagTopicBranch implements VersionState {
 
     // Add metadata to indicate we're on a topic branch at the tag
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : "unknown";
-    String metadata = String.format("branch.%s.git.0.%s", sanitizeBranchName(branchName), ctx.shortSha());
+    var metadata = String.format("branch.%s.git.0.%s", sanitizeBranchName(branchName), ctx.shortSha());
 
     return semver.withBuild(metadata);
   }

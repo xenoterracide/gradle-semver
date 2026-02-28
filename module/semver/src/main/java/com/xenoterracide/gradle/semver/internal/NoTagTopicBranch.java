@@ -23,8 +23,8 @@ public final class NoTagTopicBranch implements VersionState {
     // Prerelease uses distance from merge base (commits on topic branch)
     // Metadata includes branch name and distance
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : "unknown";
-    String prerelease = String.format("alpha.0.%d", ctx.distanceFromMergeBase());
-    String metadata = String.format(
+    var prerelease = String.format("alpha.0.%d", ctx.distanceFromMergeBase());
+    var metadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(branchName),
       ctx.distanceFromMergeBase(),

@@ -4,7 +4,6 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
-import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 /**
@@ -21,8 +20,7 @@ public final class OnExactTagHeadBranch implements VersionState {
 
   @Override
   public Semver calculate(GitContext ctx) {
-    @Nullable
-    String baseVersion = ctx.baseVersion();
+    var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("OnExactTagHeadBranch requires a tag but baseVersion is null");
     }

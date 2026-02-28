@@ -22,7 +22,7 @@ public final class NoTagHeadBranch implements VersionState {
   public Semver calculate(GitContext ctx) {
     // Start from 0.0.0, add prerelease with total commits
     // On HEAD branch, distanceFromTag represents total commits (since there's no tag)
-    String prerelease = String.format("alpha.0.%d", ctx.distanceFromTag());
+    var prerelease = String.format("alpha.0.%d", ctx.distanceFromTag());
 
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease);
   }

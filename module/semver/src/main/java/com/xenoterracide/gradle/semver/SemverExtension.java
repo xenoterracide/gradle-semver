@@ -81,12 +81,12 @@ public class SemverExtension implements Provides<Semver> {
    */
   // CHECKSTYLE.OFF: ReturnCount
   static @Nullable String getHeadBranchName(GitRemote origin) {
-    String headBranchRef = origin.headBranchRefName();
+    var headBranchRef = origin.headBranchRefName();
     if (headBranchRef == null) {
       return null;
     }
     // Convert refs/remotes/origin/main -> main
-    String prefix = Constants.R_REMOTES + origin.name() + "/";
+    var prefix = Constants.R_REMOTES + origin.name() + "/";
     if (headBranchRef.startsWith(prefix)) {
       return headBranchRef.substring(prefix.length());
     }
@@ -117,29 +117,26 @@ public class SemverExtension implements Provides<Semver> {
     var remotes = gitMetadata.remotes();
     var originOpt = findOrigin(remotes);
 
-    @Nullable
-    String currentBranch = gitMetadata.branch();
-    @Nullable
-    String headBranch = originOpt.map(SemverExtension::getHeadBranchName).orElse(null);
-    boolean isHeadBranch = Objects.equals(currentBranch, headBranch);
+    var currentBranch = gitMetadata.branch();
+    var headBranch = originOpt.map(SemverExtension::getHeadBranchName).orElse(null);
+    var isHeadBranch = Objects.equals(currentBranch, headBranch);
 
     // Calculate distance from merge base for topic branches
-    long distanceFromMergeBase = calculateDistanceFromMergeBase(gitMetadata, gitExt, originOpt, isHeadBranch);
+    var distanceFromMergeBase = calculateDistanceFromMergeBase(gitMetadata, gitExt, originOpt, isHeadBranch);
 
-    @Nullable
-    String tag = gitMetadata.tag();
-    long distanceFromTag = gitMetadata.distance();
-    boolean isOnTagExact = tag != null && distanceFromTag == 0;
+    var tag = gitMetadata.tag();
+    var distanceFromTag = gitMetadata.distance();
+    var isOnTagExact = tag != null && distanceFromTag == 0;
 
     // Get short SHA from uniqueShort or derive from commit
-    String shortSha = Optional.ofNullable(gitMetadata.uniqueShort()).orElse(UNKNOWN);
-    String fullSha = Optional.ofNullable(gitMetadata.commit()).orElse(UNKNOWN);
+    var shortSha = Optional.ofNullable(gitMetadata.uniqueShort()).orElse(UNKNOWN);
+    var fullSha = Optional.ofNullable(gitMetadata.commit()).orElse(UNKNOWN);
 
     // Check if dirty (only if checkDirty is enabled)
-    boolean isDirty = this.checkDirty.getOrElse(false) && gitMetadata.status() == GitStatus.DIRTY;
+    var isDirty = this.checkDirty.getOrElse(false) && gitMetadata.status() == GitStatus.DIRTY;
 
     // Shallow clone detection could be added here
-    boolean isShallowClone = false;
+    var isShallowClone = false;
 
     return new GitContext(
       tag,

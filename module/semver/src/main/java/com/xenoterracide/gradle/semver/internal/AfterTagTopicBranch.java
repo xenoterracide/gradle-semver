@@ -6,7 +6,6 @@ package com.xenoterracide.gradle.semver.internal;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 /**
@@ -29,26 +28,25 @@ public final class AfterTagTopicBranch implements VersionState {
 
   @Override
   public Semver calculate(GitContext ctx) {
-    @Nullable
-    String baseVersion = ctx.baseVersion();
+    var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagTopicBranch requires a tag but baseVersion is null");
     }
 
-    Semver baseSemver = Semver.parse(baseVersion);
+    var baseSemver = Semver.parse(baseVersion);
     if (baseSemver == null) {
       throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
     }
 
-    long distance = ctx.distanceFromMergeBase();
+    var distance = ctx.distanceFromMergeBase();
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
-    String metadata = String.format("branch.%s.git.%d.%s", sanitizeBranchName(branchName), distance, ctx.shortSha());
+    var metadata = String.format("branch.%s.git.%d.%s", sanitizeBranchName(branchName), distance, ctx.shortSha());
 
     return buildVersion(baseSemver, distance, metadata);
   }
 
   private static Semver buildVersion(Semver baseSemver, long distance, String metadata) {
-    String prerelease = buildPrerelease(baseSemver, distance);
+    var prerelease = buildPrerelease(baseSemver, distance);
     return baseSemver.withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
   }
 

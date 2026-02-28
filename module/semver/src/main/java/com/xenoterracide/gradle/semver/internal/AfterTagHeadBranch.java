@@ -6,7 +6,6 @@ package com.xenoterracide.gradle.semver.internal;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jspecify.annotations.Nullable;
 import org.semver4j.Semver;
 
 /**
@@ -24,8 +23,7 @@ public final class AfterTagHeadBranch implements VersionState {
 
   @Override
   public Semver calculate(GitContext ctx) {
-    @Nullable
-    String baseVersion = ctx.baseVersion();
+    var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagHeadBranch requires a tag but baseVersion is null");
     }
@@ -46,12 +44,12 @@ public final class AfterTagHeadBranch implements VersionState {
   }
 
   private static Semver calculateStableVersion(Semver semver, long distance) {
-    String prerelease = String.format("alpha.0.%d", distance);
+    var prerelease = String.format("alpha.0.%d", distance);
     return semver.withIncPatch().withClearedPreRelease().withPreRelease(prerelease);
   }
 
   private static Semver calculatePrereleaseVersion(Semver semver, long distance) {
-    String prerelease = Stream.concat(semver.getPreRelease().stream(), Stream.of(Long.toString(distance))).collect(
+    var prerelease = Stream.concat(semver.getPreRelease().stream(), Stream.of(Long.toString(distance))).collect(
       Collectors.joining(".")
     );
     return semver.withClearedPreRelease().withPreRelease(prerelease);
