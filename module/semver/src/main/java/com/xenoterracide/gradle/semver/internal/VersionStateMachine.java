@@ -29,9 +29,9 @@ public final class VersionStateMachine {
    * @return the version state for this context
    */
   public static VersionState determineState(GitContext ctx) {
-    boolean hasTag = ctx.hasTagInHistory();
-    boolean onExactTag = ctx.isOnTagExact();
-    boolean isHeadBranch = ctx.isHeadBranch();
+    var hasTag = ctx.hasTagInHistory();
+    var onExactTag = ctx.isOnTagExact();
+    var isHeadBranch = ctx.isHeadBranch();
 
     VersionState state;
     if (hasTag) {
@@ -53,7 +53,7 @@ public final class VersionStateMachine {
    * @return the calculated semantic version
    */
   public static Semver calculate(GitContext ctx) {
-    VersionState state = determineState(ctx);
+    var state = determineState(ctx);
     return state.calculate(ctx);
   }
 }
