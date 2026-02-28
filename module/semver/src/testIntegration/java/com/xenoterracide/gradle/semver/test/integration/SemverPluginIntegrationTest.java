@@ -78,7 +78,7 @@ class SemverPluginIntegrationTest {
 
   @ParameterizedTest
   @ArgumentsSource(NormalRepoArgumentsProvider.class)
-  void configurationCache(String task, String expectedVersion, String fileName) throws IOException {
+  void configurationCache(String task, String expectedVersionPattern, String fileName) throws IOException {
     Files.writeString(testProjectDir.toPath().resolve(fileName), SCRIPT);
     var build = GradleRunner.create()
       .withProjectDir(testProjectDir)
@@ -86,7 +86,9 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    assertThat(build.getOutput()).isEqualToIgnoringNewLines(expectedVersion);
+    // Without remote HEAD, treated as topic branch - version includes metadata
+    // Pattern: 0.1.0+branch.<name>.git.0.<sha> or empty string for version task
+    assertThat(build.getOutput()).matches(expectedVersionPattern);
   }
 
   @ParameterizedTest
@@ -109,12 +111,13 @@ class SemverPluginIntegrationTest {
     @Override
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
-        // semver plugin outputs
-        Arguments.of("semverVersion", "0.1.0", "build.gradle"),
-        Arguments.of("semverVersion", "0.1.0", "build.gradle.kts"),
-        // project.version outputs (default is unset in the test projects, so `--quiet` yields only a newline)
-        Arguments.of("version", "\n", "build.gradle"),
-        Arguments.of("version", "\n", "build.gradle.kts")
+        // semver plugin outputs - without remote HEAD, treated as topic branch with metadata
+        // Pattern: 0.1.0+branch.<branch-name>.git.0.<7-char-sha>
+        Arguments.of("semverVersion", "0\\.1\\.0\\+branch\\.[a-zA-Z0-9-]+\\.git\\.0\\.[a-f0-9]{7}", "build.gradle"),
+        Arguments.of("semverVersion", "0\\.1\\.0\\+branch\\.[a-zA-Z0-9-]+\\.git\\.0\\.[a-f0-9]{7}", "build.gradle.kts"),
+        // project.version outputs (default is unset in the test projects, so `--quiet` yields empty)
+        Arguments.of("version", "", "build.gradle"),
+        Arguments.of("version", "", "build.gradle.kts")
       );
     }
   }
@@ -124,12 +127,12 @@ class SemverPluginIntegrationTest {
     @Override
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
-        // semver plugin fallback outputs
-        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle"),
-        Arguments.of("semverVersion", "0.0.0-alpha.0.0", "build.gradle.kts"),
-        // project.version outputs (default is unset in the test projects, so `--quiet` yields only a newline)
-        Arguments.of("version", "\n", "build.gradle"),
-        Arguments.of("version", "\n", "build.gradle.kts")
+        // semver plugin fallback outputs - no git returns 0.0.0
+        Arguments.of("semverVersion", "0.0.0", "build.gradle"),
+        Arguments.of("semverVersion", "0.0.0", "build.gradle.kts"),
+        // project.version outputs (default is unset in the test projects, so `--quiet` yields empty)
+        Arguments.of("version", "", "build.gradle"),
+        Arguments.of("version", "", "build.gradle.kts")
       );
     }
   }

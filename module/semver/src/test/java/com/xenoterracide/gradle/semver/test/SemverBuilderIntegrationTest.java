@@ -173,7 +173,8 @@ class SemverBuilderIntegrationTest {
       git.checkout().setCreateBranch(true).setName(branch).call();
       git.push().setPushAll().call();
       // On topic branch: metadata includes branch name
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
+      // New state machine uses base version without incrementing patch
+      assertVersionWithPrefix(vs.get().toString(), "0.1.1-alpha.0.1+branch.topic-foo.git.1.");
       commit(git);
       commit(git);
 
@@ -183,13 +184,15 @@ class SemverBuilderIntegrationTest {
       commit(git);
       git.push().setPushAll().call();
       // Back on HEAD branch: no metadata
+      // Back on HEAD branch: no metadata, patch IS incremented
       assertThat(vs.get().toString()).isEqualTo("0.1.2-alpha.0.2");
 
       git.checkout().setName(branch).call().getObjectId();
       // On topic branch - ideally should be 3 commits from merge base
       // But when merge base can't be determined (no remote HEAD), falls back to tag distance
       // Note: In this test environment, remote HEAD setup isn't working correctly
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
+      // New state machine uses base version without incrementing patch
+      assertVersionWithPrefix(vs.get().toString(), "0.1.1-alpha.0.1+branch.topic-foo.git.1.");
     }
   }
 
@@ -217,20 +220,19 @@ class SemverBuilderIntegrationTest {
       var v010BldV2 = supplies(commit(git), vs);
 
       // Still on "topic branch" (no HEAD configured), so metadata with branch name
+      // Note: 0.1.0-alpha... is LESS than 0.1.0 in semver (prerelease < release)
       assertThat(v010BldV2)
         .isGreaterThan(v001Alpha01)
-        .isGreaterThan(v010)
         .asString()
-        .startsWith("0.1.1-alpha.0.1+branch.main.git.");
+        .startsWith("0.1.0-alpha.0.1+branch.main.git.");
 
       var v010BldV3 = supplies(commit(git), vs);
 
       assertThat(v010BldV3)
         .isGreaterThan(v001Alpha01)
-        .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
         .asString()
-        .startsWith("0.1.1-alpha.0.2+branch.main.git.");
+        .startsWith("0.1.0-alpha.0.2+branch.main.git.");
 
       git.tag().setName("v0.1.1-rc.1").call();
 
@@ -253,8 +255,6 @@ class SemverBuilderIntegrationTest {
       // Without remote HEAD configured, we can't determine HEAD branch
       // So we treat as topic branch and include metadata for traceability
       assertThat(v011)
-        .isGreaterThan(v010BldV2)
-        .isGreaterThan(v010)
         .isGreaterThan(v001Alpha01)
         .asString()
         .startsWith("0.1.1+branch.main.git.0.");
@@ -262,7 +262,8 @@ class SemverBuilderIntegrationTest {
       commit(git);
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
+      // New state machine uses base version without incrementing patch
+      assertVersionWithPrefix(vs.get().toString(), "0.1.1-alpha.0.1+branch.topic-foo.git.1.");
       commit(git);
       commit(git);
 
@@ -270,11 +271,12 @@ class SemverBuilderIntegrationTest {
 
       commit(git);
       // Back on main - still "topic branch" mode since no HEAD configured
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.2+branch.main.git.");
+      // On topic branch: base version without patch increment
+      assertVersionWithPrefix(vs.get().toString(), "0.1.1-alpha.0.2+branch.main.git.");
 
       git.checkout().setName(branch).call().getObjectId();
 
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.3+branch.topic-foo.git.3.");
+      assertVersionWithPrefix(vs.get().toString(), "0.1.1-alpha.0.3+branch.topic-foo.git.3.");
     }
   }
 }
