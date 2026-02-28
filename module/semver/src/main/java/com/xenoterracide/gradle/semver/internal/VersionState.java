@@ -11,14 +11,15 @@ import org.semver4j.Semver;
  * Each implementation represents a specific git state and calculates
  * the appropriate semantic version for that state.
  */
-public sealed interface VersionState permits
-  OnExactTagHeadBranch,
-  OnExactTagTopicBranch,
-  AfterTagHeadBranch,
-  AfterTagTopicBranch,
-  NoTagHeadBranch,
-  NoTagTopicBranch {
-
+public sealed interface VersionState
+  permits
+    OnExactTagHeadBranch,
+    OnExactTagTopicBranch,
+    AfterTagHeadBranch,
+    AfterTagTopicBranch,
+    NoTagHeadBranch,
+    NoTagTopicBranch
+{
   /**
    * Calculates the semantic version for this state.
    *

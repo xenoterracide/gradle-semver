@@ -25,7 +25,8 @@ public final class AfterTagTopicBranch implements VersionState {
 
   @Override
   public Semver calculate(GitContext ctx) {
-    @Nullable String baseVersion = ctx.baseVersion();
+    @Nullable
+    String baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagTopicBranch requires a tag but baseVersion is null");
     }
@@ -48,23 +49,14 @@ public final class AfterTagTopicBranch implements VersionState {
       result = baseSemver.withIncPatch();
     } else {
       // For prerelease tags, append distance to existing prerelease
-      prerelease = Stream.concat(
-        baseSemver.getPreRelease().stream(),
-        Stream.of(Long.toString(distance))
-      ).collect(Collectors.joining("."));
+      prerelease = Stream.concat(baseSemver.getPreRelease().stream(), Stream.of(Long.toString(distance))).collect(
+        Collectors.joining(".")
+      );
       result = baseSemver;
     }
 
-    String metadata = String.format(
-      "branch.%s.git.%d.%s",
-      sanitizeBranchName(branchName),
-      distance,
-      ctx.shortSha()
-    );
+    String metadata = String.format("branch.%s.git.%d.%s", sanitizeBranchName(branchName), distance, ctx.shortSha());
 
-    return result
-      .withClearedPreRelease()
-      .withPreRelease(prerelease)
-      .withBuild(metadata);
+    return result.withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
   }
 }

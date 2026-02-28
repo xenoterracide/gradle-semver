@@ -58,8 +58,7 @@ class MergeBaseFinder {
     return Optional.ofNullable(this.repo.findRef(refName)).map(Ref::getObjectId);
   }
 
-  private Optional<ObjectId> calculateMergeBase(ObjectId current, ObjectId remote)
-    throws IOException {
+  private Optional<ObjectId> calculateMergeBase(ObjectId current, ObjectId remote) throws IOException {
     try (var walk = new RevWalk(this.repo)) {
       walk.setRevFilter(RevFilter.MERGE_BASE);
       walk.markStart(List.of(walk.parseCommit(remote), walk.parseCommit(current)));

@@ -24,7 +24,8 @@ public final class AfterTagHeadBranch implements VersionState {
 
   @Override
   public Semver calculate(GitContext ctx) {
-    @Nullable String baseVersion = ctx.baseVersion();
+    @Nullable
+    String baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagHeadBranch requires a tag but baseVersion is null");
     }
@@ -40,19 +41,13 @@ public final class AfterTagHeadBranch implements VersionState {
     if (semver.getPreRelease().isEmpty()) {
       // For stable tags (e.g., v1.0.0), increment patch and add alpha prerelease
       String prerelease = String.format("alpha.0.%d", distance);
-      return semver
-        .withIncPatch()
-        .withClearedPreRelease()
-        .withPreRelease(prerelease);
+      return semver.withIncPatch().withClearedPreRelease().withPreRelease(prerelease);
     } else {
       // For prerelease tags (e.g., v1.0.0-rc.1), append distance to existing prerelease
-      String prerelease = Stream.concat(
-        semver.getPreRelease().stream(),
-        Stream.of(Long.toString(distance))
-      ).collect(Collectors.joining("."));
-      return semver
-        .withClearedPreRelease()
-        .withPreRelease(prerelease);
+      String prerelease = Stream.concat(semver.getPreRelease().stream(), Stream.of(Long.toString(distance))).collect(
+        Collectors.joining(".")
+      );
+      return semver.withClearedPreRelease().withPreRelease(prerelease);
     }
   }
 }

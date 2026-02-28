@@ -109,14 +109,17 @@ public class SemverExtension implements Provides<Semver> {
     var remotes = gitMetadata.remotes();
     var originOpt = findOrigin(remotes);
 
-    @Nullable String currentBranch = gitMetadata.branch();
-    @Nullable String headBranch = originOpt.map(SemverExtension::getHeadBranchName).orElse(null);
+    @Nullable
+    String currentBranch = gitMetadata.branch();
+    @Nullable
+    String headBranch = originOpt.map(SemverExtension::getHeadBranchName).orElse(null);
     boolean isHeadBranch = Objects.equals(currentBranch, headBranch);
 
     // Calculate distance from merge base for topic branches
     long distanceFromMergeBase = calculateDistanceFromMergeBase(gitMetadata, gitExt, originOpt, isHeadBranch);
 
-    @Nullable String tag = gitMetadata.tag();
+    @Nullable
+    String tag = gitMetadata.tag();
     long distanceFromTag = gitMetadata.distance();
     boolean isOnTagExact = tag != null && distanceFromTag == 0;
 
@@ -184,13 +187,16 @@ public class SemverExtension implements Provides<Semver> {
     // Create GitContext provider and map it through the state machine
     var gitContextProvider = createGitContextProvider(gitExt);
 
-    var semverProvider = gitContextProvider
-      .map(ctx -> {
-        var version = VersionStateMachine.calculate(ctx);
-        Logging.getLogger(SemverExtension.class).info("semver {} {} (state: {})",
-          projectName, version, VersionStateMachine.determineState(ctx).getClass().getSimpleName());
-        return version;
-      });
+    var semverProvider = gitContextProvider.map(ctx -> {
+      var version = VersionStateMachine.calculate(ctx);
+      Logging.getLogger(SemverExtension.class).info(
+        "semver {} {} (state: {})",
+        projectName,
+        version,
+        VersionStateMachine.determineState(ctx).getClass().getSimpleName()
+      );
+      return version;
+    });
 
     this.provider.set(semverProvider);
     this.provider.finalizeValueOnRead();

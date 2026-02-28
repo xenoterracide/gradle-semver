@@ -35,9 +35,7 @@ class SemverBuilderIntegrationTest {
   );
 
   // Pattern for versions without build metadata (HEAD branch after tag)
-  static final Pattern VERSION_PATTERN_NO_METADATA = Pattern.compile(
-    "^\\d+\\.\\d+\\.\\d+(?:-[^+]+)?$"
-  );
+  static final Pattern VERSION_PATTERN_NO_METADATA = Pattern.compile("^\\d+\\.\\d+\\.\\d+(?:-[^+]+)?$");
 
   static final String MAIN = "main";
   static final String ORIGIN = "origin";
@@ -129,11 +127,7 @@ class SemverBuilderIntegrationTest {
       var v010BldV2 = supplies(commit(git), vs);
 
       // On HEAD branch after tag: no metadata
-      assertThat(v010BldV2)
-        .isGreaterThan(v001Alpha01)
-        .isGreaterThan(v010)
-        .asString()
-        .isEqualTo("0.1.1-alpha.0.1");
+      assertThat(v010BldV2).isGreaterThan(v001Alpha01).isGreaterThan(v010).asString().isEqualTo("0.1.1-alpha.0.1");
 
       var v010BldV3 = supplies(commit(git), vs);
 
