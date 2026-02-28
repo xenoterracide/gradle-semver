@@ -23,7 +23,6 @@ import org.semver4j.Semver;
 public final class AfterTagHeadBranch implements VersionState {
 
   @Override
-  // CHECKSTYLE.OFF: MethodLength
   public Semver calculate(GitContext ctx) {
     @Nullable
     String baseVersion = ctx.baseVersion();
@@ -31,25 +30,30 @@ public final class AfterTagHeadBranch implements VersionState {
       throw new IllegalStateException("AfterTagHeadBranch requires a tag but baseVersion is null");
     }
 
-    Semver semver = Semver.parse(baseVersion);
+    var semver = Semver.parse(baseVersion);
     if (semver == null) {
       throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
     }
 
-    // On HEAD branch, distanceFromTag == distanceFromMergeBase
-    long distance = ctx.distanceFromTag();
-
-    if (semver.getPreRelease().isEmpty()) {
-      // For stable tags (e.g., v1.0.0), increment patch and add alpha prerelease
-      String prerelease = String.format("alpha.0.%d", distance);
-      return semver.withIncPatch().withClearedPreRelease().withPreRelease(prerelease);
-    } else {
-      // For prerelease tags (e.g., v1.0.0-rc.1), append distance to existing prerelease
-      String prerelease = Stream.concat(semver.getPreRelease().stream(), Stream.of(Long.toString(distance))).collect(
-        Collectors.joining(".")
-      );
-      return semver.withClearedPreRelease().withPreRelease(prerelease);
-    }
+    return calculateVersion(semver, ctx.distanceFromTag());
   }
-  // CHECKSTYLE.ON: MethodLength
+
+  private static Semver calculateVersion(Semver semver, long distance) {
+    if (semver.getPreRelease().isEmpty()) {
+      return calculateStableVersion(semver, distance);
+    }
+    return calculatePrereleaseVersion(semver, distance);
+  }
+
+  private static Semver calculateStableVersion(Semver semver, long distance) {
+    String prerelease = String.format("alpha.0.%d", distance);
+    return semver.withIncPatch().withClearedPreRelease().withPreRelease(prerelease);
+  }
+
+  private static Semver calculatePrereleaseVersion(Semver semver, long distance) {
+    String prerelease = Stream.concat(semver.getPreRelease().stream(), Stream.of(Long.toString(distance))).collect(
+      Collectors.joining(".")
+    );
+    return semver.withClearedPreRelease().withPreRelease(prerelease);
+  }
 }

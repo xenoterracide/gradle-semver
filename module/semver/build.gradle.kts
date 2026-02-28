@@ -33,7 +33,6 @@ testing {
         implementation(libs.junit.api)
         implementation(libs.junit.parameters)
         implementation(testFixtures(projects.git))
-        implementation(libs.jgit)
       }
     }
     val test by getting(JvmTestSuite::class) {

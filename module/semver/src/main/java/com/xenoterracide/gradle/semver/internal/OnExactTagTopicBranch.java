@@ -29,13 +29,13 @@ public final class OnExactTagTopicBranch implements VersionState {
       throw new IllegalStateException("OnExactTagTopicBranch requires a tag but baseVersion is null");
     }
 
-    Semver semver = Semver.parse(baseVersion);
+    var semver = Semver.parse(baseVersion);
     if (semver == null) {
       throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
     }
 
     // Add metadata to indicate we're on a topic branch at the tag
-    String branchName = ctx.currentBranch() != null ? ctx.currentBranch() : "unknown";
+    var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : "unknown";
     String metadata = String.format("branch.%s.git.0.%s", sanitizeBranchName(branchName), ctx.shortSha());
 
     return semver.withBuild(metadata);

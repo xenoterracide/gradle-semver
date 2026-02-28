@@ -27,7 +27,7 @@ public final class OnExactTagHeadBranch implements VersionState {
       throw new IllegalStateException("OnExactTagHeadBranch requires a tag but baseVersion is null");
     }
 
-    Semver semver = Semver.parse(baseVersion);
+    var semver = Semver.parse(baseVersion);
     if (semver == null) {
       throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
     }

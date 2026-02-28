@@ -37,6 +37,8 @@ public class SemverExtension implements Provides<Semver> {
 
   // CHECKSTYLE.ON: FinalClass
 
+  private static final String UNKNOWN = "unknown";
+
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
   private final Project project;
@@ -77,9 +79,12 @@ public class SemverExtension implements Provides<Semver> {
    * @param origin the origin remote
    * @return the HEAD branch name, or null if not available
    */
+  // CHECKSTYLE.OFF: ReturnCount
   static @Nullable String getHeadBranchName(GitRemote origin) {
     String headBranchRef = origin.headBranchRefName();
-    if (headBranchRef == null) return null;
+    if (headBranchRef == null) {
+      return null;
+    }
     // Convert refs/remotes/origin/main -> main
     String prefix = Constants.R_REMOTES + origin.name() + "/";
     if (headBranchRef.startsWith(prefix)) {
@@ -88,6 +93,8 @@ public class SemverExtension implements Provides<Semver> {
     return null;
   }
 
+  // CHECKSTYLE.ON: ReturnCount
+
   /**
    * Creates a provider that builds GitContext from GitExtension providers.
    *
@@ -95,7 +102,7 @@ public class SemverExtension implements Provides<Semver> {
    * @return provider of GitContext
    */
   private Provider<GitContext> createGitContextProvider(GitExtension gitExt) {
-    return gitExt.getProvider().map(gitMetadata -> buildGitContext(gitMetadata, gitExt));
+    return gitExt.getProvider().map(gitMetadata -> this.buildGitContext(gitMetadata, gitExt));
   }
 
   /**
@@ -105,6 +112,7 @@ public class SemverExtension implements Provides<Semver> {
    * @param gitExt the git extension (for merge base calculations)
    * @return the git context
    */
+  // CHECKSTYLE.OFF: MethodLength
   private GitContext buildGitContext(GitMetadata gitMetadata, GitExtension gitExt) {
     var remotes = gitMetadata.remotes();
     var originOpt = findOrigin(remotes);
@@ -124,11 +132,11 @@ public class SemverExtension implements Provides<Semver> {
     boolean isOnTagExact = tag != null && distanceFromTag == 0;
 
     // Get short SHA from uniqueShort or derive from commit
-    String shortSha = Optional.ofNullable(gitMetadata.uniqueShort()).orElse("unknown");
-    String fullSha = Optional.ofNullable(gitMetadata.commit()).orElse("unknown");
+    String shortSha = Optional.ofNullable(gitMetadata.uniqueShort()).orElse(UNKNOWN);
+    String fullSha = Optional.ofNullable(gitMetadata.commit()).orElse(UNKNOWN);
 
     // Check if dirty (only if checkDirty is enabled)
-    boolean isDirty = checkDirty.getOrElse(false) && gitMetadata.status() == GitStatus.DIRTY;
+    boolean isDirty = this.checkDirty.getOrElse(false) && gitMetadata.status() == GitStatus.DIRTY;
 
     // Shallow clone detection could be added here
     boolean isShallowClone = false;
@@ -148,6 +156,8 @@ public class SemverExtension implements Provides<Semver> {
     );
   }
 
+  // CHECKSTYLE.ON: MethodLength
+
   /**
    * Calculates the distance from merge base for topic branches.
    *
@@ -157,6 +167,7 @@ public class SemverExtension implements Provides<Semver> {
    * @param isHeadBranch whether we're on the HEAD branch
    * @return distance from merge base
    */
+  // CHECKSTYLE.OFF: ReturnCount
   private static long calculateDistanceFromMergeBase(
     GitMetadata gitMetadata,
     GitExtension gitExt,
@@ -180,12 +191,14 @@ public class SemverExtension implements Provides<Semver> {
     return mergeBaseDistanceOpt.orElse(gitMetadata.distance());
   }
 
+  // CHECKSTYLE.ON: ReturnCount
+
   SemverExtension build() {
     var gitExt = this.project.getExtensions().getByType(GitExtension.class);
     var projectName = this.project.getName();
 
     // Create GitContext provider and map it through the state machine
-    var gitContextProvider = createGitContextProvider(gitExt);
+    var gitContextProvider = this.createGitContextProvider(gitExt);
 
     var semverProvider = gitContextProvider.map(ctx -> {
       var version = VersionStateMachine.calculate(ctx);
