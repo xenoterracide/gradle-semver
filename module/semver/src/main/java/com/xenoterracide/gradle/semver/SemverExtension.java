@@ -139,19 +139,19 @@ public class SemverExtension implements Provides<Semver> {
     // Shallow clone detection could be added here
     var isShallowClone = false;
 
-    return new GitContext(
-      tag,
-      distanceFromTag,
-      isOnTagExact,
-      currentBranch,
-      headBranch,
-      isHeadBranch,
-      distanceFromMergeBase,
-      shortSha,
-      fullSha,
-      isDirty,
-      isShallowClone
-    );
+    return GitContext.builder()
+      .nearestTag(tag)
+      .distanceFromTag(distanceFromTag)
+      .isOnTagExact(isOnTagExact)
+      .currentBranch(currentBranch)
+      .headBranch(headBranch)
+      .isHeadBranch(isHeadBranch)
+      .distanceFromMergeBase(distanceFromMergeBase)
+      .shortSha(shortSha)
+      .fullSha(fullSha)
+      .isDirty(isDirty)
+      .isShallowClone(isShallowClone)
+      .build();
   }
 
   // CHECKSTYLE.ON: MethodLength
