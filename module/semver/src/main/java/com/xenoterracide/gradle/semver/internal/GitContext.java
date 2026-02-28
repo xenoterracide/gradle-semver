@@ -4,7 +4,6 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
-import org.immutables.builder.Builder;
 import org.jspecify.annotations.Nullable;
 
 /**

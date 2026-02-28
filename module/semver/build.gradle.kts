@@ -23,8 +23,6 @@ dependencies {
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang) { version { require("[3.8,4)") } }
   implementation(libs.jgit)
-  annotationProcessor(libs.immutables.value)
-  compileOnly(libs.immutables.value)
 }
 
 testing {
