@@ -1,6 +1,7 @@
 ---
 # SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
 #
+# SPDX-License-Identifier: CC-BY-NC-4.0
 # SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 name: java
@@ -30,8 +31,8 @@ import org.immutables.builder.Builder;
 
 @Builder
 record Bar(String foo) {
- public static BarBuilder builder() {
-  return new BarBuilder();
- }
+  public static BarBuilder builder() {
+    return new BarBuilder();
+  }
 }
 ```
