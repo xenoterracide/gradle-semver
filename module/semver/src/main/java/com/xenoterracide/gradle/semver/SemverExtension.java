@@ -68,7 +68,10 @@ public class SemverExtension implements Provides<Semver> {
    * @return optional of the origin remote
    */
   static Optional<GitRemote> findOrigin(List<GitRemote> remotes) {
-    return remotes.stream().filter(remote -> Predicate.isEqual("origin").test(remote.name())).findAny();
+    return remotes
+      .stream()
+      .filter(remote -> Predicate.isEqual("origin").test(remote.name()))
+      .findAny();
   }
 
   /**

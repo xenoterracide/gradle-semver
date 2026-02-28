@@ -77,5 +77,4 @@ public record GitContext(
     }
     return this.nearestTag.startsWith("v") ? this.nearestTag.substring(1) : this.nearestTag;
   }
-
 }
