@@ -7,7 +7,7 @@ package com.xenoterracide.gradle.semver.internal;
 import org.semver4j.Semver;
 
 /**
- * State: No tags exist in the repository, on a topic branch.
+ * Strategy: No tags exist in the repository, on a topic branch.
  *
  * <p>Examples:</p>
  * <ul>
@@ -15,7 +15,7 @@ import org.semver4j.Semver;
  *       with 2 new commits → {@code 0.0.1-alpha.0.2+branch.feature-x.git.2.abc123}</li>
  * </ul>
  */
-public final class NoTagTopicBranch implements VersionState {
+public final class NoTagTopicStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate(GitContext ctx) {

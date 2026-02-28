@@ -7,7 +7,7 @@ package com.xenoterracide.gradle.semver.internal;
 import org.semver4j.Semver;
 
 /**
- * State: HEAD is exactly on a tag, but we're on a topic branch.
+ * Strategy: HEAD is exactly on a tag, but we're on a topic branch.
  *
  * <p>This can happen if a topic branch is created but has no new commits
  * beyond the tag. The metadata indicates we're on a topic branch for
@@ -18,13 +18,13 @@ import org.semver4j.Semver;
  *   <li>v1.0.0 on feature-x (0 new commits) → {@code 1.0.0+branch.feature-x.git.0.abc123}</li>
  * </ul>
  */
-public final class OnExactTagTopicBranch implements VersionState {
+public final class OnExactTagTopicStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate(GitContext ctx) {
     var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
-      throw new IllegalStateException("OnExactTagTopicBranch requires a tag but baseVersion is null");
+      throw new IllegalStateException("OnExactTagTopicStrategy requires a tag but baseVersion is null");
     }
 
     var semver = Semver.parse(baseVersion);

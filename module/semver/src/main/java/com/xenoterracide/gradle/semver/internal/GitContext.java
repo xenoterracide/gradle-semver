@@ -22,7 +22,6 @@ import org.jspecify.annotations.Nullable;
  * @param isDirty true if working tree has uncommitted changes
  * @param isShallowClone true if repository is a shallow clone
  */
-// CHECKSTYLE.OFF: RecordComponentNumber
 @Builder
 public record GitContext(
   @Nullable String nearestTag,
@@ -37,7 +36,6 @@ public record GitContext(
   boolean isDirty,
   boolean isShallowClone
 ) {
-  // CHECKSTYLE.ON: RecordComponentNumber
 
   /**
    * Creates a builder for GitContext.

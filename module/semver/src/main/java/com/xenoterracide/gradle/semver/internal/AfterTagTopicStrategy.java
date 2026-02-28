@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import org.semver4j.Semver;
 
 /**
- * State: HEAD is after a tag, on a topic branch (not HEAD branch).
+ * Strategy: HEAD is after a tag, on a topic branch (not HEAD branch).
  *
  * <p>Examples:</p>
  * <ul>
@@ -22,7 +22,7 @@ import org.semver4j.Semver;
  * <p>The prerelease uses distance from merge base (commits on topic branch only),
  * and metadata includes branch name and the same distance.</p>
  */
-public final class AfterTagTopicBranch implements VersionState {
+public final class AfterTagTopicStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
 
@@ -30,7 +30,7 @@ public final class AfterTagTopicBranch implements VersionState {
   public Semver calculate(GitContext ctx) {
     var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
-      throw new IllegalStateException("AfterTagTopicBranch requires a tag but baseVersion is null");
+      throw new IllegalStateException("AfterTagTopicStrategy requires a tag but baseVersion is null");
     }
 
     var baseSemver = Semver.parse(baseVersion);

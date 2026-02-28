@@ -7,7 +7,7 @@ package com.xenoterracide.gradle.semver.internal;
 import org.semver4j.Semver;
 
 /**
- * State: No tags exist in the repository, on the HEAD branch.
+ * Strategy: No tags exist in the repository, on the HEAD branch.
  *
  * <p>Examples:</p>
  * <ul>
@@ -16,7 +16,7 @@ import org.semver4j.Semver;
  *
  * <p>Starts from 0.0.0 and adds prerelease with total commits.</p>
  */
-public final class NoTagHeadBranch implements VersionState {
+public final class NoTagHeadStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate(GitContext ctx) {

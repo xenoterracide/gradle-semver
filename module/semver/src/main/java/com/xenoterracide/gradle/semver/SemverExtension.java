@@ -11,7 +11,7 @@ import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import com.xenoterracide.gradle.semver.internal.GitContext;
-import com.xenoterracide.gradle.semver.internal.VersionStateMachine;
+import com.xenoterracide.gradle.semver.internal.VersionStrategyFactory;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -196,16 +196,16 @@ public class SemverExtension implements Provides<Semver> {
     var gitExt = this.project.getExtensions().getByType(GitExtension.class);
     var projectName = this.project.getName();
 
-    // Create GitContext provider and map it through the state machine
+    // Create GitContext provider and map it through the strategy machine
     var gitContextProvider = this.createGitContextProvider(gitExt);
 
     var semverProvider = gitContextProvider.map(ctx -> {
-      var version = VersionStateMachine.calculate(ctx);
+      var version = VersionStrategyFactory.calculate(ctx);
       Logging.getLogger(SemverExtension.class).info(
-        "semver {} {} (state: {})",
+        "semver {} {} (strategy: {})",
         projectName,
         version,
-        VersionStateMachine.determineState(ctx).getClass().getSimpleName()
+        VersionStrategyFactory.determineStrategy(ctx).getClass().getSimpleName()
       );
       return version;
     });

@@ -7,23 +7,23 @@ package com.xenoterracide.gradle.semver.internal;
 import org.semver4j.Semver;
 
 /**
- * State in the version calculation state machine.
- * Each implementation represents a specific git state and calculates
- * the appropriate semantic version for that state.
+ * Strategy for calculating semantic version based on git context.
+ * Each implementation represents a specific calculation strategy
+ * for a particular git scenario.
  */
 // CHECKSTYLE.OFF: LeftCurly
-public sealed interface VersionState
+public sealed interface VersionStrategy
   permits
-    OnExactTagHeadBranch,
-    OnExactTagTopicBranch,
-    AfterTagHeadBranch,
-    AfterTagTopicBranch,
-    NoTagHeadBranch,
-    NoTagTopicBranch
+    OnExactTagHeadStrategy,
+    OnExactTagTopicStrategy,
+    AfterTagHeadStrategy,
+    AfterTagTopicStrategy,
+    NoTagHeadStrategy,
+    NoTagTopicStrategy
 {
   // CHECKSTYLE.ON: LeftCurly
   /**
-   * Calculates the semantic version for this state.
+   * Calculates the semantic version for this strategy.
    *
    * @param ctx the git context
    * @return the calculated semantic version

@@ -7,22 +7,22 @@ package com.xenoterracide.gradle.semver.internal;
 import org.semver4j.Semver;
 
 /**
- * State: HEAD is exactly on a tag, and we're on the HEAD branch (main/develop).
+ * Strategy: HEAD is exactly on a tag, and we're on the HEAD branch (main/develop).
  *
  * <p>Examples:</p>
  * <ul>
  *   <li>v1.0.0 on main → {@code 1.0.0}</li>
  * </ul>
  *
- * <p>This is the cleanest state - no prerelease or metadata needed.</p>
+ * <p>This is the cleanest strategy - no prerelease or metadata needed.</p>
  */
-public final class OnExactTagHeadBranch implements VersionState {
+public final class OnExactTagHeadStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate(GitContext ctx) {
     var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
-      throw new IllegalStateException("OnExactTagHeadBranch requires a tag but baseVersion is null");
+      throw new IllegalStateException("OnExactTagHeadStrategy requires a tag but baseVersion is null");
     }
 
     var semver = Semver.parse(baseVersion);
