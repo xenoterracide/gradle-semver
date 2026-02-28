@@ -11,16 +11,14 @@ import org.semver4j.Semver;
  * Each implementation represents a specific git state and calculates
  * the appropriate semantic version for that state.
  */
-// CHECKSTYLE.OFF: LeftCurly - prettier formatting conflicts with checkstyle
-public sealed interface VersionState
-  permits
-    OnExactTagHeadBranch,
-    OnExactTagTopicBranch,
-    AfterTagHeadBranch,
-    AfterTagTopicBranch,
-    NoTagHeadBranch,
-    NoTagTopicBranch
-{
+// CHECKSTYLE.OFF: LeftCurly
+public sealed interface VersionState permits
+  OnExactTagHeadBranch,
+  OnExactTagTopicBranch,
+  AfterTagHeadBranch,
+  AfterTagTopicBranch,
+  NoTagHeadBranch,
+  NoTagTopicBranch {
   // CHECKSTYLE.ON: LeftCurly
   /**
    * Calculates the semantic version for this state.
