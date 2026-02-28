@@ -12,17 +12,17 @@ dependencyLocking {
   lockAllConfigurations()
 }
 
-// Disable record component number check - we use builders for complex records
-checkstyle {
-  configProperties["maxRecordComponentNumber"] = "99"
-}
-
 dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang) { version { require("[3.8,4)") } }
   implementation(libs.jgit)
+
+  annotationProcessor(platform(libs.immutables.bom))
+  annotationProcessor(libs.immutables.core)
+  compileOnly(platform(libs.immutables.bom))
+  compileOnly(libs.bundles.immutables)
 }
 
 testing {

@@ -15,6 +15,7 @@ import com.xenoterracide.gradle.semver.internal.VersionStateMachine;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import org.eclipse.jgit.lib.Constants;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logging;
@@ -67,10 +68,7 @@ public class SemverExtension implements Provides<Semver> {
    * @return optional of the origin remote
    */
   static Optional<GitRemote> findOrigin(List<GitRemote> remotes) {
-    return remotes
-      .stream()
-      .filter(remote -> Objects.equals(remote.name(), "origin"))
-      .findAny();
+    return remotes.stream().filter(remote -> Predicate.isEqual("origin").test(remote.name())).findAny();
   }
 
   /**

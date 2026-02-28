@@ -4,6 +4,7 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
+import org.immutables.builder.Builder;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -22,6 +23,7 @@ import org.jspecify.annotations.Nullable;
  * @param isShallowClone true if repository is a shallow clone
  */
 // CHECKSTYLE.OFF: RecordComponentNumber
+@Builder
 public record GitContext(
   @Nullable String nearestTag,
   long distanceFromTag,
@@ -36,6 +38,15 @@ public record GitContext(
   boolean isShallowClone
 ) {
   // CHECKSTYLE.ON: RecordComponentNumber
+
+  /**
+   * Creates a builder for GitContext.
+   *
+   * @return a new builder instance
+   */
+  public static GitContextBuilder builder() {
+    return new GitContextBuilder();
+  }
 
   /**
    * Checks if any tags exist in the repository history.
@@ -67,20 +78,4 @@ public record GitContext(
     return this.nearestTag.startsWith("v") ? this.nearestTag.substring(1) : this.nearestTag;
   }
 
-  @Override
-  public String toString() {
-    return String.format(
-      "GitContext[tag=%s, distanceFromTag=%d, onTagExact=%s, branch=%s, headBranch=%s, isHeadBranch=%s, " +
-        "distanceFromMergeBase=%d, sha=%s, dirty=%s]",
-      this.nearestTag,
-      this.distanceFromTag,
-      this.isOnTagExact,
-      this.currentBranch,
-      this.headBranch,
-      this.isHeadBranch,
-      this.distanceFromMergeBase,
-      this.shortSha,
-      this.isDirty
-    );
-  }
 }
