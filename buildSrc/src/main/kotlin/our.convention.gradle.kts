@@ -7,6 +7,7 @@ import org.gradle.accessors.dm.LibrariesForLibs
 
 
 plugins {
+  `java-gradle-plugin`
   `java-library`
   id("com.autonomousapps.dependency-analysis")
   id("com.gradle.plugin-publish")
@@ -17,7 +18,6 @@ plugins {
   id("com.xenoterracide.gradle.convention.publish")
   id("com.xenoterracide.gradle.convention.spotbugs")
   id("com.xenoterracide.gradle.convention.test")
-  `java-gradle-plugin`
 }
 
 val libs = the<LibrariesForLibs>()
