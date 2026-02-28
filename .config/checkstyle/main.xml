@@ -214,7 +214,6 @@ SPDX-License-Identifier: CC0-1.0
     </module>
     <module name="OuterTypeNumber" />
     <module name="ParameterNumber" />
-    <module name="RecordComponentNumber" />
 
     <!-- whitespace https://checkstyle.org/checks/whitespace/ -->
     <module name="OperatorWrap">
