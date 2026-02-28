@@ -8,10 +8,6 @@ plugins {
   our.javalibrary
 }
 
-dependencyLocking {
-  lockAllConfigurations()
-}
-
 dependencies {
   api(libs.semver)
   api(projects.git)
