@@ -221,10 +221,7 @@ class SemverBuilderIntegrationTest {
 
       // Still on "topic branch" (no HEAD configured), so metadata with branch name
       // Note: 0.1.0-alpha... is LESS than 0.1.0 in semver (prerelease < release)
-      assertThat(v010BldV2)
-        .isGreaterThan(v001Alpha01)
-        .asString()
-        .startsWith("0.1.0-alpha.0.1+branch.main.git.");
+      assertThat(v010BldV2).isGreaterThan(v001Alpha01).asString().startsWith("0.1.0-alpha.0.1+branch.main.git.");
 
       var v010BldV3 = supplies(commit(git), vs);
 
@@ -254,10 +251,7 @@ class SemverBuilderIntegrationTest {
 
       // Without remote HEAD configured, we can't determine HEAD branch
       // So we treat as topic branch and include metadata for traceability
-      assertThat(v011)
-        .isGreaterThan(v001Alpha01)
-        .asString()
-        .startsWith("0.1.1+branch.main.git.0.");
+      assertThat(v011).isGreaterThan(v001Alpha01).asString().startsWith("0.1.1+branch.main.git.0.");
 
       commit(git);
       var branch = "topic/foo";
