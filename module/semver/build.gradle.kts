@@ -5,7 +5,7 @@
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
-  our.javalibrary
+  our.convention
 }
 
 dependencies {

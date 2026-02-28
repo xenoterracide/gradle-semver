@@ -7,6 +7,7 @@ import org.gradle.accessors.dm.LibrariesForLibs
 
 
 plugins {
+  `java-library`
   id("com.autonomousapps.dependency-analysis")
   id("com.gradle.plugin-publish")
   id("com.xenoterracide.gradle.convention.checkstyle")
@@ -16,6 +17,7 @@ plugins {
   id("com.xenoterracide.gradle.convention.publish")
   id("com.xenoterracide.gradle.convention.spotbugs")
   id("com.xenoterracide.gradle.convention.test")
+  `java-gradle-plugin`
 }
 
 val libs = the<LibrariesForLibs>()
@@ -47,4 +49,54 @@ java {
 
 tasks.compileJava {
   options.release.set(17)
+}
+
+// From our.bom.gradle.kts
+configurations.configureEach {
+  exclude(group = "org.slf4j", module = "slf4j-nop")
+  exclude(group = "junit", module = "junit")
+  exclude(group = "commons-codec", module = "commons-codec")
+  exclude(group = "com.googlecode.javaewah", module = "JavaEWAH")
+
+  resolutionStrategy {
+    componentSelection {
+      all {
+        if (!candidate.group.matches(Regex("^com.xenoterracide.*"))) {
+          val nonRelease = Regex("^[\\d.]+-(M|RC|ea|beta|alpha).*$")
+          if (candidate.version.matches(nonRelease)) reject("no pre-release")
+        }
+      }
+    }
+  }
+}
+
+configurations.matching { it.name == "runtimeClasspath" || it.name == "testRuntimeClasspath" }.configureEach {
+  exclude(group = "com.google.code.findbugs", module = "jsr305")
+  exclude(group = "com.google.errorprone", module = "error_prone_annotations")
+  exclude(group = "org.checkerframework", module = "checker-qual")
+}
+
+// From our.javatest.gradle.kts
+testing {
+  suites {
+    withType<JvmTestSuite>().configureEach {
+      dependencies {
+        implementation(gradleTestKit())
+        implementation(platform(libs.junit.bom))
+        implementation.bundle(libs.bundles.test.impl)
+        runtimeOnly.bundle(libs.bundles.test.runtime)
+      }
+    }
+
+    val testIntegration by registering(JvmTestSuite::class) {
+      gradlePlugin.testSourceSet(sources)
+      dependencies {
+        runtimeOnly(project())
+      }
+    }
+  }
+}
+
+tasks.check {
+  dependsOn(testing.suites.named("testIntegration"))
 }

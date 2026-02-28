@@ -7,7 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
-  our.javalibrary
+  our.convention
   `java-test-fixtures`
   alias(libs.plugins.shadow)
 }
