@@ -9,9 +9,10 @@ import org.semver4j.Semver;
 /**
  * State: No tags exist in the repository, on a topic branch.
  *
- * <p>Examples:
+ * <p>Examples:</p>
  * <ul>
- *   <li>New repo with 5 commits on main, feature-x branched with 2 new commits → {@code 0.0.1-alpha.0.2+branch.feature-x.git.2.abc123}</li>
+ *   <li>New repo with 5 commits on main, feature-x branched
+ *       with 2 new commits → {@code 0.0.1-alpha.0.2+branch.feature-x.git.2.abc123}</li>
  * </ul>
  */
 public final class NoTagTopicBranch implements VersionState {
@@ -30,10 +31,6 @@ public final class NoTagTopicBranch implements VersionState {
       ctx.shortSha()
     );
 
-    return Semver.ZERO
-      .withIncPatch()
-      .withClearedPreRelease()
-      .withPreRelease(prerelease)
-      .withBuild(metadata);
+    return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
   }
 }

@@ -9,12 +9,12 @@ import org.semver4j.Semver;
 /**
  * State: No tags exist in the repository, on the HEAD branch.
  *
- * <p>Examples:
+ * <p>Examples:</p>
  * <ul>
  *   <li>New repo with 5 commits on main → {@code 0.0.1-alpha.0.5}</li>
  * </ul>
  *
- * <p>Starts from 0.0.0 and adds prerelease with total commits.
+ * <p>Starts from 0.0.0 and adds prerelease with total commits.</p>
  */
 public final class NoTagHeadBranch implements VersionState {
 
@@ -24,9 +24,6 @@ public final class NoTagHeadBranch implements VersionState {
     // On HEAD branch, distanceFromTag represents total commits (since there's no tag)
     String prerelease = String.format("alpha.0.%d", ctx.distanceFromTag());
 
-    return Semver.ZERO
-      .withIncPatch()
-      .withClearedPreRelease()
-      .withPreRelease(prerelease);
+    return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease);
   }
 }

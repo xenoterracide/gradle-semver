@@ -10,7 +10,7 @@ import org.semver4j.Semver;
  * State machine for determining the correct version calculation state
  * based on git context.
  *
- * <p>The state machine has 6 states based on two dimensions:
+ * <p>The state machine has 6 states based on two dimensions:</p>
  * <ul>
  *   <li>Tag relationship: ON_EXACT_TAG, AFTER_TAG, or NO_TAG</li>
  *   <li>Branch type: HEAD_BRANCH or TOPIC_BRANCH</li>
@@ -33,15 +33,17 @@ public final class VersionStateMachine {
     boolean onExactTag = ctx.isOnTagExact();
     boolean isHeadBranch = ctx.isHeadBranch();
 
+    VersionState state;
     if (hasTag) {
       if (onExactTag) {
-        return isHeadBranch ? new OnExactTagHeadBranch() : new OnExactTagTopicBranch();
+        state = isHeadBranch ? new OnExactTagHeadBranch() : new OnExactTagTopicBranch();
       } else {
-        return isHeadBranch ? new AfterTagHeadBranch() : new AfterTagTopicBranch();
+        state = isHeadBranch ? new AfterTagHeadBranch() : new AfterTagTopicBranch();
       }
     } else {
-      return isHeadBranch ? new NoTagHeadBranch() : new NoTagTopicBranch();
+      state = isHeadBranch ? new NoTagHeadBranch() : new NoTagTopicBranch();
     }
+    return state;
   }
 
   /**
