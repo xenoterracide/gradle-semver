@@ -63,6 +63,15 @@ The plugin uses a strategy pattern to determine the version based on git context
 | **After pre-release tag** (e.g., `v1.0.0-rc.1`) | `1.0.0-rc.1.5`     | `1.0.0-rc.1.3+branch.feature.git.3.abc123`    |
 | **No tags in repo**                             | `0.0.1-alpha.0.5`  | `0.0.1-alpha.0.3+branch.feature.git.3.abc123` |
 
+> ⚠️ **Warning: Version Resolution Risk**
+>
+> Topic branch versions after stable tags use an incremented patch version (e.g., `1.0.2-alpha` vs HEAD's `1.0.1-alpha`).
+> If you publish from topic branches to the same repository as HEAD branches, Gradle will resolve `1.0.2-alpha` as "newer"
+> than `1.0.1-alpha`, which may cause unintended topic branch artifacts to be consumed.
+>
+> **Recommendation**: Only publish releases from HEAD branches (main/develop), or use separate artifact repositories
+> for topic branch builds (e.g., Artifactory/GitLab Package Registry with branch-specific paths).
+
 ### Key Behaviors
 
 1. **HEAD Branch vs Topic Branch**:
