@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: Copyright © 2025 - 2026 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2025, 2026 Caleb Cushing
 
 SPDX-License-Identifier: CC-BY-NC-4.0
 -->
@@ -50,9 +50,54 @@ logger.quiet("semver: " + semver) // 0.1.1-alpha.0.1+branch.topic-foo.git.32.3aa
 
 The plugin exposes a `Semver`. See [Semver4J](https://javadoc.io/doc/org.semver4j/semver4j/latest/index.html).
 
-### Tasks
+## Version Calculation Algorithm
 
-#### `./gradlew semverVersion`
+The plugin uses a strategy pattern to determine the version based on git context:
+
+### Scenarios
+
+| Scenario                                        | HEAD Branch Output | Topic Branch Output                           |
+| ----------------------------------------------- | ------------------ | --------------------------------------------- |
+| **On exact tag**                                | `1.0.0`            | `1.0.0+branch.feature.git.0.abc123`           |
+| **After stable tag** (e.g., `v1.0.0`)           | `1.0.1-alpha.0.5`  | `1.0.2-alpha.0.3+branch.feature.git.3.abc123` |
+| **After pre-release tag** (e.g., `v1.0.0-rc.1`) | `1.0.0-rc.1.5`     | `1.0.0-rc.1.3+branch.feature.git.3.abc123`    |
+| **No tags in repo**                             | `0.0.1-alpha.0.5`  | `0.0.1-alpha.0.3+branch.feature.git.3.abc123` |
+
+### Key Behaviors
+
+1. **HEAD Branch vs Topic Branch**:
+   - On the HEAD branch (e.g., `main`, `develop`), versions are clean with no metadata
+   - On topic branches, versions include `+branch.<name>.git.<distance>.<sha>` metadata
+
+2. **Distance Calculation**:
+   - HEAD branch: Distance from the nearest tag
+   - Topic branch: Distance from the merge base (commits on the topic branch only)
+
+3. **Stable vs Pre-release Tags**:
+   - After a stable tag (e.g., `v1.0.0`): Patch is incremented (`1.0.1-alpha...`)
+   - After a pre-release tag (e.g., `v1.0.0-rc.1`): Distance appended (`1.0.0-rc.1.3`)
+
+4. **Dirty Working Tree**:
+   - When `checkDirty` is enabled, `.dirty` is appended to metadata
+   - Example: `0.1.1-alpha.0.3+branch.feature.git.3.abc123.dirty`
+
+5. **No Tags**:
+   - Starts from `0.0.0` base
+   - Example: `0.0.1-alpha.0.5` (5 commits from initial commit)
+
+### Version Components
+
+```
+<major>.<minor>.<patch>[-<prerelease>][+<metadata>]
+```
+
+- **major.minor.patch**: From the nearest tag (or `0.0.0` if no tags)
+- **prerelease**: `alpha.0.<distance>` for stable tags, or `<tag-prerelease>.<distance>` for pre-release tags
+- **metadata**: `branch.<branch-name>.git.<distance>.<short-sha>` (topic branches only)
+
+## Tasks
+
+### `./gradlew semverVersion`
 
 Prints the semantic version computed by the `com.xenoterracide.gradle.semver` plugin.
 
@@ -70,13 +115,13 @@ Examples:
 # 0.0.0-alpha.0.0
 ```
 
-#### `./gradlew version`
+### `./gradlew version`
 
 Prints `project.version`.
 
 This task is intentionally conservative because end users may or may not assign a value to `project.version`.
 
-- If `project.version` is unset (Gradle’s default `unspecified`), the task prints **nothing** (just a newline).
+- If `project.version` is unset (Gradle's default `unspecified`), the task prints **nothing** (just a newline).
 - If `project.version` is set, it prints that value.
 
 For scripting, you usually want `--quiet`:
