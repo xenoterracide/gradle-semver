@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
-package com.xenoterracide.gradle.semver.internal;
+package com.xenoterracide.gradle.semver;
 
 import java.util.Objects;
 import org.semver4j.Semver;
@@ -16,7 +16,7 @@ import org.semver4j.Semver;
  *       with 2 new commits → {@code 0.0.1-alpha.0.2+branch.feature-x.git.2.abc123}</li>
  * </ul>
  */
-public final class NoTagTopicStrategy implements VersionStrategy {
+final class NoTagTopicStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
 

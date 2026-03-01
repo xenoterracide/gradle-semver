@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
-package com.xenoterracide.gradle.semver.internal;
+package com.xenoterracide.gradle.semver;
 
 import org.immutables.builder.Builder;
 import org.jspecify.annotations.Nullable;

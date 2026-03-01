@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
-package com.xenoterracide.gradle.semver.internal;
+package com.xenoterracide.gradle.semver;
 
 import org.semver4j.Semver;
 
@@ -16,7 +16,7 @@ import org.semver4j.Semver;
  *
  * <p>This is the cleanest strategy - no prerelease or metadata needed.</p>
  */
-public final class OnExactTagHeadStrategy implements VersionStrategy {
+final class OnExactTagHeadStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate(GitContext ctx) {

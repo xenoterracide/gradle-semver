@@ -10,8 +10,6 @@ import com.xenoterracide.gradle.git.GitRemote;
 import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
-import com.xenoterracide.gradle.semver.internal.GitContext;
-import com.xenoterracide.gradle.semver.internal.VersionStrategyFactory;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

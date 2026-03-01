@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
-package com.xenoterracide.gradle.semver.internal;
+package com.xenoterracide.gradle.semver;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ import org.semver4j.Semver;
  * <p>The prerelease uses distance from merge base (commits on topic branch only),
  * and metadata includes branch name and the same distance.</p>
  */
-public final class AfterTagTopicStrategy implements VersionStrategy {
+final class AfterTagTopicStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
 
