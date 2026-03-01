@@ -10,6 +10,10 @@ plugins {
   alias(libs.plugins.shadow)
 }
 
+dependencyLocking {
+  lockAllConfigurations()
+}
+
 dependencies {
   api(libs.semver)
   api(projects.git)
