@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import com.xenoterracide.gradle.convention.publish.GithubPublicRepositoryConfiguration
-import net.ltgt.gradle.errorprone.ErrorProneOptions
+import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.accessors.dm.LibrariesForLibs
-import org.gradle.api.plugins.ExtensionAware
 
 
 plugins {
@@ -51,9 +50,9 @@ java {
 
 tasks.compileJava {
   options.release.set(17)
-  // Disable check that doesn't apply to Gradle plugins
-  // Gradle uses @Inject on abstract class constructors for DI
-  (options as ExtensionAware).extensions.configure<net.ltgt.gradle.errorprone.ErrorProneOptions> {
+  options.errorprone {
+    // Disable check that doesn't apply to Gradle plugins
+    // Gradle uses @Inject on abstract class constructors for DI
     disable("InjectOnConstructorOfAbstractClass")
   }
 }
