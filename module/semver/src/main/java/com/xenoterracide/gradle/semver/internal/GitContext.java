@@ -5,7 +5,7 @@
 package com.xenoterracide.gradle.semver.internal;
 
 import org.immutables.builder.Builder;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Immutable value object containing all git-derived context for version calculation.

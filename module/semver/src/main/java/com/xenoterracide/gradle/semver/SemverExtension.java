@@ -114,6 +114,7 @@ public class SemverExtension implements Provides<Semver> {
    * @return the git context
    */
   // CHECKSTYLE.OFF: MethodLength
+  @SuppressWarnings("NP_NULL_PARAM_DEREF")
   private GitContext buildGitContext(GitMetadata gitMetadata, GitExtension gitExt) {
     var remotes = gitMetadata.remotes();
     var originOpt = findOrigin(remotes);
@@ -139,20 +140,19 @@ public class SemverExtension implements Provides<Semver> {
     // Shallow clone detection could be added here
     var isShallowClone = false;
 
-    // Use constructor directly as the Immutables builder doesn't support @Nullable parameters
-    return new GitContext(
-      tag,
-      distanceFromTag,
-      isOnTagExact,
-      currentBranch,
-      headBranch,
-      isHeadBranch,
-      distanceFromMergeBase,
-      shortSha,
-      fullSha,
-      isDirty,
-      isShallowClone
-    );
+    return GitContext.builder()
+      .nearestTag(tag)
+      .distanceFromTag(distanceFromTag)
+      .isOnTagExact(isOnTagExact)
+      .currentBranch(currentBranch)
+      .headBranch(headBranch)
+      .isHeadBranch(isHeadBranch)
+      .distanceFromMergeBase(distanceFromMergeBase)
+      .shortSha(shortSha)
+      .fullSha(fullSha)
+      .isDirty(isDirty)
+      .isShallowClone(isShallowClone)
+      .build();
   }
 
   // CHECKSTYLE.ON: MethodLength

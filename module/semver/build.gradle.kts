@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.spotbugs.snom.SpotBugsTask
 
 plugins {
   our.convention
@@ -13,6 +14,7 @@ dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
+  runtimeOnly(libs.jetbrains.annotations)
   implementation(libs.commons.lang) { version { require("[3.8,4)") } }
   implementation(libs.jgit)
   shadow(libs.jgit)
@@ -21,6 +23,15 @@ dependencies {
   annotationProcessor(libs.immutables.core)
   compileOnly(platform(libs.immutables.bom))
   compileOnly(libs.bundles.immutables)
+
+  // Make annotations available to SpotBugs for null analysis
+  spotbugs(libs.spotbugs)
+}
+
+// Ensure SpotBugs has access to annotation classes for proper null analysis
+tasks.withType<SpotBugsTask>().configureEach {
+  auxClassPaths.from(configurations.compileClasspath.get())
+  auxClassPaths.from(configurations.runtimeClasspath.get())
 }
 
 tasks.withType<ShadowJar>().configureEach {

@@ -4,6 +4,7 @@
 
 package com.xenoterracide.gradle.semver.internal;
 
+import java.util.Objects;
 import org.semver4j.Semver;
 
 /**
@@ -17,18 +18,21 @@ import org.semver4j.Semver;
  */
 public final class NoTagTopicStrategy implements VersionStrategy {
 
+  private static final String UNKNOWN = "unknown";
+
   @Override
   public Semver calculate(GitContext ctx) {
     // Start from 0.0.0
     // Prerelease uses distance from merge base (commits on topic branch)
     // Metadata includes branch name and distance
-    var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : "unknown";
+    var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
+    var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
     var prerelease = String.format("alpha.0.%d", ctx.distanceFromMergeBase());
     var metadata = String.format(
       "branch.%s.git.%d.%s",
-      sanitizeBranchName(branchName),
+      sanitizeBranchName(Objects.requireNonNull(branchName, "branchName")),
       ctx.distanceFromMergeBase(),
-      ctx.shortSha()
+      Objects.requireNonNull(shortSha, "shortSha")
     );
 
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
