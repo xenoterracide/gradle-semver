@@ -14,7 +14,6 @@ dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
-  runtimeOnly(libs.jetbrains.annotations)
   implementation(libs.commons.lang) { version { require("[3.8,4)") } }
   implementation(libs.jgit)
   shadow(libs.jgit)
@@ -24,7 +23,6 @@ dependencies {
   compileOnly(platform(libs.immutables.bom))
   compileOnly(libs.bundles.immutables)
 
-  // Make annotations available to SpotBugs for null analysis
   spotbugs(libs.spotbugs)
 }
 

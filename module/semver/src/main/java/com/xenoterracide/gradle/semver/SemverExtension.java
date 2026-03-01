@@ -114,7 +114,6 @@ public class SemverExtension implements Provides<Semver> {
    * @return the git context
    */
   // CHECKSTYLE.OFF: MethodLength
-  @SuppressWarnings("NP_NULL_PARAM_DEREF")
   private GitContext buildGitContext(GitMetadata gitMetadata, GitExtension gitExt) {
     var remotes = gitMetadata.remotes();
     var originOpt = findOrigin(remotes);
