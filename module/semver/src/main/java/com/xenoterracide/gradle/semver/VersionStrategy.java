@@ -40,4 +40,15 @@ public sealed interface VersionStrategy
   default String sanitizeBranchName(String branch) {
     return branch.replaceAll("[^a-zA-Z0-9]", "-");
   }
+
+  /**
+   * Appends dirty marker to metadata if working tree is dirty.
+   *
+   * @param metadata the base metadata string
+   * @param ctx the git context
+   * @return metadata with dirty marker appended if dirty
+   */
+  default String appendDirtyMarker(String metadata, GitContext ctx) {
+    return ctx.isDirty() ? metadata + ".dirty" : metadata;
+  }
 }

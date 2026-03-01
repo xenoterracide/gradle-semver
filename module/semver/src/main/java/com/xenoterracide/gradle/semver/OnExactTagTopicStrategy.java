@@ -38,11 +38,12 @@ final class OnExactTagTopicStrategy implements VersionStrategy {
     // Add metadata to indicate we're on a topic branch at the tag
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
     var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
-    var metadata = String.format(
+    var baseMetadata = String.format(
       "branch.%s.git.0.%s",
       sanitizeBranchName(Objects.requireNonNull(branchName, "branchName")),
       Objects.requireNonNull(shortSha, "shortSha")
     );
+    var metadata = appendDirtyMarker(baseMetadata, ctx);
 
     return semver.withBuild(metadata);
   }

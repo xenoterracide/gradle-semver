@@ -19,7 +19,7 @@ class NoExecSystemReaderTest {
   @Test
   void getEnvOtherVariableReturnsValue() {
     var reader = new NoExecSystemReader();
-    // HOME should exist in most environments
-    assertThat(reader.getenv("HOME")).isNotNull();
+    // Compare with actual system environment to verify pass-through behavior
+    assertThat(reader.getenv("HOME")).isEqualTo(System.getenv("HOME"));
   }
 }

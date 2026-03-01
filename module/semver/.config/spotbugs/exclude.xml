@@ -16,6 +16,8 @@ SPDX-License-Identifier: CC0-1.0
   </Match>
   <Match>
     <!-- some incompatibility with spotbugs, and Gradle's jspecify annotations -->
+    <Class name="com.xenoterracide.gradle.semver.SemverExtension" />
+    <Method name="buildGitContext" />
     <Bug pattern="NP_NULL_PARAM_DEREF" />
   </Match>
 </FindBugsFilter>

@@ -11,7 +11,6 @@ import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.eclipse.jgit.lib.Constants;
@@ -118,7 +117,7 @@ public class SemverExtension implements Provides<Semver> {
 
     var currentBranch = gitMetadata.branch();
     var headBranch = originOpt.map(SemverExtension::getHeadBranchName).orElse(null);
-    var isHeadBranch = Objects.equals(currentBranch, headBranch);
+    var isHeadBranch = currentBranch != null && currentBranch.equals(headBranch);
 
     // Calculate distance from merge base for topic branches
     var distanceFromMergeBase = calculateDistanceFromMergeBase(gitMetadata, gitExt, originOpt, isHeadBranch);
@@ -197,12 +196,13 @@ public class SemverExtension implements Provides<Semver> {
     var gitContextProvider = this.createGitContextProvider(gitExt);
 
     var semverProvider = gitContextProvider.map(ctx -> {
-      var version = VersionStrategyFactory.calculate(ctx);
+      var strategy = VersionStrategyFactory.determineStrategy(ctx);
+      var version = strategy.calculate(ctx);
       Logging.getLogger(SemverExtension.class).info(
         "semver {} {} (strategy: {})",
         projectName,
         version,
-        VersionStrategyFactory.determineStrategy(ctx).getClass().getSimpleName()
+        strategy.getClass().getSimpleName()
       );
       return version;
     });

@@ -32,8 +32,8 @@ dependencies {
 
 // Ensure SpotBugs has access to annotation classes for proper null analysis
 tasks.withType<SpotBugsTask>().configureEach {
-  auxClassPaths.from(configurations.compileClasspath.get())
-  auxClassPaths.from(configurations.runtimeClasspath.get())
+  auxClassPaths.from(configurations.compileClasspath)
+  auxClassPaths.from(configurations.runtimeClasspath)
 }
 
 tasks.withType<ShadowJar>().configureEach {

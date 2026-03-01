@@ -28,12 +28,13 @@ final class NoTagTopicStrategy implements VersionStrategy {
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
     var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
     var prerelease = String.format("alpha.0.%d", ctx.distanceFromMergeBase());
-    var metadata = String.format(
+    var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(Objects.requireNonNull(branchName, "branchName")),
       ctx.distanceFromMergeBase(),
       Objects.requireNonNull(shortSha, "shortSha")
     );
+    var metadata = appendDirtyMarker(baseMetadata, ctx);
 
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
   }

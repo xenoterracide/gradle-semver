@@ -42,19 +42,23 @@ final class AfterTagTopicStrategy implements VersionStrategy {
     var distance = ctx.distanceFromMergeBase();
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
     var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
-    var metadata = String.format(
+    var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(Objects.requireNonNull(branchName, "branchName")),
       distance,
       Objects.requireNonNull(shortSha, "shortSha")
     );
+    var metadata = appendDirtyMarker(baseMetadata, ctx);
 
     return buildVersion(baseSemver, distance, metadata);
   }
 
   private static Semver buildVersion(Semver baseSemver, long distance, String metadata) {
-    var prerelease = buildPrerelease(baseSemver, distance);
-    return baseSemver.withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
+    // If the nearest tag is a stable release (no prerelease), increment the patch
+    // so that topic-branch versions (e.g. 1.0.1-alpha.0.N) sort after the tag.
+    var targetBase = baseSemver.getPreRelease().isEmpty() ? baseSemver.withIncPatch() : baseSemver;
+    var prerelease = buildPrerelease(targetBase, distance);
+    return targetBase.withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
   }
 
   private static String buildPrerelease(Semver baseSemver, long distance) {
