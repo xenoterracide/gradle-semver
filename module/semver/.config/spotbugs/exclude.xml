@@ -15,7 +15,7 @@ SPDX-License-Identifier: CC0-1.0
     <Bug pattern="EI_EXPOSE_REP" />
   </Match>
   <Match>
-    <!-- some incompatability with spotbugs, and gradle's jspecify annotations -->
+    <!-- some incompatibility with spotbugs, and Gradle's jspecify annotations -->
     <Bug pattern="NP_NULL_PARAM_DEREF" />
   </Match>
 </FindBugsFilter>
