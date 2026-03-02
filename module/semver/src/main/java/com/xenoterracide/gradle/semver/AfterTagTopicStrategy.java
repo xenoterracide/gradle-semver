@@ -54,8 +54,9 @@ final class AfterTagTopicStrategy implements VersionStrategy {
   }
 
   private static Semver buildVersion(Semver baseSemver, long distance, String metadata) {
-    // If the nearest tag is a stable release (no prerelease), increment the patch
-    // so that topic-branch versions (e.g. 1.0.1-alpha.0.N) sort after the tag.
+    // Topic branch uses same base version as HEAD branch
+    // For stable tags: increment patch (same as HEAD branch)
+    // For prerelease tags: use base as-is (same as HEAD branch)
     var targetBase = baseSemver.getPreRelease().isEmpty() ? baseSemver.withIncPatch() : baseSemver;
     var prerelease = buildPrerelease(targetBase, distance);
     return targetBase.withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);

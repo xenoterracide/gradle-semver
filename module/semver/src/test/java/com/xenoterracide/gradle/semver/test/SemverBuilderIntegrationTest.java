@@ -173,7 +173,7 @@ class SemverBuilderIntegrationTest {
       git.checkout().setCreateBranch(true).setName(branch).call();
       git.push().setPushAll().call();
       // On topic branch: metadata includes branch name
-      // Patch is incremented for topic branch versions after stable tag
+      // Same base version as HEAD branch (0.1.2-alpha after v0.1.1 tag)
       assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
       commit(git);
       commit(git);
@@ -191,7 +191,7 @@ class SemverBuilderIntegrationTest {
       // On topic branch - ideally should be 3 commits from merge base
       // But when merge base can't be determined (no remote HEAD), falls back to tag distance
       // Note: In this test environment, remote HEAD setup isn't working correctly
-      // Patch is incremented for topic branch versions after stable tag
+      // Same base version as HEAD branch (0.1.2-alpha after v0.1.1 tag)
       assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
     }
   }
@@ -220,7 +220,7 @@ class SemverBuilderIntegrationTest {
       var v010BldV2 = supplies(commit(git), vs);
 
       // Still on "topic branch" (no HEAD configured), so metadata with branch name
-      // Patch is incremented for topic branch versions after stable tag
+      // Same base version as HEAD branch (0.1.1-alpha)
       assertThat(v010BldV2).isGreaterThan(v001Alpha01).asString().startsWith("0.1.1-alpha.0.1+branch.main.git.");
 
       var v010BldV3 = supplies(commit(git), vs);
@@ -256,7 +256,7 @@ class SemverBuilderIntegrationTest {
       commit(git);
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
-      // Patch is incremented for topic branch versions after stable tag
+      // Same base version as HEAD branch (0.1.2-alpha after v0.1.1 tag)
       assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
       commit(git);
       commit(git);
@@ -265,7 +265,7 @@ class SemverBuilderIntegrationTest {
 
       commit(git);
       // Back on main - still "topic branch" mode since no HEAD configured
-      // Patch is incremented for topic branch versions after stable tag
+      // Same base version as HEAD branch (0.1.2-alpha)
       assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.2+branch.main.git.");
 
       git.checkout().setName(branch).call().getObjectId();
