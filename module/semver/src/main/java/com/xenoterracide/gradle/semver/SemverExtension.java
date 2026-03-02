@@ -126,7 +126,7 @@ public class SemverExtension implements Provides<Semver> {
     var distanceFromTag = gitMetadata.distance();
     var isOnTagExact = tag != null && distanceFromTag == 0;
 
-    // Get short SHA from uniqueShort or derive from commit
+    // Get short SHA from git's unique abbreviation, or "unknown" if not available
     var shortSha = Optional.ofNullable(gitMetadata.uniqueShort()).orElse(UNKNOWN);
     var fullSha = Optional.ofNullable(gitMetadata.commit()).orElse(UNKNOWN);
 
