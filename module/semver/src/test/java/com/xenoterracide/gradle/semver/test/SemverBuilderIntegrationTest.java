@@ -29,17 +29,12 @@ import org.semver4j.Semver;
 
 class SemverBuilderIntegrationTest {
 
-  // Pattern for versions with build metadata (topic branches, or no-head-branch cases)
-  static final Pattern VERSION_PATTERN_WITH_METADATA = Pattern.compile(
-    "^\\d+\\.\\d+\\.\\d+(?:-[^+]+)?\\+(branch\\.[\\p{Alnum}-]+\\.)?git\\.\\d+\\.\\p{XDigit}{7}$"
+  static final Pattern VERSION_PATTERN = Pattern.compile(
+    "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+(branch\\.[\\p{Alnum}-]+\\.)?git\\.\\d+\\.\\p{XDigit}{7}$"
   );
-
-  // Pattern for versions without build metadata (HEAD branch after tag)
-  static final Pattern VERSION_PATTERN_NO_METADATA = Pattern.compile("^\\d+\\.\\d+\\.\\d+(?:-[^+]+)?$");
 
   static final String MAIN = "main";
   static final String ORIGIN = "origin";
-  final Logger log = Logging.getLogger(this.getClass());
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File bareRepo;
@@ -47,39 +42,7 @@ class SemverBuilderIntegrationTest {
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
 
-  private static int abbreviatedShaLength(String versionString) {
-    // e.g. "0.1.2-alpha.0.2+git.2.af15c63" or "...+branch.topic-foo.git.3.af15c63"
-    var lastDot = versionString.lastIndexOf('.');
-    assertThat(lastDot)
-      .describedAs("version must contain a '.' before the abbreviated sha: %s", versionString)
-      .isGreaterThan(0);
-    return versionString.length() - lastDot - 1;
-  }
-
-  private static void assertVersionWithPrefix(String actual, String expectedPrefix) {
-    assertVersionWithPrefix(actual, expectedPrefix, true);
-  }
-
-  private static void assertVersionWithPrefix(String actual, String expectedPrefix, boolean hasMetadata) {
-    assertThat(actual).satisfies(s -> {
-      assertThat(s).describedAs("version string").startsWith(expectedPrefix);
-
-      if (hasMetadata) {
-        assertThat(s).describedAs("version with metadata").matches(VERSION_PATTERN_WITH_METADATA);
-
-        var shaLen = abbreviatedShaLength(s);
-        assertThat(shaLen).describedAs("abbreviated sha length for '%s'", s).isEqualTo(7);
-
-        var sha = s.substring(s.length() - shaLen);
-        assertThat(sha).describedAs("abbreviated sha suffix for '%s'", s).hasSize(shaLen).matches("^[0-9a-fA-F]+$");
-
-        // Note: We don't check total length because prerelease identifiers can vary in length
-        // (e.g., "alpha.0.1" vs "rc.1.1" vs "alpha.0.10")
-      } else {
-        assertThat(s).describedAs("version without metadata").matches(VERSION_PATTERN_NO_METADATA);
-      }
-    });
-  }
+  private final Logger log = Logging.getLogger(this.getClass());
 
   static Supplier<Semver> versionSupplier(ProjectBuilder pb) {
     return () -> {
@@ -110,13 +73,14 @@ class SemverBuilderIntegrationTest {
       }
 
       var vs = versionSupplier(pb);
+      var size = 29;
 
-      // On HEAD branch (main), no build metadata is added
       var v001Alpha01 = vs.get();
-      assertVersionWithPrefix(v001Alpha01.toString(), "0.0.1-alpha.0.1", false);
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(size).matches(VERSION_PATTERN);
 
       var v001Alpha02 = supplies(commit(git), vs);
-      assertVersionWithPrefix(v001Alpha02.toString(), "0.0.1-alpha.0.2", false);
+
+      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(size).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
@@ -126,8 +90,15 @@ class SemverBuilderIntegrationTest {
 
       var v010BldV2 = supplies(commit(git), vs);
 
-      // On HEAD branch after tag: no metadata
-      assertThat(v010BldV2).isGreaterThan(v001Alpha01).isGreaterThan(v010).asString().isEqualTo("0.1.1-alpha.0.1");
+      assertThat(v010BldV2)
+        .isGreaterThan(v001Alpha01)
+        .isGreaterThan(v010)
+        .asString()
+        .startsWith("0.1.1-alpha.0.1+")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
+
+      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.git.3aae11e"));
 
       var v010BldV3 = supplies(commit(git), vs);
 
@@ -136,7 +107,8 @@ class SemverBuilderIntegrationTest {
         .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
         .asString()
-        .isEqualTo("0.1.1-alpha.0.2");
+        .startsWith("0.1.1-alpha.0.2+")
+        .matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.1-rc.1").call();
 
@@ -150,16 +122,10 @@ class SemverBuilderIntegrationTest {
         .asString()
         .isEqualTo("0.1.1-rc.1");
 
-      // Regression/assertion: when we are N commits past a prerelease tag, we must append that distance
-      // to the prerelease identifiers (rc.1.<N>) but NO metadata on HEAD branch
-      var v011Rc1BldV1 = supplies(commit(git), vs);
-      assertThat(v011Rc1BldV1.toString()).isEqualTo("0.1.1-rc.1.1");
-
       git.tag().setName("v0.1.1").call();
 
       var v011 = vs.get();
 
-      // On HEAD branch at exact tag: clean version without metadata
       assertThat(v011)
         .isGreaterThan(v010BldV2)
         .isGreaterThan(v010)
@@ -172,9 +138,12 @@ class SemverBuilderIntegrationTest {
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
       git.push().setPushAll().call();
-      // On topic branch: metadata includes branch name
-      // Same base version as HEAD branch (0.1.2-alpha after v0.1.1 tag)
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.1.")
+        .hasSize(46)
+        .matches(VERSION_PATTERN);
       commit(git);
       commit(git);
 
@@ -183,16 +152,20 @@ class SemverBuilderIntegrationTest {
 
       commit(git);
       git.push().setPushAll().call();
-      // Back on HEAD branch: no metadata
-      // Back on HEAD branch: no metadata, patch IS incremented
-      assertThat(vs.get().toString()).isEqualTo("0.1.2-alpha.0.2");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.2+git.2.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
 
       git.checkout().setName(branch).call().getObjectId();
-      // On topic branch - ideally should be 3 commits from merge base
-      // But when merge base can't be determined (no remote HEAD), falls back to tag distance
-      // Note: In this test environment, remote HEAD setup isn't working correctly
-      // Same base version as HEAD branch (0.1.2-alpha after v0.1.1 tag)
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.3.")
+        .hasSize(46)
+        .matches(VERSION_PATTERN);
     }
   }
 
@@ -202,14 +175,14 @@ class SemverBuilderIntegrationTest {
     try (var git = Git.init().setDirectory(projectDir).setInitialBranch(MAIN).call()) {
       commit(git);
       var vs = versionSupplier(pb);
+      var size = 29;
 
-      // Without remote HEAD configured, we're on a "topic branch" relative to nothing
-      // So we get metadata with branch name
       var v001Alpha01 = vs.get();
-      assertVersionWithPrefix(v001Alpha01.toString(), "0.0.1-alpha.0.1+branch.main.git.1.");
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(size).matches(VERSION_PATTERN);
 
       var v001Alpha02 = supplies(commit(git), vs);
-      assertVersionWithPrefix(v001Alpha02.toString(), "0.0.1-alpha.0.2+branch.main.git.2.");
+
+      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(size).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
@@ -219,58 +192,80 @@ class SemverBuilderIntegrationTest {
 
       var v010BldV2 = supplies(commit(git), vs);
 
-      // Still on "topic branch" (no HEAD configured), so metadata with branch name
-      // Same base version as HEAD branch (0.1.1-alpha)
-      assertThat(v010BldV2).isGreaterThan(v001Alpha01).asString().startsWith("0.1.1-alpha.0.1+branch.main.git.");
+      assertThat(v010BldV2)
+        .isGreaterThan(v001Alpha01)
+        .isGreaterThan(v010)
+        .asString()
+        .startsWith("0.1.1-alpha.0.1+")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
+
+      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.git.3aae11e"));
 
       var v010BldV3 = supplies(commit(git), vs);
 
       assertThat(v010BldV3)
         .isGreaterThan(v001Alpha01)
+        .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
         .asString()
-        .startsWith("0.1.1-alpha.0.2+branch.main.git.");
+        .startsWith("0.1.1-alpha.0.2+")
+        .matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.1-rc.1").call();
 
       var v011Rc1 = vs.get();
 
-      // On topic branch at exact tag - metadata includes branch name for traceability
-      assertVersionWithPrefix(v011Rc1.toString(), "0.1.1-rc.1+branch.main.git.0.");
-
-      // Regression/assertion: when we are N commits past a prerelease tag
-      var v011Rc1BldV1 = supplies(commit(git), vs);
-      // Prerelease tag + distance has longer prerelease identifier, just check prefix and metadata pattern
-      assertThat(v011Rc1BldV1.toString())
-        .startsWith("0.1.1-rc.1.1+branch.main.git.1.")
-        .matches(VERSION_PATTERN_WITH_METADATA);
+      assertThat(v011Rc1)
+        .isGreaterThan(v001Alpha01)
+        .isGreaterThan(v010)
+        .isGreaterThan(v010BldV2)
+        .isGreaterThan(v010BldV3)
+        .asString()
+        .isEqualTo("0.1.1-rc.1");
 
       git.tag().setName("v0.1.1").call();
 
       var v011 = vs.get();
 
-      // Without remote HEAD configured, we can't determine HEAD branch
-      // So we treat as topic branch and include metadata for traceability
-      assertThat(v011).isGreaterThan(v001Alpha01).asString().startsWith("0.1.1+branch.main.git.0.");
+      assertThat(v011)
+        .isGreaterThan(v010BldV2)
+        .isGreaterThan(v010)
+        .isGreaterThan(v001Alpha01)
+        .hasToString("0.1.1")
+        .extracting(Semver::getMajor, Semver::getMinor, Semver::getPatch, Semver::getPreRelease, Semver::getBuild)
+        .containsExactly(0, 1, 1, Collections.emptyList(), Collections.emptyList());
 
       commit(git);
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
-      // Same base version as HEAD branch (0.1.2-alpha after v0.1.1 tag)
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+git.1.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
       commit(git);
       commit(git);
 
       git.checkout().setName(MAIN).call();
 
       commit(git);
-      // Back on main - still "topic branch" mode since no HEAD configured
-      // Same base version as HEAD branch (0.1.2-alpha)
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.2+branch.main.git.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.2+git.2.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
 
       git.checkout().setName(branch).call().getObjectId();
 
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.3+branch.topic-foo.git.3.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.3+git.3.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
     }
   }
 }
