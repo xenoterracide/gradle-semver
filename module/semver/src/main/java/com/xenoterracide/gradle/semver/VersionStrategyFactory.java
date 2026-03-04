@@ -4,8 +4,6 @@
 
 package com.xenoterracide.gradle.semver;
 
-import org.semver4j.Semver;
-
 /**
  * Factory for creating version calculation strategies based on git context.
  *
@@ -43,16 +41,5 @@ final class VersionStrategyFactory {
       strategy = isHeadBranch ? new NoTagHeadStrategy(ctx) : new NoTagTopicStrategy(ctx);
     }
     return strategy;
-  }
-
-  /**
-   * Calculates the semantic version using the appropriate strategy.
-   *
-   * @param ctx the git context
-   * @return the calculated semantic version
-   */
-  public static Semver calculate(GitContext ctx) {
-    var strategy = determineStrategy(ctx);
-    return strategy.calculate();
   }
 }

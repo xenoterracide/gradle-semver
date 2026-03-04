@@ -133,4 +133,54 @@ class VersionStrategyTest {
     var version = new NoTagHeadStrategy(ctx).calculate();
     assertThat(version.toString()).startsWith("0.0.1-alpha.0.3");
   }
+
+  // Tests for VersionStrategyFactory.determineStrategy()
+
+  @Test
+  void factorySelectsOnExactTagHeadStrategy() {
+    var ctx = createContext("v1.0.0", 0, true, "main", "main", true, 0, "abc1234", "fullsha", false, false);
+    var strategy = VersionStrategyFactory.determineStrategy(ctx);
+    assertThat(strategy).isInstanceOf(OnExactTagHeadStrategy.class);
+    assertThat(strategy.calculate().toString()).isEqualTo("1.0.0");
+  }
+
+  @Test
+  void factorySelectsOnExactTagTopicStrategy() {
+    var ctx = createContext("v1.0.0", 0, true, "feature-x", "main", false, 0, "abc1234", "fullsha", false, false);
+    var strategy = VersionStrategyFactory.determineStrategy(ctx);
+    assertThat(strategy).isInstanceOf(OnExactTagTopicStrategy.class);
+    assertThat(strategy.calculate().toString()).startsWith("1.0.0+branch.feature-x.git.0.");
+  }
+
+  @Test
+  void factorySelectsAfterTagHeadStrategy() {
+    var ctx = createContext("v1.0.0", 5, false, "main", "main", true, 5, "abc1234", "fullsha", false, false);
+    var strategy = VersionStrategyFactory.determineStrategy(ctx);
+    assertThat(strategy).isInstanceOf(AfterTagHeadStrategy.class);
+    assertThat(strategy.calculate().toString()).startsWith("1.0.1-alpha.0.5+git.5.");
+  }
+
+  @Test
+  void factorySelectsAfterTagTopicStrategy() {
+    var ctx = createContext("v1.0.0", 5, false, "feature-x", "main", false, 2, "abc1234", "fullsha", false, false);
+    var strategy = VersionStrategyFactory.determineStrategy(ctx);
+    assertThat(strategy).isInstanceOf(AfterTagTopicStrategy.class);
+    assertThat(strategy.calculate().toString()).startsWith("1.0.1-alpha.0.2+branch.feature-x.git.5.");
+  }
+
+  @Test
+  void factorySelectsNoTagHeadStrategy() {
+    var ctx = createContext(null, 5, false, "main", "main", true, 5, "abc1234", "fullsha", false, false);
+    var strategy = VersionStrategyFactory.determineStrategy(ctx);
+    assertThat(strategy).isInstanceOf(NoTagHeadStrategy.class);
+    assertThat(strategy.calculate().toString()).startsWith("0.0.1-alpha.0.5+git.5.");
+  }
+
+  @Test
+  void factorySelectsNoTagTopicStrategy() {
+    var ctx = createContext(null, 5, false, "feature-x", "main", false, 2, "abc1234", "fullsha", false, false);
+    var strategy = VersionStrategyFactory.determineStrategy(ctx);
+    assertThat(strategy).isInstanceOf(NoTagTopicStrategy.class);
+    assertThat(strategy.calculate().toString()).startsWith("0.0.1-alpha.0.2+branch.feature-x.git.2.");
+  }
 }
