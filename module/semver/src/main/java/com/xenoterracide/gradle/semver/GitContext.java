@@ -55,15 +55,6 @@ public record GitContext(
   }
 
   /**
-   * Checks if we're on a topic branch (not the HEAD branch and not detached).
-   *
-   * @return true if on a topic branch
-   */
-  public boolean isTopicBranch() {
-    return !this.isHeadBranch && this.currentBranch != null;
-  }
-
-  /**
    * Gets the base version string without the 'v' prefix.
    *
    * @return the base version (e.g., "1.0.0"), or null if no tag
