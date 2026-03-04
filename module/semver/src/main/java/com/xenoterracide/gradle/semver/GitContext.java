@@ -17,8 +17,8 @@ import org.jspecify.annotations.Nullable;
  * @param headBranch the HEAD branch name from origin (e.g., "main", "develop"), or null if unknown
  * @param isHeadBranch true if current branch is the HEAD branch
  * @param distanceFromMergeBase number of commits from merge base to HEAD
- * @param shortSha the abbreviated commit SHA
- * @param fullSha the full 40-character commit SHA
+ * @param shortSha the abbreviated commit SHA, or null if not available
+ * @param fullSha the full 40-character commit SHA, or null if not available
  * @param isDirty true if working tree has uncommitted changes
  * @param isShallowClone true if repository is a shallow clone
  */
@@ -31,8 +31,8 @@ public record GitContext(
   @Nullable String headBranch,
   boolean isHeadBranch,
   long distanceFromMergeBase,
-  String shortSha,
-  String fullSha,
+  @Nullable String shortSha,
+  @Nullable String fullSha,
   boolean isDirty,
   boolean isShallowClone
 ) {
