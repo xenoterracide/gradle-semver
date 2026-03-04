@@ -18,7 +18,6 @@ dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
-  implementation(libs.commons.lang) { version { require("[3.8,4)") } }
   implementation(libs.jgit)
   shadow(libs.jgit)
 
