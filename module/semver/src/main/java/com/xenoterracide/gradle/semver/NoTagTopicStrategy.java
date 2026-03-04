@@ -4,7 +4,6 @@
 
 package com.xenoterracide.gradle.semver;
 
-import java.util.Objects;
 import org.semver4j.Semver;
 
 /**
@@ -30,9 +29,9 @@ final class NoTagTopicStrategy implements VersionStrategy {
     var prerelease = String.format("alpha.0.%d", ctx.distanceFromMergeBase());
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
-      sanitizeBranchName(Objects.requireNonNull(branchName, "branchName")),
+      sanitizeBranchName(branchName),
       ctx.distanceFromMergeBase(),
-      Objects.requireNonNull(shortSha, "shortSha")
+      shortSha
     );
     var metadata = appendDirtyMarker(baseMetadata, ctx);
 
