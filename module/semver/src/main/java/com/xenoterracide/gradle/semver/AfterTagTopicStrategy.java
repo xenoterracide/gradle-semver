@@ -29,31 +29,33 @@ final class AfterTagTopicStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate(GitContext ctx) {
+    var baseSemver = parseBaseVersion(ctx);
+    var metadata = this.buildMetadata(ctx);
+    return buildVersion(baseSemver, ctx.distanceFromMergeBase(), metadata);
+  }
+
+  private static Semver parseBaseVersion(GitContext ctx) {
     var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagTopicStrategy requires a tag but baseVersion is null");
     }
-
-    var baseSemver = Semver.parse(baseVersion);
-    if (baseSemver == null) {
+    var semver = Semver.parse(baseVersion);
+    if (semver == null) {
       throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
     }
+    return semver;
+  }
 
-    // Use distanceFromMergeBase for prerelease (to match 0.15.0 behavior)
-    // Use distanceFromTag for metadata (actual commits from tag)
-    var prereleaseDistance = ctx.distanceFromMergeBase();
-    var buildDistance = ctx.distanceFromTag();
+  private String buildMetadata(GitContext ctx) {
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
     var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(Objects.requireNonNull(branchName, "branchName")),
-      buildDistance,
+      ctx.distanceFromTag(),
       Objects.requireNonNull(shortSha, "shortSha")
     );
-    var metadata = appendDirtyMarker(baseMetadata, ctx);
-
-    return buildVersion(baseSemver, prereleaseDistance, metadata);
+    return this.appendDirtyMarker(baseMetadata, ctx);
   }
 
   private static Semver buildVersion(Semver baseSemver, long distance, String metadata) {

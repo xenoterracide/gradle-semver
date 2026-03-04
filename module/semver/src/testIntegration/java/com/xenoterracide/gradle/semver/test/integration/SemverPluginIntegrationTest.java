@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -111,10 +111,9 @@ class SemverPluginIntegrationTest {
     @Override
     public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
       return Stream.of(
-        // semver plugin outputs - without remote HEAD, treated as topic branch with metadata
-        // Pattern: 0.1.0+branch.<branch-name>.git.0.<7-char-sha>
-        Arguments.of("semverVersion", "0\\.1\\.0\\+branch\\.[a-zA-Z0-9-]+\\.git\\.0\\.[a-f0-9]{7}", "build.gradle"),
-        Arguments.of("semverVersion", "0\\.1\\.0\\+branch\\.[a-zA-Z0-9-]+\\.git\\.0\\.[a-f0-9]{7}", "build.gradle.kts"),
+        // semver plugin outputs - on exact tag, clean version without metadata
+        Arguments.of("semverVersion", "0.1.0", "build.gradle"),
+        Arguments.of("semverVersion", "0.1.0", "build.gradle.kts"),
         // project.version outputs (default is unset in the test projects, so `--quiet` yields empty)
         Arguments.of("version", "", "build.gradle"),
         Arguments.of("version", "", "build.gradle.kts")
