@@ -31,18 +31,18 @@ final class AfterTagHeadStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate() {
-    var baseVersion = ctx.baseVersion();
+    var baseVersion = this.ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagHeadStrategy requires a tag but baseVersion is null");
     }
 
     var semver = Semver.parse(baseVersion);
     if (semver == null) {
-      throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
+      throw new IllegalStateException("Invalid tag format: " + this.ctx.nearestTag());
     }
 
-    var distance = ctx.distanceFromTag();
-    var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
+    var distance = this.ctx.distanceFromTag();
+    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
     var metadata = String.format("git.%d.%s", distance, shortSha);
     var metadataWithDirty = appendDirtyMarker(metadata, this.ctx);
 

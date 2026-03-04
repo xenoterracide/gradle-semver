@@ -34,30 +34,30 @@ final class AfterTagTopicStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate() {
-    var baseSemver = parseBaseVersion();
+    var baseSemver = this.parseBaseVersion();
     var metadata = this.buildMetadata();
-    return buildVersion(baseSemver, ctx.distanceFromMergeBase(), metadata);
+    return buildVersion(baseSemver, this.ctx.distanceFromMergeBase(), metadata);
   }
 
   private Semver parseBaseVersion() {
-    var baseVersion = ctx.baseVersion();
+    var baseVersion = this.ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagTopicStrategy requires a tag but baseVersion is null");
     }
     var semver = Semver.parse(baseVersion);
     if (semver == null) {
-      throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
+      throw new IllegalStateException("Invalid tag format: " + this.ctx.nearestTag());
     }
     return semver;
   }
 
   private String buildMetadata() {
-    var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
-    var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
+    var branchName = this.ctx.currentBranch() != null ? this.ctx.currentBranch() : UNKNOWN;
+    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(branchName),
-      ctx.distanceFromTag(),
+      this.ctx.distanceFromTag(),
       shortSha
     );
     return this.appendDirtyMarker(baseMetadata, this.ctx);
