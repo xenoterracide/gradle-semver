@@ -13,13 +13,15 @@ import org.semver4j.Semver;
  *
  * <p>Examples:</p>
  * <ul>
- *   <li>5 commits after v1.0.0 on develop → {@code 1.0.1-alpha.0.5}</li>
- *   <li>1 commit after v0.1.1-rc.1 → {@code 0.1.1-rc.1.1}</li>
+ *   <li>5 commits after v1.0.0 on develop → {@code 1.0.1-alpha.0.5+git.5.abc123}</li>
+ *   <li>1 commit after v0.1.1-rc.1 → {@code 0.1.1-rc.1.1+git.1.abc123}</li>
  * </ul>
  *
- * <p>No build metadata is added on the HEAD branch to keep versions clean.</p>
+ * <p>Build metadata includes git distance and short SHA for traceability.</p>
  */
 final class AfterTagHeadStrategy implements VersionStrategy {
+
+  private static final String UNKNOWN = "unknown";
 
   @Override
   public Semver calculate(GitContext ctx) {
@@ -33,7 +35,12 @@ final class AfterTagHeadStrategy implements VersionStrategy {
       throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
     }
 
-    return calculateVersion(semver, ctx.distanceFromTag());
+    var distance = ctx.distanceFromTag();
+    var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
+    var metadata = String.format("git.%d.%s", distance, shortSha);
+    var metadataWithDirty = appendDirtyMarker(metadata, ctx);
+
+    return calculateVersion(semver, distance).withBuild(metadataWithDirty);
   }
 
   private static Semver calculateVersion(Semver semver, long distance) {

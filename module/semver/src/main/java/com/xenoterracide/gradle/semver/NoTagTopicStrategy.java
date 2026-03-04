@@ -36,6 +36,7 @@ final class NoTagTopicStrategy implements VersionStrategy {
     );
     var metadata = appendDirtyMarker(baseMetadata, ctx);
 
+    // Topic branch uses same base version as HEAD (0.0.1)
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
   }
 }

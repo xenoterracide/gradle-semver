@@ -117,7 +117,8 @@ public class SemverExtension implements Provides<Semver> {
 
     var currentBranch = gitMetadata.branch();
     var headBranch = originOpt.map(SemverExtension::getHeadBranchName).orElse(null);
-    var isHeadBranch = currentBranch != null && currentBranch.equals(headBranch);
+    // When there's no HEAD branch configured (headBranch is null), treat current branch as HEAD
+    var isHeadBranch = headBranch == null || Objects.equals(currentBranch, headBranch);
 
     // Calculate distance from merge base for topic branches
     var distanceFromMergeBase = calculateDistanceFromMergeBase(gitMetadata, gitExt, originOpt, isHeadBranch);

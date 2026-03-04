@@ -39,18 +39,21 @@ final class AfterTagTopicStrategy implements VersionStrategy {
       throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
     }
 
-    var distance = ctx.distanceFromMergeBase();
+    // Use distanceFromMergeBase for prerelease (to match 0.15.0 behavior)
+    // Use distanceFromTag for metadata (actual commits from tag)
+    var prereleaseDistance = ctx.distanceFromMergeBase();
+    var buildDistance = ctx.distanceFromTag();
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
     var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(Objects.requireNonNull(branchName, "branchName")),
-      distance,
+      buildDistance,
       Objects.requireNonNull(shortSha, "shortSha")
     );
     var metadata = appendDirtyMarker(baseMetadata, ctx);
 
-    return buildVersion(baseSemver, distance, metadata);
+    return buildVersion(baseSemver, prereleaseDistance, metadata);
   }
 
   private static Semver buildVersion(Semver baseSemver, long distance, String metadata) {
