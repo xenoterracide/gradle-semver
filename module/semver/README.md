@@ -56,22 +56,23 @@ The plugin uses a strategy pattern to determine the version based on git context
 
 ### Scenarios
 
-| Scenario                                        | HEAD Branch Output | Topic Branch Output                           |
-| ----------------------------------------------- | ------------------ | --------------------------------------------- |
-| **On exact tag**                                | `1.0.0`            | `1.0.0+branch.feature.git.0.abc123`           |
-| **After stable tag** (e.g., `v1.0.0`)           | `1.0.1-alpha.0.5`  | `1.0.1-alpha.0.3+branch.feature.git.3.abc123` |
-| **After pre-release tag** (e.g., `v1.0.0-rc.1`) | `1.0.0-rc.1.5`     | `1.0.0-rc.1.3+branch.feature.git.3.abc123`    |
-| **No tags in repo**                             | `0.0.1-alpha.0.5`  | `0.0.1-alpha.0.3+branch.feature.git.3.abc123` |
+| Scenario                                        | HEAD Branch Output             | Topic Branch Output                           |
+| ----------------------------------------------- | ------------------------------ | --------------------------------------------- |
+| **On exact tag**                                | `1.0.0`                        | `1.0.0+branch.feature.git.0.abc123`           |
+| **After stable tag** (e.g., `v1.0.0`)           | `1.0.1-alpha.0.5+git.5.abc123` | `1.0.1-alpha.0.3+branch.feature.git.5.abc123` |
+| **After pre-release tag** (e.g., `v1.0.0-rc.1`) | `1.0.0-rc.1.5+git.5.abc123`    | `1.0.0-rc.1.3+branch.feature.git.5.abc123`    |
+| **No tags in repo**                             | `0.0.1-alpha.0.5+git.5.abc123` | `0.0.1-alpha.0.3+branch.feature.git.3.abc123` |
 
 ### Key Behaviors
 
 1. **HEAD Branch vs Topic Branch**:
-   - On the HEAD branch (e.g., `main`, `develop`), versions are clean with no metadata
+   - On the HEAD branch (e.g., `main`, `develop`), versions include `+git.<distance>.<sha>` metadata
    - On topic branches, versions include `+branch.<name>.git.<distance>.<sha>` metadata
+   - On exact tags (any branch): Clean version without metadata
 
 2. **Distance Calculation**:
-   - HEAD branch: Distance from the nearest tag
-   - Topic branch: Distance from the merge base (commits on the topic branch only)
+   - **Prerelease distance**: For HEAD branch, distance from tag; for topic branch, distance from merge base
+   - **Metadata distance**: Always distance from the nearest tag (total commits)
 
 3. **Stable vs Pre-release Tags**:
    - After a stable tag (e.g., `v1.0.0`): Patch is incremented (`1.0.1-alpha...`)
@@ -82,8 +83,7 @@ The plugin uses a strategy pattern to determine the version based on git context
    - Example: `0.1.1-alpha.0.3+branch.feature.git.3.abc123.dirty`
 
 5. **No Tags**:
-   - Starts from `0.0.0` base
-   - Example: `0.0.1-alpha.0.5` (5 commits from initial commit)
+   - Starts from `0.0.0` base, resulting in `0.0.1-alpha...`
 
 ### Version Components
 
@@ -93,7 +93,10 @@ The plugin uses a strategy pattern to determine the version based on git context
 
 - **major.minor.patch**: From the nearest tag (or `0.0.0` if no tags)
 - **prerelease**: `alpha.0.<distance>` for stable tags, or `<tag-prerelease>.<distance>` for pre-release tags
-- **metadata**: `branch.<branch-name>.git.<distance>.<short-sha>` (topic branches only)
+- **metadata**:
+  - HEAD branch: `git.<distance>.<short-sha>`
+  - Topic branch: `branch.<branch-name>.git.<distance>.<short-sha>`
+  - Dirty: `.dirty` appended to metadata
 
 ## Tasks
 
