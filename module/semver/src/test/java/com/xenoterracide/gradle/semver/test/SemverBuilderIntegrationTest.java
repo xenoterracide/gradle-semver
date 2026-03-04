@@ -122,6 +122,11 @@ class SemverBuilderIntegrationTest {
         .asString()
         .isEqualTo("0.1.1-rc.1");
 
+      // Regression/assertion: when we are N commits past a prerelease tag, we must append that distance
+      // to the prerelease identifiers (rc.1.<N>) and include build metadata.
+      var v011Rc1BldV1 = supplies(commit(git), vs);
+      assertThat(v011Rc1BldV1.toString()).startsWith("0.1.1-rc.1.1+git.1.").matches(VERSION_PATTERN);
+
       git.tag().setName("v0.1.1").call();
 
       var v011 = vs.get();
