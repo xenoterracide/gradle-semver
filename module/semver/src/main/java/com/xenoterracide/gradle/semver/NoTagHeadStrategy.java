@@ -4,6 +4,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.google.common.base.MoreObjects;
 import org.semver4j.Semver;
 
 /**
@@ -32,7 +33,7 @@ final class NoTagHeadStrategy implements VersionStrategy {
     // On HEAD branch, distanceFromTag represents total commits (since there's no tag)
     var distance = this.ctx.distanceFromTag();
     var prerelease = String.format("alpha.0.%d", distance);
-    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
+    var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
     var metadata = String.format("git.%d.%s", distance, shortSha);
 
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);

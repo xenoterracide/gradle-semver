@@ -4,6 +4,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.google.common.base.MoreObjects;
 import org.semver4j.Semver;
 
 /**
@@ -40,8 +41,8 @@ final class OnExactTagTopicStrategy implements VersionStrategy {
     }
 
     // Add metadata to indicate we're on a topic branch at the tag
-    var branchName = this.ctx.currentBranch() != null ? this.ctx.currentBranch() : UNKNOWN;
-    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
+    var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
+    var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
     var baseMetadata = String.format("branch.%s.git.0.%s", sanitizeBranchName(branchName), shortSha);
     var metadata = appendDirtyMarker(baseMetadata, this.ctx);
 

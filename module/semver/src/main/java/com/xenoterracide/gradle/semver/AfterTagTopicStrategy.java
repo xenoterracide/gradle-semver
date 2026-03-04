@@ -4,6 +4,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.google.common.base.MoreObjects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.semver4j.Semver;
@@ -52,8 +53,8 @@ final class AfterTagTopicStrategy implements VersionStrategy {
   }
 
   private String buildMetadata() {
-    var branchName = this.ctx.currentBranch() != null ? this.ctx.currentBranch() : UNKNOWN;
-    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
+    var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
+    var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(branchName),
