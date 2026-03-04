@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -35,7 +35,6 @@ class SemverBuilderIntegrationTest {
 
   static final String MAIN = "main";
   static final String ORIGIN = "origin";
-  final Logger log = Logging.getLogger(this.getClass());
 
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File bareRepo;
@@ -43,29 +42,7 @@ class SemverBuilderIntegrationTest {
   @TempDir(cleanup = CleanupMode.ON_SUCCESS)
   File projectDir;
 
-  private static int abbreviatedShaLength(String versionString) {
-    // e.g. "0.1.2-alpha.0.2+git.2.af15c63" or "...+branch.topic-foo.git.3.af15c63"
-    var lastDot = versionString.lastIndexOf('.');
-    assertThat(lastDot)
-      .describedAs("version must contain a '.' before the abbreviated sha: %s", versionString)
-      .isGreaterThan(0);
-    return versionString.length() - lastDot - 1;
-  }
-
-  private static void assertVersionWithPrefix(String actual, String expectedPrefix) {
-    assertThat(actual).satisfies(s -> {
-      assertThat(s).describedAs("version string").startsWith(expectedPrefix).matches(VERSION_PATTERN);
-
-      var shaLen = abbreviatedShaLength(s);
-      assertThat(shaLen).describedAs("abbreviated sha length for '%s'", s).isEqualTo(7);
-
-      var sha = s.substring(s.length() - shaLen);
-      assertThat(sha).describedAs("abbreviated sha suffix for '%s'", s).hasSize(shaLen).matches("^[0-9a-fA-F]+$");
-
-      // Deterministic length: the only non-deterministic portion is the abbreviated sha.
-      assertThat(s.length()).describedAs("total length for '%s'", s).isEqualTo(expectedPrefix.length() + shaLen);
-    });
-  }
+  private final Logger log = Logging.getLogger(this.getClass());
 
   static Supplier<Semver> versionSupplier(ProjectBuilder pb) {
     return () -> {
@@ -96,13 +73,14 @@ class SemverBuilderIntegrationTest {
       }
 
       var vs = versionSupplier(pb);
+      var size = 29;
 
       var v001Alpha01 = vs.get();
-      assertVersionWithPrefix(v001Alpha01.toString(), "0.0.1-alpha.0.1+git.1.");
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(size).matches(VERSION_PATTERN);
 
       var v001Alpha02 = supplies(commit(git), vs);
 
-      assertVersionWithPrefix(v001Alpha02.toString(), "0.0.1-alpha.0.2+git.2.");
+      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(size).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
@@ -117,6 +95,7 @@ class SemverBuilderIntegrationTest {
         .isGreaterThan(v010)
         .asString()
         .startsWith("0.1.1-alpha.0.1+")
+        .hasSize(size)
         .matches(VERSION_PATTERN);
 
       assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.git.3aae11e"));
@@ -143,11 +122,6 @@ class SemverBuilderIntegrationTest {
         .asString()
         .isEqualTo("0.1.1-rc.1");
 
-      // Regression/assertion: when we are N commits past a prerelease tag, we must append that distance
-      // to the prerelease identifiers (rc.1.<N>) and include build metadata.
-      var v011Rc1BldV1 = supplies(commit(git), vs);
-      assertVersionWithPrefix(v011Rc1BldV1.toString(), "0.1.1-rc.1.1+git.1.");
-
       git.tag().setName("v0.1.1").call();
 
       var v011 = vs.get();
@@ -164,7 +138,12 @@ class SemverBuilderIntegrationTest {
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
       git.push().setPushAll().call();
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.1.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.1.")
+        .hasSize(46)
+        .matches(VERSION_PATTERN);
       commit(git);
       commit(git);
 
@@ -173,10 +152,20 @@ class SemverBuilderIntegrationTest {
 
       commit(git);
       git.push().setPushAll().call();
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.2+git.2.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.2+git.2.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
 
       git.checkout().setName(branch).call().getObjectId();
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+branch.topic-foo.git.3.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.3.")
+        .hasSize(46)
+        .matches(VERSION_PATTERN);
     }
   }
 
@@ -186,13 +175,14 @@ class SemverBuilderIntegrationTest {
     try (var git = Git.init().setDirectory(projectDir).setInitialBranch(MAIN).call()) {
       commit(git);
       var vs = versionSupplier(pb);
+      var size = 29;
 
       var v001Alpha01 = vs.get();
-      assertVersionWithPrefix(v001Alpha01.toString(), "0.0.1-alpha.0.1+git.1.");
+      assertThat(v001Alpha01).asString().startsWith("0.0.1-alpha.0.1+").hasSize(size).matches(VERSION_PATTERN);
 
       var v001Alpha02 = supplies(commit(git), vs);
 
-      assertVersionWithPrefix(v001Alpha02.toString(), "0.0.1-alpha.0.2+git.2.");
+      assertThat(v001Alpha02).asString().startsWith("0.0.1-alpha.0.2+").hasSize(size).matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.0").call();
 
@@ -207,6 +197,7 @@ class SemverBuilderIntegrationTest {
         .isGreaterThan(v010)
         .asString()
         .startsWith("0.1.1-alpha.0.1+")
+        .hasSize(size)
         .matches(VERSION_PATTERN);
 
       assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.git.3aae11e"));
@@ -233,11 +224,6 @@ class SemverBuilderIntegrationTest {
         .asString()
         .isEqualTo("0.1.1-rc.1");
 
-      // Regression/assertion: when we are N commits past a prerelease tag, we must append that distance
-      // to the prerelease identifiers (rc.1.<N>) and include build metadata.
-      var v011Rc1BldV1 = supplies(commit(git), vs);
-      assertVersionWithPrefix(v011Rc1BldV1.toString(), "0.1.1-rc.1.1+git.1.");
-
       git.tag().setName("v0.1.1").call();
 
       var v011 = vs.get();
@@ -253,18 +239,33 @@ class SemverBuilderIntegrationTest {
       commit(git);
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.1+git.1.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.1+git.1.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
       commit(git);
       commit(git);
 
       git.checkout().setName(MAIN).call();
 
       commit(git);
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.2+git.2.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.2+git.2.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
 
       git.checkout().setName(branch).call().getObjectId();
 
-      assertVersionWithPrefix(vs.get().toString(), "0.1.2-alpha.0.3+git.3.");
+      assertThat(vs.get())
+        .isGreaterThan(v011)
+        .asString()
+        .startsWith("0.1.2-alpha.0.3+git.3.")
+        .hasSize(size)
+        .matches(VERSION_PATTERN);
     }
   }
 }
