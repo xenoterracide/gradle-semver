@@ -35,12 +35,12 @@ final class VersionStrategyFactory {
     VersionStrategy strategy;
     if (hasTag) {
       if (onExactTag) {
-        strategy = isHeadBranch ? new OnExactTagHeadStrategy() : new OnExactTagTopicStrategy();
+        strategy = isHeadBranch ? new OnExactTagHeadStrategy(ctx) : new OnExactTagTopicStrategy(ctx);
       } else {
-        strategy = isHeadBranch ? new AfterTagHeadStrategy() : new AfterTagTopicStrategy();
+        strategy = isHeadBranch ? new AfterTagHeadStrategy(ctx) : new AfterTagTopicStrategy(ctx);
       }
     } else {
-      strategy = isHeadBranch ? new NoTagHeadStrategy() : new NoTagTopicStrategy();
+      strategy = isHeadBranch ? new NoTagHeadStrategy(ctx) : new NoTagTopicStrategy(ctx);
     }
     return strategy;
   }
@@ -53,6 +53,6 @@ final class VersionStrategyFactory {
    */
   public static Semver calculate(GitContext ctx) {
     var strategy = determineStrategy(ctx);
-    return strategy.calculate(ctx);
+    return strategy.calculate();
   }
 }

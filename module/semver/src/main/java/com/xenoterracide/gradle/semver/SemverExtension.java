@@ -198,7 +198,7 @@ public class SemverExtension implements Provides<Semver> {
 
     var semverProvider = gitContextProvider.map(ctx -> {
       var strategy = VersionStrategyFactory.determineStrategy(ctx);
-      var version = strategy.calculate(ctx);
+      var version = strategy.calculate();
       Logging.getLogger(SemverExtension.class).info(
         "semver {} {} (strategy: {})",
         projectName,

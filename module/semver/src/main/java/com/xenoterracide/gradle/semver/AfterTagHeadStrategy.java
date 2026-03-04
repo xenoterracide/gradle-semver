@@ -23,8 +23,14 @@ final class AfterTagHeadStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
 
+  private final GitContext ctx;
+
+  AfterTagHeadStrategy(GitContext ctx) {
+    this.ctx = ctx;
+  }
+
   @Override
-  public Semver calculate(GitContext ctx) {
+  public Semver calculate() {
     var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagHeadStrategy requires a tag but baseVersion is null");
@@ -38,7 +44,7 @@ final class AfterTagHeadStrategy implements VersionStrategy {
     var distance = ctx.distanceFromTag();
     var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
     var metadata = String.format("git.%d.%s", distance, shortSha);
-    var metadataWithDirty = appendDirtyMarker(metadata, ctx);
+    var metadataWithDirty = appendDirtyMarker(metadata, this.ctx);
 
     return calculateVersion(semver, distance).withBuild(metadataWithDirty);
   }

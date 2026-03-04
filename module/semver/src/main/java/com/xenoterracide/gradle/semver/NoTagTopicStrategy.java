@@ -18,22 +18,27 @@ import org.semver4j.Semver;
 final class NoTagTopicStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
+  private final GitContext ctx;
+
+  NoTagTopicStrategy(GitContext ctx) {
+    this.ctx = ctx;
+  }
 
   @Override
-  public Semver calculate(GitContext ctx) {
+  public Semver calculate() {
     // Start from 0.0.0
     // Prerelease uses distance from merge base (commits on topic branch)
     // Metadata includes branch name and distance
-    var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
-    var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
-    var prerelease = String.format("alpha.0.%d", ctx.distanceFromMergeBase());
+    var branchName = this.ctx.currentBranch() != null ? this.ctx.currentBranch() : UNKNOWN;
+    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
+    var prerelease = String.format("alpha.0.%d", this.ctx.distanceFromMergeBase());
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(branchName),
-      ctx.distanceFromMergeBase(),
+      this.ctx.distanceFromMergeBase(),
       shortSha
     );
-    var metadata = appendDirtyMarker(baseMetadata, ctx);
+    var metadata = appendDirtyMarker(baseMetadata, this.ctx);
 
     // Topic branch uses same base version as HEAD (0.0.1)
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);

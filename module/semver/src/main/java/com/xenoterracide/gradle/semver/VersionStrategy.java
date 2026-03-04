@@ -25,10 +25,9 @@ public sealed interface VersionStrategy
   /**
    * Calculates the semantic version for this strategy.
    *
-   * @param ctx the git context
    * @return the calculated semantic version
    */
-  Semver calculate(GitContext ctx);
+  Semver calculate();
 
   /**
    * Sanitizes a branch name for use in version metadata.

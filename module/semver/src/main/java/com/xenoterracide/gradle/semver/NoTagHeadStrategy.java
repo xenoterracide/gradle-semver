@@ -20,13 +20,19 @@ final class NoTagHeadStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
 
+  private final GitContext ctx;
+
+  NoTagHeadStrategy(GitContext ctx) {
+    this.ctx = ctx;
+  }
+
   @Override
-  public Semver calculate(GitContext ctx) {
+  public Semver calculate() {
     // Start from 0.0.0, add prerelease with total commits
     // On HEAD branch, distanceFromTag represents total commits (since there's no tag)
-    var distance = ctx.distanceFromTag();
+    var distance = this.ctx.distanceFromTag();
     var prerelease = String.format("alpha.0.%d", distance);
-    var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
+    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
     var metadata = String.format("git.%d.%s", distance, shortSha);
 
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);

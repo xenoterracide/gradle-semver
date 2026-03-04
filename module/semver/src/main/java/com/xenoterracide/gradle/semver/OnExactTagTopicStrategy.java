@@ -21,24 +21,29 @@ import org.semver4j.Semver;
 final class OnExactTagTopicStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
+  private final GitContext ctx;
+
+  OnExactTagTopicStrategy(GitContext ctx) {
+    this.ctx = ctx;
+  }
 
   @Override
-  public Semver calculate(GitContext ctx) {
-    var baseVersion = ctx.baseVersion();
+  public Semver calculate() {
+    var baseVersion = this.ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("OnExactTagTopicStrategy requires a tag but baseVersion is null");
     }
 
     var semver = Semver.parse(baseVersion);
     if (semver == null) {
-      throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
+      throw new IllegalStateException("Invalid tag format: " + this.ctx.nearestTag());
     }
 
     // Add metadata to indicate we're on a topic branch at the tag
-    var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
-    var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
+    var branchName = this.ctx.currentBranch() != null ? this.ctx.currentBranch() : UNKNOWN;
+    var shortSha = this.ctx.shortSha() != null ? this.ctx.shortSha() : UNKNOWN;
     var baseMetadata = String.format("branch.%s.git.0.%s", sanitizeBranchName(branchName), shortSha);
-    var metadata = appendDirtyMarker(baseMetadata, ctx);
+    var metadata = appendDirtyMarker(baseMetadata, this.ctx);
 
     return semver.withBuild(metadata);
   }

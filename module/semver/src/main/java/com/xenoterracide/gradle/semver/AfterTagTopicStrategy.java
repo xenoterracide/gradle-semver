@@ -26,14 +26,20 @@ final class AfterTagTopicStrategy implements VersionStrategy {
 
   private static final String UNKNOWN = "unknown";
 
+  private final GitContext ctx;
+
+  AfterTagTopicStrategy(GitContext ctx) {
+    this.ctx = ctx;
+  }
+
   @Override
-  public Semver calculate(GitContext ctx) {
-    var baseSemver = parseBaseVersion(ctx);
-    var metadata = this.buildMetadata(ctx);
+  public Semver calculate() {
+    var baseSemver = parseBaseVersion();
+    var metadata = this.buildMetadata();
     return buildVersion(baseSemver, ctx.distanceFromMergeBase(), metadata);
   }
 
-  private static Semver parseBaseVersion(GitContext ctx) {
+  private Semver parseBaseVersion() {
     var baseVersion = ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("AfterTagTopicStrategy requires a tag but baseVersion is null");
@@ -45,7 +51,7 @@ final class AfterTagTopicStrategy implements VersionStrategy {
     return semver;
   }
 
-  private String buildMetadata(GitContext ctx) {
+  private String buildMetadata() {
     var branchName = ctx.currentBranch() != null ? ctx.currentBranch() : UNKNOWN;
     var shortSha = ctx.shortSha() != null ? ctx.shortSha() : UNKNOWN;
     var baseMetadata = String.format(
@@ -54,7 +60,7 @@ final class AfterTagTopicStrategy implements VersionStrategy {
       ctx.distanceFromTag(),
       shortSha
     );
-    return this.appendDirtyMarker(baseMetadata, ctx);
+    return this.appendDirtyMarker(baseMetadata, this.ctx);
   }
 
   private static Semver buildVersion(Semver baseSemver, long distance, String metadata) {

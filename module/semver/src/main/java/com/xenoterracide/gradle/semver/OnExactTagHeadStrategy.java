@@ -18,16 +18,22 @@ import org.semver4j.Semver;
  */
 final class OnExactTagHeadStrategy implements VersionStrategy {
 
+  private final GitContext ctx;
+
+  OnExactTagHeadStrategy(GitContext ctx) {
+    this.ctx = ctx;
+  }
+
   @Override
-  public Semver calculate(GitContext ctx) {
-    var baseVersion = ctx.baseVersion();
+  public Semver calculate() {
+    var baseVersion = this.ctx.baseVersion();
     if (baseVersion == null) {
       throw new IllegalStateException("OnExactTagHeadStrategy requires a tag but baseVersion is null");
     }
 
     var semver = Semver.parse(baseVersion);
     if (semver == null) {
-      throw new IllegalStateException("Invalid tag format: " + ctx.nearestTag());
+      throw new IllegalStateException("Invalid tag format: " + this.ctx.nearestTag());
     }
 
     // On exact tag on HEAD branch: pure version without any suffixes
