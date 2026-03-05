@@ -12,7 +12,7 @@ import org.semver4j.Semver;
  * for a particular git scenario.
  */
 // CHECKSTYLE.OFF: LeftCurly
-public sealed interface VersionStrategy
+sealed interface VersionStrategy
   permits
     OnExactTagHeadStrategy,
     OnExactTagTopicStrategy,
