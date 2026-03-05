@@ -28,11 +28,11 @@ final class NoTagTopicStrategy implements VersionStrategy {
   @Override
   public Semver calculate() {
     // Start from 0.0.0
-    // Prerelease uses distance from merge base (commits on topic branch)
-    // Metadata includes branch name and distance
+    // Prerelease uses distance from tag (total commits, like HEAD branch)
+    // Metadata uses distance from merge base (commits on topic branch only)
     var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
     var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
-    var prerelease = String.format("alpha.0.%d", this.ctx.distanceFromMergeBase());
+    var prerelease = String.format("alpha.0.%d", this.ctx.distanceFromTag());
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(branchName),

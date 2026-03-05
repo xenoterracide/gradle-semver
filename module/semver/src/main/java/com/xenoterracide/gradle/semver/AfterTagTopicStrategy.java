@@ -16,14 +16,14 @@ import org.semver4j.Semver;
  * <p>Examples (v1.0.0 was 5 commits ago on main):</p>
  * <ul>
  *   <li>3 commits on feature-x branch (branched from main) →
- *       {@code 1.0.1-alpha.0.3+branch.feature-x.git.8.abc123}
- *       (prerelease: 3 commits on branch; metadata: 8 total commits from tag)</li>
+ *       {@code 1.0.1-alpha.0.5+branch.feature-x.git.3.abc123}
+ *       (prerelease: 5 total from tag, like HEAD branch; metadata: 3 commits on branch)</li>
  *   <li>1 commit on feature-x after v0.1.1-rc.1 →
  *       {@code 0.1.1-rc.1.1+branch.feature-x.git.1.abc123}</li>
  * </ul>
  *
- * <p>The prerelease uses distance from merge base (commits on topic branch only),
- * while metadata includes branch name and total distance from tag (for traceability).</p>
+ * <p>The prerelease uses distance from tag (same as HEAD branch would),
+ * while metadata uses distance from merge base (commits on topic branch only).</p>
  */
 final class AfterTagTopicStrategy implements VersionStrategy {
 
@@ -39,7 +39,8 @@ final class AfterTagTopicStrategy implements VersionStrategy {
   public Semver calculate() {
     var baseSemver = this.parseBaseVersion();
     var metadata = this.buildMetadata();
-    return buildVersion(baseSemver, this.ctx.distanceFromMergeBase(), metadata);
+    // Prerelease uses distance from tag (HEAD branch style), metadata uses distance from merge base
+    return buildVersion(baseSemver, this.ctx.distanceFromTag(), metadata);
   }
 
   private Semver parseBaseVersion() {
@@ -57,11 +58,11 @@ final class AfterTagTopicStrategy implements VersionStrategy {
   private String buildMetadata() {
     var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
     var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
-    // Metadata shows total distance from tag (for traceability to tag)
+    // Metadata shows distance from merge base (commits on topic branch only)
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(branchName),
-      this.ctx.distanceFromTag(),
+      this.ctx.distanceFromMergeBase(),
       shortSha
     );
     return this.appendDirtyMarker(baseMetadata, this.ctx);

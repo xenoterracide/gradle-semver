@@ -151,6 +151,7 @@ class SpecIntegrationTest {
         .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.1.")
         .hasSize(46)
         .matches(VERSION_PATTERN);
+      // 2 more commits on topic branch
       commit(git);
       commit(git);
 
@@ -170,7 +171,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.3.")
+        .startsWith("0.1.2-alpha.0.3+branch.topic-foo.git.1.")
         .hasSize(46)
         .matches(VERSION_PATTERN);
 
@@ -188,9 +189,9 @@ class SpecIntegrationTest {
       commit(git);
       git.push().setPushAll().call();
       var v020Rc1BldV1 = vs.get();
-      // prerelease uses distance from merge base (0), metadata uses distance from tag (1)
+      // prerelease uses distance from tag (1), metadata uses distance from merge base (0)
       assertThat(v020Rc1BldV1.toString())
-        .startsWith("0.2.0-rc.1.0+branch.topic-prerelease-test.git.1.")
+        .startsWith("0.2.0-rc.1.1+branch.topic-prerelease-test.git.0.")
         .matches(VERSION_PATTERN);
     }
   }
