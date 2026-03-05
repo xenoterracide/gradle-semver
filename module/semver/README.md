@@ -106,7 +106,7 @@ Prints the semantic version computed by the `com.xenoterracide.gradle.semver` pl
 
 - Output is always a single line.
 - This value is derived from git metadata (tags, distance, branch, dirty status), _not_ from `project.version`.
-- In a repo without a usable git history/tag, it falls back to `0.0.0-alpha.0.0`.
+- In a repo without a usable git history/tag, it falls back to `0.0.0`.
 
 Examples:
 
@@ -124,14 +124,14 @@ Prints `project.version`.
 
 This task is intentionally conservative because end users may or may not assign a value to `project.version`.
 
-- If `project.version` is unset (Gradle's default `unspecified`), the task prints **nothing** (just a newline).
+- If `project.version` is unset (Gradle's default `unspecified`), the task prints **nothing** (no output).
 - If `project.version` is set, it prints that value.
 
 For scripting, you usually want `--quiet`:
 
 ```sh
 ./gradlew version --quiet
-# (prints a newline only when project.version is unset)
+# (prints nothing when project.version is unset)
 
 ./gradlew -Pversion=1.2.3 version --quiet
 # 1.2.3

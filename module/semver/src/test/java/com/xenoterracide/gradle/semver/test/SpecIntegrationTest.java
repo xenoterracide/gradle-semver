@@ -263,7 +263,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.1+")
+        .startsWith("0.1.2-alpha.0.1+git.")
         .hasSize(size)
         .matches(VERSION_PATTERN);
 
@@ -285,7 +285,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.3+")
+        .startsWith("0.1.2-alpha.0.3+git.")
         .hasSize(size)
         .matches(VERSION_PATTERN);
     }
