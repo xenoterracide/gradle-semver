@@ -99,6 +99,9 @@ class SpecIntegrationTest {
         .hasSize(size)
         .matches(VERSION_PATTERN);
 
+      // Verify Semver comparison ignores build metadata (SHA doesn't affect equality)
+      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+git.1.0000000"));
+
       var v010BldV3 = supplies(commit(git), vs);
 
       assertThat(v010BldV3)
@@ -222,6 +225,9 @@ class SpecIntegrationTest {
         .startsWith("0.1.1-alpha.0.1+")
         .hasSize(size)
         .matches(VERSION_PATTERN);
+
+      // Verify Semver comparison ignores build metadata (SHA doesn't affect equality)
+      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+git.1.0000000"));
 
       var v010BldV3 = supplies(commit(git), vs);
 
