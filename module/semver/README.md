@@ -63,16 +63,24 @@ The plugin uses a strategy pattern to determine the version based on git context
 | **After pre-release tag** (e.g., `v1.0.0-rc.1`) | `1.0.0-rc.1.5+git.5.abc123`    | `1.0.0-rc.1.5+branch.feature.git.3.abc123`    |
 | **No tags in repo**                             | `0.0.1-alpha.0.5+git.5.abc123` | `0.0.1-alpha.0.5+branch.feature.git.3.abc123` |
 
+### Terminology
+
+- **HEAD branch**: The default branch of the remote (e.g., `main`, `develop`, `master`).
+  See [`git remote set-head`](https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-emset-headem).
+- **Merge base**: The best common ancestor between two commits (where the topic branch diverged).
+  See [`git merge-base`](https://git-scm.com/docs/git-merge-base).
+- **Distance**: Number of commits between two points (computed via `git rev-list --count`).
+
 ### Key Behaviors
 
 1. **HEAD Branch vs Topic Branch**:
-   - On the HEAD branch (e.g., `main`, `develop`), versions include `+git.<distance>.<sha>` metadata
-   - On topic branches, versions include `+branch.<name>.git.<distance>.<sha>` metadata
-   - On exact tags (any branch): Clean version without metadata
+   - On the HEAD branch, versions include `+git.<distance>.<sha>` [build metadata](https://semver.org/#spec-item-10)
+   - On topic branches, versions include `+branch.<name>.git.<distance>.<sha>` build metadata
+   - On exact tags (any branch): Clean version without build metadata
 
 2. **Distance Calculation**:
    - **Prerelease distance**: Distance from tag (same for HEAD and topic branches)
-   - **Metadata distance**: For HEAD branch, distance from tag; for topic branch, distance from merge base
+   - **Build metadata distance**: For HEAD branch, distance from tag; for topic branch, distance from merge base
 
 3. **Stable vs Pre-release Tags**:
    - After a stable tag (e.g., `v1.0.0`): Patch is incremented (`1.0.1-alpha...`)

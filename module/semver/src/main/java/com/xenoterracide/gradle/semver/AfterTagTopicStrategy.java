@@ -11,13 +11,15 @@ import java.util.stream.Stream;
 import org.semver4j.Semver;
 
 /**
- * Strategy: HEAD is after a tag, on a topic branch (not HEAD branch).
+ * Strategy: HEAD is after a tag, on a topic branch (not the
+ * <a href="https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-emset-headem">HEAD branch</a>).
  *
  * <p>Examples (v1.0.0 was 5 commits ago on main):</p>
  * <ul>
  *   <li>3 commits on feature-x branch (branched from main) →
  *       {@code 1.0.1-alpha.0.5+branch.feature-x.git.3.abc123}
- *       (prerelease: 5 total from tag, like HEAD branch; metadata: 3 commits on branch)</li>
+ *       (prerelease: 5 total from tag, like HEAD branch;
+ *       metadata: 3 commits since <a href="https://git-scm.com/docs/git-merge-base">merge base</a>)</li>
  *   <li>1 commit on feature-x after v0.1.1-rc.1 →
  *       {@code 0.1.1-rc.1.1+branch.feature-x.git.1.abc123}</li>
  * </ul>

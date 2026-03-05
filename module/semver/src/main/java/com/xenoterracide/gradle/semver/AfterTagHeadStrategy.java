@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 import org.semver4j.Semver;
 
 /**
- * Strategy: HEAD is after a tag (distance > 0), on the HEAD branch (main/develop).
+ * Strategy: HEAD is after a tag (distance > 0), on the
+ * <a href="https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-emset-headem">HEAD branch</a>
+ * (e.g., main, develop).
  *
  * <p>Examples:</p>
  * <ul>

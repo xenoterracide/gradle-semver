@@ -8,7 +8,8 @@ import com.google.common.base.MoreObjects;
 import org.semver4j.Semver;
 
 /**
- * Strategy: No tags exist in the repository, on the HEAD branch.
+ * Strategy: No tags exist in the repository, on the
+ * <a href="https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-emset-headem">HEAD branch</a>.
  *
  * <p>Examples:</p>
  * <ul>

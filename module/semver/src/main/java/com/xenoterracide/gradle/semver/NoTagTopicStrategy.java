@@ -8,12 +8,15 @@ import com.google.common.base.MoreObjects;
 import org.semver4j.Semver;
 
 /**
- * Strategy: No tags exist in the repository, on a topic branch.
+ * Strategy: No tags exist in the repository, on a topic branch (not the
+ * <a href="https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-emset-headem">HEAD branch</a>).
  *
  * <p>Examples:</p>
  * <ul>
  *   <li>New repo with 5 commits on main, feature-x branched
- *       with 2 new commits → {@code 0.0.1-alpha.0.2+branch.feature-x.git.2.abc123}</li>
+ *       with 2 new commits → {@code 0.0.1-alpha.0.5+branch.feature-x.git.2.abc123}
+ *       (prerelease: 5 total commits, like HEAD branch;
+ *       metadata: 2 commits since <a href="https://git-scm.com/docs/git-merge-base">merge base</a>)</li>
  * </ul>
  */
 final class NoTagTopicStrategy implements VersionStrategy {

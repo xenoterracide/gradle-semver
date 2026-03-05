@@ -9,10 +9,11 @@ import com.xenoterracide.tools.java.util.ObjectTools;
 import org.semver4j.Semver;
 
 /**
- * Strategy: HEAD is exactly on a tag, but we're on a topic branch.
+ * Strategy: HEAD is exactly on a tag, but we're on a topic branch (not the
+ * <a href="https://git-scm.com/docs/git-remote#Documentation/git-remote.txt-emset-headem">HEAD branch</a>).
  *
  * <p>This can happen if a topic branch is created but has no new commits
- * beyond the tag. The metadata indicates we're on a topic branch for
+ * beyond the tag. The build metadata indicates we're on a topic branch for
  * traceability.</p>
  *
  * <p>Examples:</p>
