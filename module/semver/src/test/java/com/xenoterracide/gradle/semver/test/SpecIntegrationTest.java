@@ -171,6 +171,25 @@ class SpecIntegrationTest {
         .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.3.")
         .hasSize(46)
         .matches(VERSION_PATTERN);
+
+      // Regression test: prerelease tag on topic branch should extend prerelease, not replace
+      // Create tag on main, then create new branch from that point
+      git.checkout().setName(MAIN).call();
+      commit(git);
+      git.tag().setName("v0.2.0-rc.1").call();
+      git.push().setPushAll().call();
+      var v020Rc1 = vs.get();
+      assertThat(v020Rc1).asString().isEqualTo("0.2.0-rc.1");
+
+      var prBranch = "topic/prerelease-test";
+      git.checkout().setCreateBranch(true).setName(prBranch).call();
+      commit(git);
+      git.push().setPushAll().call();
+      var v020Rc1BldV1 = vs.get();
+      // Note: prerelease uses distance from merge base (0 for first commit), metadata uses tag distance (1)
+      assertThat(v020Rc1BldV1.toString())
+        .startsWith("0.2.0-rc.1.0+branch.topic-prerelease-test.git.1.")
+        .matches(VERSION_PATTERN);
     }
   }
 
@@ -250,6 +269,7 @@ class SpecIntegrationTest {
         .startsWith("0.1.2-alpha.0.1+git.1.")
         .hasSize(size)
         .matches(VERSION_PATTERN);
+
       commit(git);
       commit(git);
 
