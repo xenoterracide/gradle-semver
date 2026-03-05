@@ -123,7 +123,7 @@ Examples:
 # 0.1.0
 
 ./gradlew semverVersion --quiet
-# 0.0.0-alpha.0.0
+# 0.0.0
 ```
 
 ### `./gradlew version`
