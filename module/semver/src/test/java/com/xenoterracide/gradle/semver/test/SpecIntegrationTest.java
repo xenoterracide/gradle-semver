@@ -267,10 +267,11 @@ class SpecIntegrationTest {
       commit(git);
       var branch = "topic/foo";
       git.checkout().setCreateBranch(true).setName(branch).call();
+      // Without remote HEAD, topic branch is treated as HEAD branch
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.1+git.")
+        .startsWith("0.1.2-alpha.0.1+git.1.")
         .hasSize(size)
         .matches(VERSION_PATTERN);
 
@@ -283,7 +284,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.2+")
+        .startsWith("0.1.2-alpha.0.2+git.2.")
         .hasSize(size)
         .matches(VERSION_PATTERN);
 
