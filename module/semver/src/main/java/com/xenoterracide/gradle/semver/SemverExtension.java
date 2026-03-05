@@ -13,7 +13,6 @@ import com.xenoterracide.gradle.git.Provides;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.eclipse.jgit.lib.Constants;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
@@ -36,6 +35,14 @@ public class SemverExtension implements Provides<Semver> {
   // CHECKSTYLE.ON: FinalClass
 
   private static final String UNKNOWN = "unknown";
+
+  /**
+   * Prefix for remote refs, copied from org.eclipse.jgit.lib.Constants.R_REMOTES.
+   * Using our own constant avoids a direct dependency on JGit in this module.
+   *
+   * @see <a href="https://github.com/eclipse-jgit/jgit">JGit</a>
+   */
+  private static final String R_REMOTES = "refs/remotes/";
 
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
@@ -84,7 +91,7 @@ public class SemverExtension implements Provides<Semver> {
       return null;
     }
     // Convert refs/remotes/origin/main -> main
-    var prefix = Constants.R_REMOTES + origin.name() + "/";
+    var prefix = R_REMOTES + origin.name() + "/";
     if (headBranchRef.startsWith(prefix)) {
       return headBranchRef.substring(prefix.length());
     }

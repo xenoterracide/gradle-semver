@@ -18,10 +18,8 @@ dependencies {
   api(libs.semver)
   api(projects.git)
   compileOnlyApi(libs.jspecify)
-  implementation(libs.jgit)
   implementation(libs.java.tools)
   implementation(libs.guava)
-  shadow(libs.jgit)
   shadow(libs.java.tools)
   shadow(libs.guava)
 
@@ -41,11 +39,9 @@ tasks.withType<SpotBugsTask>().configureEach {
 
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
-  relocate("org.eclipse.jgit", "com.xenoterracide.gradle.semver.jgit")
   relocate("com.xenoterracide.tools", "com.xenoterracide.gradle.semver.tools")
   relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
   dependencies {
-    include { it.moduleGroup == "org.eclipse.jgit" }
     include { it.moduleGroup == "com.xenoterracide" && it.moduleName == "tools" }
     include { it.moduleGroup == "com.google.guava" }
   }
