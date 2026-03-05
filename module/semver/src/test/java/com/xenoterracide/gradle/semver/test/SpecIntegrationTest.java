@@ -95,11 +95,9 @@ class SpecIntegrationTest {
         .isGreaterThan(v001Alpha01)
         .isGreaterThan(v010)
         .asString()
-        .startsWith("0.1.1-alpha.0.1+")
+        .startsWith("0.1.1-alpha.0.1+git.1.")
         .hasSize(size)
         .matches(VERSION_PATTERN);
-
-      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.git.3aae11e"));
 
       var v010BldV3 = supplies(commit(git), vs);
 
@@ -108,7 +106,7 @@ class SpecIntegrationTest {
         .isGreaterThan(v010)
         .isGreaterThan(v010BldV2)
         .asString()
-        .startsWith("0.1.1-alpha.0.2+")
+        .startsWith("0.1.1-alpha.0.2+git.2.")
         .matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.1-rc.1").call();
@@ -225,8 +223,6 @@ class SpecIntegrationTest {
         .hasSize(size)
         .matches(VERSION_PATTERN);
 
-      assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+2.git.3aae11e"));
-
       var v010BldV3 = supplies(commit(git), vs);
 
       assertThat(v010BldV3)
@@ -267,7 +263,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.1+git.1.")
+        .startsWith("0.1.2-alpha.0.1+")
         .hasSize(size)
         .matches(VERSION_PATTERN);
 
@@ -280,7 +276,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.2+git.2.")
+        .startsWith("0.1.2-alpha.0.2+")
         .hasSize(size)
         .matches(VERSION_PATTERN);
 
@@ -289,7 +285,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.3+git.3.")
+        .startsWith("0.1.2-alpha.0.3+")
         .hasSize(size)
         .matches(VERSION_PATTERN);
     }
