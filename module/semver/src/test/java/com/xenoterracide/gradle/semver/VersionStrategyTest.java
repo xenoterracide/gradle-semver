@@ -66,8 +66,8 @@ class VersionStrategyTest {
   void afterTagTopicStrategy() {
     var ctx = createContext("v1.0.0", 5, false, "feature-x", "main", false, 2, "abc1234", "fullsha", false, false);
     var version = new AfterTagTopicStrategy(ctx).calculate();
-    // Both prerelease and metadata use merge base distance (2)
-    assertThat(version.toString()).startsWith("1.0.1-alpha.0.2+branch.feature-x.git.2.");
+    // prerelease uses merge base distance (2), metadata uses tag distance (5)
+    assertThat(version.toString()).startsWith("1.0.1-alpha.0.2+branch.feature-x.git.5.");
   }
 
   @Test
@@ -81,8 +81,8 @@ class VersionStrategyTest {
   void afterPrereleaseTagTopicStrategy() {
     var ctx = createContext("v1.0.0-rc.1", 3, false, "feature-x", "main", false, 1, "abc1234", "fullsha", false, false);
     var version = new AfterTagTopicStrategy(ctx).calculate();
-    // Both prerelease and metadata use merge base distance (1)
-    assertThat(version.toString()).startsWith("1.0.0-rc.1.1+branch.feature-x.git.1.");
+    // prerelease uses merge base distance (1), metadata uses tag distance (3)
+    assertThat(version.toString()).startsWith("1.0.0-rc.1.1+branch.feature-x.git.3.");
   }
 
   @Test
@@ -165,7 +165,7 @@ class VersionStrategyTest {
     var ctx = createContext("v1.0.0", 5, false, "feature-x", "main", false, 2, "abc1234", "fullsha", false, false);
     var strategy = VersionStrategyFactory.determineStrategy(ctx);
     assertThat(strategy).isInstanceOf(AfterTagTopicStrategy.class);
-    assertThat(strategy.calculate().toString()).startsWith("1.0.1-alpha.0.2+branch.feature-x.git.2.");
+    assertThat(strategy.calculate().toString()).startsWith("1.0.1-alpha.0.2+branch.feature-x.git.5.");
   }
 
   @Test

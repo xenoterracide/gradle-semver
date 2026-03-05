@@ -13,16 +13,17 @@ import org.semver4j.Semver;
 /**
  * Strategy: HEAD is after a tag, on a topic branch (not HEAD branch).
  *
- * <p>Examples:</p>
+ * <p>Examples (v1.0.0 was 5 commits ago on main):</p>
  * <ul>
- *   <li>3 commits on feature-x branch (branched from main 5 commits after v1.0.0) →
- *       {@code 1.0.1-alpha.0.3+branch.feature-x.git.3.abc123}</li>
+ *   <li>3 commits on feature-x branch (branched from main) →
+ *       {@code 1.0.1-alpha.0.3+branch.feature-x.git.8.abc123}
+ *       (prerelease: 3 commits on branch; metadata: 8 total commits from tag)</li>
  *   <li>1 commit on feature-x after v0.1.1-rc.1 →
  *       {@code 0.1.1-rc.1.1+branch.feature-x.git.1.abc123}</li>
  * </ul>
  *
- * <p>Both prerelease and metadata use distance from merge base (commits on topic branch only),
- * making it easy to see how many commits are on the branch at a glance.</p>
+ * <p>The prerelease uses distance from merge base (commits on topic branch only),
+ * while metadata includes branch name and total distance from tag (for traceability).</p>
  */
 final class AfterTagTopicStrategy implements VersionStrategy {
 
@@ -56,11 +57,11 @@ final class AfterTagTopicStrategy implements VersionStrategy {
   private String buildMetadata() {
     var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
     var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
-    // Metadata shows distance from merge base (commits on topic branch only)
+    // Metadata shows total distance from tag (for traceability to tag)
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",
       sanitizeBranchName(branchName),
-      this.ctx.distanceFromMergeBase(),
+      this.ctx.distanceFromTag(),
       shortSha
     );
     return this.appendDirtyMarker(baseMetadata, this.ctx);
