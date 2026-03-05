@@ -4,6 +4,7 @@
 
 package com.xenoterracide.gradle.semver;
 
+import com.xenoterracide.tools.java.util.ObjectTools;
 import org.semver4j.Semver;
 
 /**
@@ -26,10 +27,10 @@ final class OnExactTagHeadStrategy implements VersionStrategy {
 
   @Override
   public Semver calculate() {
-    var baseVersion = this.ctx.baseVersion();
-    if (baseVersion == null) {
-      throw new IllegalStateException("OnExactTagHeadStrategy requires a tag but baseVersion is null");
-    }
+    var baseVersion = ObjectTools.illegalStateNull(
+      this.ctx.baseVersion(),
+      "OnExactTagHeadStrategy requires a tag but baseVersion is null"
+    );
 
     var semver = Semver.parse(baseVersion);
     if (semver == null) {

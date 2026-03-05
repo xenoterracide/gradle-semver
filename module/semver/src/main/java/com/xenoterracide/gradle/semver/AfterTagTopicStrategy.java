@@ -5,6 +5,7 @@
 package com.xenoterracide.gradle.semver;
 
 import com.google.common.base.MoreObjects;
+import com.xenoterracide.tools.java.util.ObjectTools;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.semver4j.Semver;
@@ -41,10 +42,10 @@ final class AfterTagTopicStrategy implements VersionStrategy {
   }
 
   private Semver parseBaseVersion() {
-    var baseVersion = this.ctx.baseVersion();
-    if (baseVersion == null) {
-      throw new IllegalStateException("AfterTagTopicStrategy requires a tag but baseVersion is null");
-    }
+    var baseVersion = ObjectTools.illegalStateNull(
+      this.ctx.baseVersion(),
+      "AfterTagTopicStrategy requires a tag but baseVersion is null"
+    );
     var semver = Semver.parse(baseVersion);
     if (semver == null) {
       throw new IllegalStateException("Invalid tag format: " + this.ctx.nearestTag());
