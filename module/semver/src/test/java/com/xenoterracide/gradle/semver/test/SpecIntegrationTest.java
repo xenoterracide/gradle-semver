@@ -53,6 +53,7 @@ class SpecIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("checkstyle:JavaNCSS")
   void headBranch() throws Exception {
     var pb = ProjectBuilder.builder().withProjectDir(projectDir);
     Git.init().setDirectory(bareRepo).setInitialBranch(MAIN).setBare(true).call().close();
