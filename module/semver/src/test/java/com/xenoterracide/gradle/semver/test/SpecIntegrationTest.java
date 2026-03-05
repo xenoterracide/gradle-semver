@@ -27,7 +27,7 @@ import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.semver4j.Semver;
 
-class SemverBuilderIntegrationTest {
+class SpecIntegrationTest {
 
   static final Pattern VERSION_PATTERN = Pattern.compile(
     "^\\d+\\.\\d+\\.\\d+-\\p{Alpha}+\\.\\d+\\.\\d+\\+(branch\\.[\\p{Alnum}-]+\\.)?git\\.\\d+\\.\\p{XDigit}{7}$"
