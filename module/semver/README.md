@@ -59,8 +59,8 @@ The plugin uses a strategy pattern to determine the version based on git context
 | Scenario                                        | HEAD Branch Output             | Topic Branch Output                           |
 | ----------------------------------------------- | ------------------------------ | --------------------------------------------- |
 | **On exact tag**                                | `1.0.0`                        | `1.0.0+branch.feature.git.0.abc123`           |
-| **After stable tag** (e.g., `v1.0.0`)           | `1.0.1-alpha.0.5+git.5.abc123` | `1.0.1-alpha.0.3+branch.feature.git.5.abc123` |
-| **After pre-release tag** (e.g., `v1.0.0-rc.1`) | `1.0.0-rc.1.5+git.5.abc123`    | `1.0.0-rc.1.3+branch.feature.git.5.abc123`    |
+| **After stable tag** (e.g., `v1.0.0`)           | `1.0.1-alpha.0.5+git.5.abc123` | `1.0.1-alpha.0.3+branch.feature.git.3.abc123` |
+| **After pre-release tag** (e.g., `v1.0.0-rc.1`) | `1.0.0-rc.1.5+git.5.abc123`    | `1.0.0-rc.1.3+branch.feature.git.3.abc123`    |
 | **No tags in repo**                             | `0.0.1-alpha.0.5+git.5.abc123` | `0.0.1-alpha.0.3+branch.feature.git.3.abc123` |
 
 ### Key Behaviors
@@ -72,7 +72,7 @@ The plugin uses a strategy pattern to determine the version based on git context
 
 2. **Distance Calculation**:
    - **Prerelease distance**: For HEAD branch, distance from tag; for topic branch, distance from merge base
-   - **Metadata distance**: Always distance from the nearest tag (total commits)
+   - **Metadata distance**: For HEAD branch, distance from tag; for topic branch, distance from merge base (same as prerelease)
 
 3. **Stable vs Pre-release Tags**:
    - After a stable tag (e.g., `v1.0.0`): Patch is incremented (`1.0.1-alpha...`)
@@ -94,8 +94,8 @@ The plugin uses a strategy pattern to determine the version based on git context
 - **major.minor.patch**: From the nearest tag (or `0.0.0` if no tags)
 - **prerelease**: `alpha.0.<distance>` for stable tags, or `<tag-prerelease>.<distance>` for pre-release tags
 - **metadata**:
-  - HEAD branch: `git.<distance>.<short-sha>`
-  - Topic branch: `branch.<branch-name>.git.<distance>.<short-sha>`
+  - HEAD branch: `git.<distance-from-tag>.<short-sha>`
+  - Topic branch: `branch.<branch-name>.git.<distance-from-merge-base>.<short-sha>`
   - Dirty: `.dirty` appended to metadata
 
 ## Tasks
