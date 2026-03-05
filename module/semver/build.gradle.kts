@@ -29,6 +29,8 @@ dependencies {
   compileOnly(libs.bundles.immutables)
 
   spotbugs(libs.spotbugs)
+
+  testImplementation(libs.jgit)
 }
 
 // Ensure SpotBugs has access to annotation classes for proper null analysis
