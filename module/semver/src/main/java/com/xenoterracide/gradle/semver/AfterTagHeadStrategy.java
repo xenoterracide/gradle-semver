@@ -38,10 +38,10 @@ final class AfterTagHeadStrategy implements VersionStrategy {
       "AfterTagHeadStrategy requires a tag but baseVersion is null"
     );
 
-    var semver = Semver.parse(baseVersion);
-    if (semver == null) {
-      throw new IllegalStateException("Invalid tag format: " + this.ctx.nearestTag());
-    }
+    var semver = ObjectTools.illegalStateNull(
+      Semver.parse(baseVersion),
+      "Invalid tag format: " + this.ctx.nearestTag()
+    );
 
     var distance = this.ctx.distanceFromTag();
     var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);

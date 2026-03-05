@@ -36,10 +36,10 @@ final class OnExactTagTopicStrategy implements VersionStrategy {
       "OnExactTagTopicStrategy requires a tag but baseVersion is null"
     );
 
-    var semver = Semver.parse(baseVersion);
-    if (semver == null) {
-      throw new IllegalStateException("Invalid tag format: " + this.ctx.nearestTag());
-    }
+    var semver = ObjectTools.illegalStateNull(
+      Semver.parse(baseVersion),
+      "Invalid tag format: " + this.ctx.nearestTag()
+    );
 
     // Add metadata to indicate we're on a topic branch at the tag
     var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
