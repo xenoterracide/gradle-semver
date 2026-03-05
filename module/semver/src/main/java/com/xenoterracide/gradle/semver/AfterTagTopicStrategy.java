@@ -22,7 +22,7 @@ import org.semver4j.Semver;
  * </ul>
  *
  * <p>The prerelease uses distance from merge base (commits on topic branch only),
- * and metadata includes branch name and the same distance.</p>
+ * while metadata includes branch name and total distance from tag (for traceability).</p>
  */
 final class AfterTagTopicStrategy implements VersionStrategy {
 

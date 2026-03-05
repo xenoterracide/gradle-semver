@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class VersionStrategyTest {
 
   // CHECKSTYLE.OFF: ParameterNumber - test helper method needs many parameters
-  private static GitContext createContext(
+  static GitContext createContext(
     String nearestTag,
     long distanceFromTag,
     boolean isOnTagExact,

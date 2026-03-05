@@ -88,7 +88,7 @@ class SemverPluginIntegrationTest {
 
     // Without remote HEAD, treated as topic branch - version includes metadata
     // Pattern: 0.1.0+branch.<name>.git.0.<sha> or empty string for version task
-    assertThat(build.getOutput()).matches(expectedVersionPattern);
+    assertThat(build.getOutput()).isEqualToIgnoringNewLines(expectedVersionPattern);
   }
 
   @ParameterizedTest
