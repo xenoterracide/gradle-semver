@@ -77,8 +77,9 @@ class VersionOrderingIntegrationTest {
         .redirectError(ProcessBuilder.Redirect.PIPE)
         .start();
       try (var reader = new BufferedReader(new InputStreamReader(setHead.getErrorStream(), StandardCharsets.UTF_8))) {
-        setHead.waitFor();
+        var exitCode = setHead.waitFor();
         log.warn("set-head: {}", reader.lines().toList());
+        assertThat(exitCode).as("git remote set-head should succeed").isEqualTo(0);
       }
 
       // Get versions at different points
@@ -121,12 +122,13 @@ class VersionOrderingIntegrationTest {
       // Setup
       commit(git);
       git.push().setRemote(ORIGIN).setPushAll().call();
-      new ProcessBuilder("git", "remote", "set-head", ORIGIN, "--auto")
+      var setHead = new ProcessBuilder("git", "remote", "set-head", ORIGIN, "--auto")
         .directory(projectDir)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-        .waitFor();
+        .start();
+      var exitCode = setHead.waitFor();
+      assertThat(exitCode).as("git remote set-head should succeed").isEqualTo(0);
 
       git.tag().setName("v1.0.0").call();
 

@@ -86,8 +86,8 @@ class SemverPluginIntegrationTest {
       .withPluginClasspath()
       .build();
 
-    // Without remote HEAD, treated as topic branch - version includes metadata
-    // Pattern: 0.1.0+branch.<name>.git.0.<sha> or empty string for version task
+    // Without remote HEAD, treated as HEAD branch
+    // On exact tag: clean version (e.g., 0.1.0), version task: empty string
     assertThat(build.getOutput()).isEqualToIgnoringNewLines(expectedVersionPattern);
   }
 

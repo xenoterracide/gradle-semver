@@ -35,7 +35,8 @@ final class NoTagHeadStrategy implements VersionStrategy {
     var distance = this.ctx.distanceFromTag();
     var prerelease = String.format("alpha.0.%d", distance);
     var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
-    var metadata = String.format("git.%d.%s", distance, shortSha);
+    var baseMetadata = String.format("git.%d.%s", distance, shortSha);
+    var metadata = this.appendDirtyMarker(baseMetadata, this.ctx);
 
     return Semver.ZERO.withIncPatch().withClearedPreRelease().withPreRelease(prerelease).withBuild(metadata);
   }
