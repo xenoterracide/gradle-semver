@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 name: pull-request
-description: work on pull request
+description: work on PR (pull request)
 license: CC-BY-NC-SA-4.0
 metadata:
   author: Caleb Cushing
