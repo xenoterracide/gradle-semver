@@ -21,7 +21,7 @@ Let your domain language define the responsibilities in your system. Build each 
   - prefer `final` for fields unless they need to be mutable.
   - prefer `record` classes for simple data carriers.
   - `var strings = List.of("foo");` over `var strings = new ArrayList<String>(); strings.add("foo");`
-  - Error Prone [Var][https://errorprone.info/bugpattern/Var] rule is enforced to prevent mutable variables. If you need mutability, you must explicitly annotate with `@Var` and justify why mutability is necessary.
+  - Error Prone [Var](https://errorprone.info/bugpattern/Var) rule is enforced to prevent mutable variables. If you need mutability, you must explicitly annotate with `@Var` and justify why mutability is necessary.
 - prefer non nullability. Using [jspecify](https://jspecify.dev/docs/spec/) and [Nullaway](https://github.com/uber/NullAway/wiki) we enforce non nullability by default and explicitly annotate nullable types with `@Nullable`. This helps prevent null pointer exceptions and makes it clear when a value can be null. `Optional` is preferred when mapping or filtering would be clearer than procedural logic.
 
 ## Style
@@ -36,7 +36,7 @@ Let your domain language define the responsibilities in your system. Build each 
   - `String foo = "foo";`
   - `List<Foo> list = new ArrayList<>();`
 - avoid `private` except with fields. prefer the default "package protected" unless must be `public` or is useful for subclasses.
-  - this allows methods to be exposed for testing but not outside of the package.
+  - this allows methods to be exposed for testing but not outside the package. This aligns with the Vertical Slice architecture, Test Driven Principles, conventions where tests live in the same package and can access package protected methods, as well as original Java Language design that made this the default visibility. `private` is only necessary to prevent access from other classes in the same package, which is uncommon and should be avoided.
 - use `import` statements unless it would result in conflicts.
 - prefer builder pattern over complex constructors with immutables library `@Builder` and a static factory. e.g.
 
