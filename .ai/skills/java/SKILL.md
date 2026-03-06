@@ -36,7 +36,7 @@ Let your domain language define the responsibilities in your system. Build each 
   - `String foo = "foo";`
   - `List<Foo> list = new ArrayList<>();`
     COUNTER EXAMPLE GOOD
-  - Supplier<Foo> fooSupplier = () -> new Foo(); // not using var is better than casting
+  - `Supplier<Foo> fooSupplier = () -> new Foo();` // not using var is better than casting
     COUNTER EXAMPLE BAD
   - `var fooSupplier = (Supplier<Foo>) () -> new Foo();` // casting is bad and should be avoided.
 - avoid `private` except with fields. prefer the default "package protected" unless must be `public` or is useful for subclasses.
