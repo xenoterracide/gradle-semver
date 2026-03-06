@@ -2,10 +2,10 @@
 SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
 
 SPDX-License-Identifier: CC-BY-NC-4.0
+SPDX-License-Identifier: CC-BY-NC-SA-4.0
 -->
 
 - skills are in `.ai/skills`, use relevant skills
-- `./gradlew check` must pass if `*.kts`, `*.java`, or `checkstyle/*.xml` has changed
 - `yarn ug` updates gradle dependencies
 - `gh` can be used if authenticated and available to:
   - open PR's
