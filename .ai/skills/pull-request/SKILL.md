@@ -11,6 +11,7 @@ metadata:
 allowed-tools: Shell(gh:*) Shell(git:*)
 ---
 
+- files should be committed
 - commits must be pushed
 - required workflows must pass
 - git push --force is not allowed
