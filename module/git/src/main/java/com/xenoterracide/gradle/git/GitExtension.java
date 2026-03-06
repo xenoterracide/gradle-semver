@@ -4,7 +4,6 @@
 
 package com.xenoterracide.gradle.git;
 
-import com.google.errorprone.annotations.Var;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -161,19 +160,12 @@ public class GitExtension implements Provides<GitMetadata> {
   }
 
   private Optional<Long> distanceFromMergeBase(org.eclipse.jgit.lib.Repository repository, ObjectId mergeBase) {
-    @Var
-    Optional<Long> result;
     try {
-      var head = repository.resolve(HEAD_REF);
-      if (head == null) {
-        result = Optional.empty();
-      } else {
-        var calculator = new DistanceCalculator(this.git::get);
-        result = Optional.of(calculator.distanceBetween(mergeBase, head));
-      }
+      return Optional.ofNullable(repository.resolve(HEAD_REF)).map(head ->
+        new DistanceCalculator(this.git::get).distanceBetween(mergeBase, head)
+      );
     } catch (IOException e) {
-      result = Optional.empty();
+      return Optional.empty();
     }
-    return result;
   }
 }

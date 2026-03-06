@@ -8,6 +8,8 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +50,9 @@ class DistanceCalculator implements Function<String, Long> {
   long distanceBetween(ObjectId from, ObjectId to) {
     return this.git.tryGit(g -> {
         var repo = g.getRepository();
-        try (var walk = new org.eclipse.jgit.revwalk.RevWalk(repo)) {
-          var fromCommit = walk.parseCommit(from);
-          var toCommit = walk.parseCommit(to);
+        try (var walk = new RevWalk(repo)) {
+          RevCommit fromCommit = walk.parseCommit(from);
+          RevCommit toCommit = walk.parseCommit(to);
           return g.log().add(toCommit).not(fromCommit).call();
         }
       })
