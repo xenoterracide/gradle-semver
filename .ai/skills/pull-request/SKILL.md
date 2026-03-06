@@ -27,4 +27,5 @@ allowed-tools: Shell(gh:*) Shell(git:*) Shell(./gradlew:*) pull_request_read add
 - git push --force is not allowed
 - must be synchronized with HEAD branch using a merge strategy
   - it is easier to delete and regenerate lockfiles than merge them
-- reply to PR comments and fix if desirable
+- respond to ALL pr comments.
+  - fix if valid, or explain why not if invalid
