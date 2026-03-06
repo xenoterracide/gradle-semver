@@ -15,6 +15,7 @@ allowed-tools: Shell(gh:*) Shell(git:*)
 - keep the pull request message up to date
 - files should be committed and pushed
   - ensure code compiles and tests pass before committing
+    - run relevant, specific, tests before running all tests
     - prefer `./gradlew compile test` for quick feedback
     - run full `./gradlew check` when changes are substantial
     - always verify GitHub PR checks pass after pushing
