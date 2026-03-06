@@ -8,7 +8,7 @@ license: CC-BY-NC-SA-4.0
 description: Write Java
 metadata:
   author: Caleb Cushing
-allowed-tools: ./gradlew
+allowed-tools: Shell(./gradlew:*)
 ---
 
 ## Design Principles

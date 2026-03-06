@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
-name: github
+name: pull-request
 description: work on pull request
 license: CC-BY-NC-SA-4.0
 metadata:
