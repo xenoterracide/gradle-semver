@@ -28,4 +28,4 @@ allowed-tools: Shell(gh:*) Shell(git:*) Shell(./gradlew:*) pull_request_read add
 - must be synchronized with HEAD branch using a merge strategy
   - it is easier to delete and regenerate lockfiles than merge them
 - respond to ALL pr comments.
-  - fix and comment if valid, or explain why not if invalid, ask if uncertain.
+  - fix and comment if valid, or explain why not if invalid, ask if uncertain. This helps humans understand current comment status.
