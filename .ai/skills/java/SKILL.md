@@ -1,7 +1,6 @@
 ---
 # SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
 #
-# SPDX-License-Identifier: CC-BY-NC-4.0
 # SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 name: java
@@ -11,6 +10,10 @@ metadata:
   author: Caleb Cushing
 allowed-tools: ./gradlew
 ---
+
+## Design Principles
+
+Let your domain language define the responsibilities in your system. Build each unit—object, function, or module—around a single responsibility derived from that language. Encapsulate behavior so it’s polymorphic, letting the unit decide how to act rather than orchestrating externally. If you follow these principles, your code will naturally be composable, clear, and aligned with the domain.
 
 ## Instructions
 
