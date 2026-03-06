@@ -25,6 +25,7 @@ Use for writing Java code.
   - this allows methods to be exposed for testing but not outside of the package.
 - prefer `final` for fields unless they need to be mutable
 - prefer `record` classes for simple data carriers.
+- use `import` statements unless it would result in conflicts.
 - prefer builder pattern over complex constructors with immutables library `@Builder` and a static factory. e.g.
 
 ```java
