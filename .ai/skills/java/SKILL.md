@@ -26,22 +26,54 @@ Let your domain language define the responsibilities in your system. Build each 
 
 ## Style
 
-- prefer `var` keyword to explicit local variable type declaration. using var reduces quantity of code but more importantly coupling as sometimes it means classes no longer have to be imported and thus class name changes do not impact client code in some cases. note: `@Var` is unrelated to this. Examples:
-  GOOD
-  - `var x = 1;`
-  - `var foo = "foo"`
-  - `var list = new ArrayList<Foo>();`
-    BAD
-  - `int x = 1;`
-  - `String foo = "foo";`
-  - `List<Foo> list = new ArrayList<>();`
-    COUNTER EXAMPLE GOOD
-  - `Supplier<Foo> fooSupplier = () -> new Foo();` // not using var is better than casting
-    COUNTER EXAMPLE BAD
-  - `var fooSupplier = (Supplier<Foo>) () -> new Foo();` // casting is bad and should be avoided.
-- avoid `private` except with fields. prefer the default "package protected" unless must be `public` or is useful for subclasses.
-  - this allows methods to be exposed for testing but not outside the package. This aligns with the Vertical Slice architecture, Test Driven Principles, conventions where tests live in the same package and can access package protected methods, as well as original Java Language design that made this the default visibility. `private` is only necessary to prevent access from other classes in the same package, which is uncommon and should be avoided.
+### var keyword
+
+prefer `var` keyword to explicit local variable type declaration. using var reduces quantity of code but more importantly coupling as sometimes it means classes no longer have to be imported and thus class name changes do not impact client code in some cases.
+
+note: `@Var` is unrelated to this.
+
+Examples:
+
+#### GOOD
+
+- `var x = 1;`
+- `var foo = "foo"`
+- `var list = new ArrayList<Foo>();`
+
+#### BAD
+
+- `int x = 1;`
+- `String foo = "foo";`
+- `List<Foo> list = new ArrayList<>();`
+
+#### COUNTER EXAMPLE GOOD
+
+- `Supplier<Foo> fooSupplier = () -> new Foo();` // not using var is better than casting
+
+#### COUNTER EXAMPLE BAD
+
+- `var fooSupplier = (Supplier<Foo>) () -> new Foo();` // casting is bad and should be avoided.
+
+#### COUNTER EXAMPLE BETTER
+
+Relying on a static method or variable can often be better than either even though it's more verbose.
+
+```java
+static Supplier<Foo> fooSupplier() {
+  return () -> new Foo();
+}
+```
+
+### Imports
+
 - use `import` statements unless it would result in conflicts.
+- use `static import` for test helpers that maintain clarity such as `assertThat` for AssertJ and `given` or `mock` from Mockito. Avoid static imports if it makes code comprehension.
+
+### Visibility
+
+Avoid `private` except with fields. prefer the default "package protected" unless must be `public` or is useful for subclasses.
+
+- this allows methods to be exposed for testing but not outside the package. This aligns with the Vertical Slice architecture, Test Driven Principles, conventions where tests live in the same package and can access package protected methods, as well as original Java Language design that made this the default visibility. `private` is only necessary to prevent access from other classes in the same package, which is uncommon and should be avoided.
 - prefer builder pattern over complex constructors with immutables library `@Builder` and a static factory. e.g.
 
 ```java
