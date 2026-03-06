@@ -20,7 +20,9 @@ allowed-tools: Shell(gh:*) Shell(git:*) Shell(./gradlew:*) pull_request_read add
     - run `./gradlew test` for quick test logic verification
     - run `./gradlew checkstyle` for checkstyle verification
     - run full `./gradlew check` before finalizing or when changes affect multiple modules.
-    - always verify GitHub PR checks pass after pushing
+  - verify GitHub PR checks pass after pushing
+    - use available tools to check workflow status
+    - fix any failures before requesting review
     - if Github checks fail after pushing, fix before requesting review
 - git push --force is not allowed
 - must be synchronized with HEAD branch using a merge strategy
