@@ -5,7 +5,7 @@
 
 name: java
 license: CC-BY-NC-SA-4.0
-description: Write Java
+description: Write code in the Java programming language.
 metadata:
   author: Caleb Cushing
 allowed-tools: Shell(./gradlew:*)
