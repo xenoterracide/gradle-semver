@@ -8,7 +8,7 @@ description: work on PR (pull request)
 license: CC-BY-NC-SA-4.0
 metadata:
   author: Caleb Cushing
-allowed-tools: Shell(gh:*) Shell(git:*) Shell(./gradlew:*) pull_request_read add_issue_comment add_reply_to_pull_request_comment
+allowed-tools: Shell(gh:*) Shell(git:*) Shell(./gradlew:*) pull_request_read add_issue_comment add_reply_to_pull_request_comment get_check_runs
 ---
 
 - use commit-or-pr-message
