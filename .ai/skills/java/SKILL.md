@@ -26,7 +26,7 @@ Let your domain language define the responsibilities in your system. Build each 
 
 ## Style
 
-- prefer `var` keyword to explicit local variable type declaration. note: `@Var` is unrelated to this. Examples:
+- prefer `var` keyword to explicit local variable type declaration. using var reduces quantity of code but more importantly coupling as sometimes it means classes no longer have to be imported and thus class name changes do not impact client code in some cases. note: `@Var` is unrelated to this. Examples:
   GOOD
   - `var x = 1;`
   - `var foo = "foo"`
