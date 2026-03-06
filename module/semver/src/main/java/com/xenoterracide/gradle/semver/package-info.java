@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
 /**
- * This package contains the main classes for the plugin.
+ * Semantic versioning plugin for Gradle with git integration.
  */
 @NullMarked
 package com.xenoterracide.gradle.semver;

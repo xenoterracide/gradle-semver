@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -25,23 +25,45 @@ class MergeBaseFinder {
   }
 
   public Optional<ObjectId> find(@Nullable GitRemote gitRemote) {
-    if (gitRemote == null || gitRemote.headBranch() == null) return Optional.empty();
+    var headBranchRef = extractHeadBranchRef(gitRemote);
+    if (headBranchRef == null) {
+      return Optional.empty();
+    }
     try {
-      var current = Optional.ofNullable(this.repo.findRef(Constants.HEAD)).map(Ref::getObjectId).orElseThrow();
-      var remote = Optional.ofNullable(this.repo.findRef(gitRemote.headBranchRefName()))
-        .map(Ref::getObjectId)
-        .orElseThrow();
-
-      try (var walk = new RevWalk(this.repo)) {
-        walk.setRevFilter(RevFilter.MERGE_BASE);
-        walk.markStart(List.of(walk.parseCommit(remote), walk.parseCommit(current)));
-
-        var mergeBase = walk.next();
-
-        return Optional.ofNullable(mergeBase).map(ObjectId::toObjectId);
-      }
+      return this.findMergeBase(headBranchRef);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    }
+  }
+
+  private static @Nullable String extractHeadBranchRef(@Nullable GitRemote gitRemote) {
+    if (gitRemote == null || gitRemote.headBranch() == null) {
+      return null;
+    }
+    return gitRemote.headBranchRefName();
+  }
+
+  private Optional<ObjectId> findMergeBase(String headBranchRef) throws IOException {
+    var currentOpt = this.resolveRef(Constants.HEAD);
+    var remoteOpt = this.resolveRef(headBranchRef);
+
+    if (currentOpt.isEmpty() || remoteOpt.isEmpty()) {
+      return Optional.empty();
+    }
+
+    return this.calculateMergeBase(currentOpt.get(), remoteOpt.get());
+  }
+
+  private Optional<ObjectId> resolveRef(String refName) throws IOException {
+    return Optional.ofNullable(this.repo.findRef(refName)).map(Ref::getObjectId);
+  }
+
+  private Optional<ObjectId> calculateMergeBase(ObjectId current, ObjectId remote) throws IOException {
+    try (var walk = new RevWalk(this.repo)) {
+      walk.setRevFilter(RevFilter.MERGE_BASE);
+      walk.markStart(List.of(walk.parseCommit(remote), walk.parseCommit(current)));
+      var mergeBase = walk.next();
+      return Optional.ofNullable(mergeBase).map(ObjectId::toObjectId);
     }
   }
 }

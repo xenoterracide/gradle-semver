@@ -1,12 +1,14 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
 package com.xenoterracide.gradle.git;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.eclipse.jgit.lib.ObjectId;
 import org.gradle.api.Incubating;
 import org.gradle.api.provider.Provider;
 
@@ -14,6 +16,8 @@ import org.gradle.api.provider.Provider;
  * Extension for the {@link GitPlugin} mainly providing {@link Provider}'s for {@link GitMetadata}.
  */
 public class GitExtension implements Provides<GitMetadata> {
+
+  private static final String HEAD_REF = "HEAD";
 
   private final Provider<GitMetadata> provider;
   private final Provider<org.eclipse.jgit.api.Git> git;
@@ -135,7 +139,33 @@ public class GitExtension implements Provides<GitMetadata> {
    * @return the distance
    */
   public Optional<Long> commonAncestorDistanceFor(GitRemoteForGradle remote) {
-    var oObjectId = new MergeBaseFinder(this.git.get().getRepository()).find(remote);
-    return oObjectId.map(oid -> new DistanceCalculator(this.git::get).apply(oid.getName()));
+    return this.calculateDistanceFromMergeBase(remote);
+  }
+
+  /**
+   * Overloaded method that accepts a {@link GitRemote} for convenience.
+   *
+   * @param remote
+   *   the remote
+   * @return the distance
+   */
+  public Optional<Long> commonAncestorDistanceFor(GitRemote remote) {
+    return this.calculateDistanceFromMergeBase(remote);
+  }
+
+  private Optional<Long> calculateDistanceFromMergeBase(GitRemote remote) {
+    var repository = this.git.get().getRepository();
+    var oMergeBase = new MergeBaseFinder(repository).find(remote);
+    return oMergeBase.flatMap(mergeBase -> this.distanceFromMergeBase(repository, mergeBase));
+  }
+
+  private Optional<Long> distanceFromMergeBase(org.eclipse.jgit.lib.Repository repository, ObjectId mergeBase) {
+    try {
+      return Optional.ofNullable(repository.resolve(HEAD_REF)).map(head ->
+        new DistanceCalculator(this.git::get).distanceBetween(mergeBase, head)
+      );
+    } catch (IOException e) {
+      return Optional.empty();
+    }
   }
 }

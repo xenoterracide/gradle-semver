@@ -1,10 +1,11 @@
-# SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
 [versions]
 ep = "2.+"
 convention = "0.17.+"
+immutables = "2.+"
 junit = "6.+"
 
 [libraries]
@@ -14,6 +15,11 @@ errorprone-annotations = { module = "com.google.errorprone:error_prone_annotatio
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "ep" }
 errorprone-nullaway = "com.uber.nullaway:nullaway:0.+"
 guava = "com.google.guava:guava:+"
+immutables-annotate = { module = "org.immutables:annotate" }
+immutables-annotations = { module = "org.immutables:value-annotations" }
+immutables-bom = { module = "org.immutables:bom", version.ref = "immutables" }
+immutables-builder = { module = "org.immutables:builder" }
+immutables-core = { module = "org.immutables:value" }
 java-tools = "com.xenoterracide:tools:0.+"
 jgit = "org.eclipse.jgit:org.eclipse.jgit:7.+"
 jspecify = "org.jspecify:jspecify:1.+"
@@ -39,10 +45,11 @@ vavr = "io.vavr:vavr:1.+"
 
 [bundles]
 ep = ["errorprone-core", "errorprone-nullaway"]
+immutables = ["immutables-annotations", "immutables-builder", "immutables-annotate"]
 test-impl = ["junit-api", "assertj", "junit-parameters"]
 test-runtime = ["junit-engine", "junit-launcher"]
 
 [plugins]
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis" }
 shadow = { id = "com.gradleup.shadow", version = "9.+" }
-semver = { id = "com.xenoterracide.gradle.semver", version = "0.+" }
+semver = { id = "com.xenoterracide.gradle.semver", version = "0.15.0" }

@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
@@ -9,7 +9,7 @@
   - "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --style python"
   - &prettier "prettier --cache --ignore-unknown --write"
 "*.{md,adoc}":
-  - "reuse annotate --license 'CC-BY-NC-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - "reuse annotate --license 'CC-BY-NC-SA-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
 "*.{xml,yml,yaml,properties,toml,json5,js}":
   - &cc0 "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --fallback-dot-license"
@@ -29,3 +29,4 @@
 # unique
 "*.java":
   - "reuse annotate --license 'GPL-3.0-or-later WITH Classpath-exception-2.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - *prettier

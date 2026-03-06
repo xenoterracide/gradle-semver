@@ -1,19 +1,19 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
 package com.xenoterracide.gradle.semver;
 
 import com.xenoterracide.gradle.git.GitExtension;
-import com.xenoterracide.gradle.git.GitRemoteForGradle;
+import com.xenoterracide.gradle.git.GitMetadata;
+import com.xenoterracide.gradle.git.GitRemote;
+import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.git.ProvidedFactory;
 import com.xenoterracide.gradle.git.Provides;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import org.gradle.api.Project;
-import org.gradle.api.Transformer;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -33,6 +33,16 @@ import org.semver4j.Semver;
 public class SemverExtension implements Provides<Semver> {
 
   // CHECKSTYLE.ON: FinalClass
+
+  private static final String UNKNOWN = "unknown";
+
+  /**
+   * Prefix for remote refs, copied from org.eclipse.jgit.lib.Constants.R_REMOTES.
+   * Using our own constant avoids a direct dependency on JGit in this module.
+   *
+   * @see <a href="https://github.com/eclipse-jgit/jgit">JGit</a>
+   */
+  private static final String R_REMOTES = "refs/remotes/";
 
   private final Property<Semver> provider;
   private final Property<Boolean> checkDirty;
@@ -55,74 +65,148 @@ public class SemverExtension implements Provides<Semver> {
     return new SemverExtension(project).build();
   }
 
-  static Optional<GitRemoteForGradle> getOrigin(List<GitRemoteForGradle> remotes) {
+  /**
+   * Finds the origin remote from a list of remotes.
+   *
+   * @param remotes the list of remotes
+   * @return optional of the origin remote
+   */
+  static Optional<GitRemote> findOrigin(List<GitRemote> remotes) {
     return remotes
       .stream()
-      .filter(remote -> Objects.equals(remote.getName(), "origin"))
-      .filter(remote -> remote.getHeadBranch().isPresent())
+      .filter(remote -> Objects.equals(remote.name(), "origin"))
       .findAny();
   }
 
-  static Provider<String> getBranch(GitExtension gitExt) {
-    return gitExt
-      .getRemotes()
-      .map(remotes -> getOrigin(remotes).map(remote -> remote.getHeadBranch().get()))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
-      .zip(gitExt.getBranch(), (remoteBranch, localBranch) ->
-        Objects.equals(remoteBranch, localBranch) ? null : localBranch
-      );
+  /**
+   * Gets the HEAD branch name from a remote.
+   *
+   * @param origin the origin remote
+   * @return the HEAD branch name, or null if not available
+   */
+  // CHECKSTYLE.OFF: ReturnCount
+  static @Nullable String getHeadBranchName(GitRemote origin) {
+    var headBranchRef = origin.headBranchRefName();
+    if (headBranchRef == null) {
+      return null;
+    }
+    // Convert refs/remotes/origin/main -> main
+    var prefix = R_REMOTES + origin.name() + "/";
+    if (headBranchRef.startsWith(prefix)) {
+      return headBranchRef.substring(prefix.length());
+    }
+    return null;
   }
 
-  static Function<GitRemoteForGradle, @Nullable Long> commonAncestorDistanceFor(GitExtension gitExt) {
-    return remote -> gitExt.commonAncestorDistanceFor(remote).orElse(null);
+  // CHECKSTYLE.ON: ReturnCount
+
+  /**
+   * Creates a provider that builds GitContext from GitExtension providers.
+   *
+   * @param gitExt the git extension
+   * @return provider of GitContext
+   */
+  private Provider<GitContext> createGitContextProvider(GitExtension gitExt) {
+    return gitExt.getProvider().map(gitMetadata -> this.buildGitContext(gitMetadata, gitExt));
   }
 
-  static Provider<Long> getDistance(GitExtension gitExt) {
-    return gitExt
-      .getRemotes()
-      .map(SemverExtension::getOrigin)
-      .filter(Optional::isPresent)
-      .map(Optional::get)
-      .zip(gitExt.getBranch(), (remote, local) -> Objects.equals(remote.headBranch(), local) ? null : remote)
-      .map(commonAncestorDistanceFor(gitExt)::apply)
-      .orElse(gitExt.getDistance());
+  /**
+   * Builds a GitContext from GitMetadata and GitExtension.
+   *
+   * @param gitMetadata the git metadata
+   * @param gitExt the git extension (for merge base calculations)
+   * @return the git context
+   */
+  // CHECKSTYLE.OFF: MethodLength
+  private GitContext buildGitContext(GitMetadata gitMetadata, GitExtension gitExt) {
+    var remotes = gitMetadata.remotes();
+    var originOpt = findOrigin(remotes);
+
+    var currentBranch = gitMetadata.branch();
+    var headBranch = originOpt.map(SemverExtension::getHeadBranchName).orElse(null);
+    // When there's no HEAD branch configured (headBranch is null), treat current branch as HEAD
+    var isHeadBranch = headBranch == null || Objects.equals(currentBranch, headBranch);
+
+    // Calculate distance from merge base for topic branches
+    var distanceFromMergeBase = calculateDistanceFromMergeBase(gitMetadata, gitExt, originOpt, isHeadBranch);
+
+    var tag = gitMetadata.tag();
+    var distanceFromTag = gitMetadata.distance();
+    var isOnTagExact = tag != null && distanceFromTag == 0;
+
+    // Get short SHA from git's unique abbreviation, or "unknown" if not available
+    var shortSha = Optional.ofNullable(gitMetadata.uniqueShort()).orElse(UNKNOWN);
+    var fullSha = Optional.ofNullable(gitMetadata.commit()).orElse(UNKNOWN);
+
+    // Check if dirty (only if checkDirty is enabled)
+    var isDirty = this.checkDirty.getOrElse(false) && gitMetadata.status() == GitStatus.DIRTY;
+
+    // Shallow clone detection could be added here
+    var isShallowClone = false;
+
+    return GitContext.builder()
+      .nearestTag(tag)
+      .distanceFromTag(distanceFromTag)
+      .isOnTagExact(isOnTagExact)
+      .currentBranch(currentBranch)
+      .headBranch(headBranch)
+      .isHeadBranch(isHeadBranch)
+      .distanceFromMergeBase(distanceFromMergeBase)
+      .shortSha(shortSha)
+      .fullSha(fullSha)
+      .isDirty(isDirty)
+      .isShallowClone(isShallowClone)
+      .build();
   }
 
-  Transformer<Semver, Semver> configureBuilder(GitExtension gitExt) {
-    var checkDirty = this.getCheckDirty();
-    // Distance from nearest tag (i.e. `git describe` distance).
-    var tagDistance = gitExt.getDistance();
-    // Distance to common ancestor with HEAD branch (0 on HEAD branch; >0 on diverged branches).
-    var headBranchDistance = getDistance(gitExt);
-    var gitStatus = gitExt.getStatus();
-    var uniqueShort = gitExt.getUniqueShort();
-    var branch = getBranch(gitExt);
+  // CHECKSTYLE.ON: MethodLength
 
-    return semver ->
-      new SemverBuilder(semver)
-        .withDirtyOut(checkDirty.getOrElse(false))
-        .withPreReleaseDistance(headBranchDistance.getOrElse(0L))
-        .withBuildDistance(tagDistance.getOrElse(0L))
-        .withGitStatus(gitStatus.get())
-        .withUniqueShort(uniqueShort.getOrNull())
-        .withBranch(branch.getOrNull())
-        .build();
+  /**
+   * Calculates the distance from merge base for topic branches.
+   *
+   * @param gitMetadata the git metadata
+   * @param gitExt the git extension
+   * @param originOpt optional of origin remote
+   * @param isHeadBranch whether we're on the HEAD branch
+   * @return distance from merge base
+   */
+  // CHECKSTYLE.OFF: ReturnCount
+  private static long calculateDistanceFromMergeBase(
+    GitMetadata gitMetadata,
+    GitExtension gitExt,
+    Optional<GitRemote> originOpt,
+    boolean isHeadBranch
+  ) {
+    if (isHeadBranch || originOpt.isEmpty()) {
+      // On HEAD branch or no origin: merge base distance equals tag distance
+      return gitMetadata.distance();
+    }
+
+    // On topic branch: try to get distance from merge base
+    var origin = originOpt.get();
+    return gitExt.commonAncestorDistanceFor(origin).orElseGet(gitMetadata::distance);
   }
+
+  // CHECKSTYLE.ON: ReturnCount
 
   SemverExtension build() {
     var gitExt = this.project.getExtensions().getByType(GitExtension.class);
     var projectName = this.project.getName();
 
-    var semverProvider = gitExt
-      .getTag()
-      .map(tag -> Objects.requireNonNull(Semver.parse(tag)))
-      .orElse(Semver.ZERO)
-      .map(this.configureBuilder(gitExt))
-      .map(semver -> {
-        Logging.getLogger(SemverExtension.class).info("semver {} {}", projectName, semver);
-        return semver;
-      });
+    // Create GitContext provider and map it through the strategy machine
+    var gitContextProvider = this.createGitContextProvider(gitExt);
+
+    var semverProvider = gitContextProvider.map(ctx -> {
+      var strategy = VersionStrategyFactory.determineStrategy(ctx);
+      var version = strategy.calculate();
+      Logging.getLogger(SemverExtension.class).info(
+        "semver {} {} (strategy: {})",
+        projectName,
+        version,
+        strategy.getClass().getSimpleName()
+      );
+      return version;
+    });
 
     this.provider.set(semverProvider);
     this.provider.finalizeValueOnRead();

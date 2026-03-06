@@ -34,6 +34,6 @@ public abstract class PrintVersionTask extends DefaultTask {
   @TaskAction
   public void printVersion() {
     var text = this.getVersionText().getOrElse("");
-    System.out.println(text);
+    System.out.print(text);
   }
 }
