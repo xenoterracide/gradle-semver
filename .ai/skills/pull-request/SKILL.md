@@ -11,12 +11,14 @@ metadata:
 allowed-tools: Shell(gh:*) Shell(git:*)
 ---
 
-- files should be committed
-- commits must be pushed
-- required workflows must pass
+- use commit-or-pr-message
+- keep the pull request message up to date
+- files should be committed and pushed
+  - ensure code compiles and tests pass before committing
+    - prefer `./gradlew compile test` for quick feedback
+    - run full `./gradlew check` when changes are substantial
+    - always verify GitHub PR checks pass after pushing
 - git push --force is not allowed
 - must be synchronized with HEAD branch using a merge strategy
   - it is easier to delete and regenerate lockfiles than merge them
-- use commit-or-pr-message
-- keep the pull request message up to date
 - reply to PR comments and fix if desirable

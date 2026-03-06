@@ -59,6 +59,16 @@ tasks.compileJava {
   }
 }
 
+tasks.withType<JavaCompile>().configureEach {
+  options.compilerArgs.addAll(
+    listOf(
+      "-Aimmutables.gradle.incremental",
+      "-Aimmutables.annotations.pick=jakarta",
+      "-Aimmutables.guava.suppress",
+    ),
+  )
+}
+
 // From our.bom.gradle.kts
 configurations.configureEach {
   exclude(group = "org.slf4j", module = "slf4j-nop")
