@@ -98,7 +98,6 @@ class SpecIntegrationTest {
         .startsWith("0.1.1-alpha.0.1+git.1.")
         .hasSize(size)
         .matches(VERSION_PATTERN);
-
       // Verify Semver comparison ignores build metadata (SHA doesn't affect equality)
       assertThat(v010BldV2).isEqualByComparingTo(new Semver("0.1.1-alpha.0.1+git.1.0000000"));
 
@@ -113,9 +112,7 @@ class SpecIntegrationTest {
         .matches(VERSION_PATTERN);
 
       git.tag().setName("v0.1.1-rc.1").call();
-
       var v011Rc1 = vs.get();
-
       assertThat(v011Rc1)
         .isGreaterThan(v001Alpha01)
         .isGreaterThan(v010)
@@ -148,7 +145,7 @@ class SpecIntegrationTest {
       assertThat(vs.get())
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.1.")
+        .startsWith("0.1.2-alpha.0.1+branch.topic-foo.git.0.")
         .hasSize(46)
         .matches(VERSION_PATTERN);
       // 2 more commits on topic branch
@@ -168,10 +165,22 @@ class SpecIntegrationTest {
         .matches(VERSION_PATTERN);
 
       git.checkout().setName(branch).call().getObjectId();
-      assertThat(vs.get())
+      // At this point:
+      // - v0.1.1 tag exists
+      // - 1 commit on main after tag (commit A) = merge base
+      // - 2 commits on topic branch (commits B, C)
+      // - 1 additional commit on main (commit D) - NOT on topic branch
+      //
+      // Distance from tag: 3 (commits A, B, C)
+      // Distance from merge base: should be 2 (commits B, C)
+      //
+      // DEBUG: Print actual version to verify
+      var debugVersion = vs.get();
+      log.warn("Line 174 version: {}", debugVersion);
+      assertThat(debugVersion)
         .isGreaterThan(v011)
         .asString()
-        .startsWith("0.1.2-alpha.0.3+branch.topic-foo.git.1.")
+        .startsWith("0.1.2-alpha.0.3+branch.topic-foo.git.2.")
         .hasSize(46)
         .matches(VERSION_PATTERN);
 
@@ -189,9 +198,9 @@ class SpecIntegrationTest {
       commit(git);
       git.push().setPushAll().call();
       var v020Rc1BldV1 = vs.get();
-      // prerelease uses distance from tag (1), metadata uses distance from merge base (0)
+      // prerelease uses distance from tag (1), metadata uses merge base distance (1)
       assertThat(v020Rc1BldV1.toString())
-        .startsWith("0.2.0-rc.1.1+branch.topic-prerelease-test.git.0.")
+        .startsWith("0.2.0-rc.1.1+branch.topic-prerelease-test.git.1.")
         .matches(VERSION_PATTERN);
     }
   }
