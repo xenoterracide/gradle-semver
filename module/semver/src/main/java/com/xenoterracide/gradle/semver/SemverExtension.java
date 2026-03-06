@@ -177,21 +177,14 @@ public class SemverExtension implements Provides<Semver> {
     Optional<GitRemote> originOpt,
     boolean isHeadBranch
   ) {
-    if (isHeadBranch) {
-      // On HEAD branch: merge base distance equals tag distance
-      return gitMetadata.distance();
-    }
-
-    if (originOpt.isEmpty()) {
-      // No origin: can't calculate merge base
+    if (isHeadBranch || originOpt.isEmpty()) {
+      // On HEAD branch or no origin: merge base distance equals tag distance
       return gitMetadata.distance();
     }
 
     // On topic branch: try to get distance from merge base
     var origin = originOpt.get();
-    var mergeBaseDistanceOpt = gitExt.commonAncestorDistanceFor(origin);
-
-    return mergeBaseDistanceOpt.orElse(gitMetadata.distance());
+    return gitExt.commonAncestorDistanceFor(origin).orElseGet(gitMetadata::distance);
   }
 
   // CHECKSTYLE.ON: ReturnCount
