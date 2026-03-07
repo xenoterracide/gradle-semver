@@ -1,70 +1,60 @@
-# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 #
 # SPDX-License-Identifier: MIT
 
-HEAD := $(shell git rev-parse --verify HEAD)
-GRADLE_DIR := $(wildcard ./.gradle/)
-BUILD_DIRS := $(wildcard ./build/ */build/ ./module/*/build/)
-CONFIGURATION_CACHE := $(wildcard $(GRADLE_DIR)configuration-cache/)
+HEAD = $(shell git rev-parse --verify HEAD)
+ENGINE ?= junie
+SKILL_FILE := .agents/skills/commit-or-pr-message/SKILL.md
 
-check_defined = $(strip $(foreach 1, $1,$(call __check_defined,$1,$(strip $(value 2)))))
-__check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))))
-
-define gh_head_run_url
-	gh run list --workflow $(1) --commit $(HEAD) --json url --jq '.[0].["url"]'
-endef
+# kimi uses --skills-dir for auto-discovery; other engines need --skill-file
+ifeq ($(ENGINE),kimi)
+  SKILL_ARG :=
+else
+  SKILL_ARG := --skill-file "$(SKILL_FILE)"
+endif
 
 define gh_head_run_id
-	gh run list --workflow $(1) --commit $(HEAD) --json databaseId --jq '.[0].["databaseId"]'
+	gh run list --workflow $(1) --commit $(HEAD) --json databaseId --jq '.[0].databaseId // ""'
 endef
 
-.PHONY: up
-up:
-# success if no output
-	./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0
-
-.PHONY: build
-build:
-	./gradlew build --console=plain
-
 .PHONY: merge
-merge: merge-head push create-pr build watch-full merge-squash
-
-.PHONY: clean
-clean:
-	./gradlew clean
-
-.PHONY: cleaner
-cleaner: clean-build clean-gradle
-
-clean-cc: $(CONFIGURATION_CACHE)
-	- rm -rf $(CONFIGURATION_CACHE)
-
-ci-build:
-	./gradlew build --build-cache --scan
-
-ci-full:
-	./gradlew build --no-build-cache --no-configuration-cache --scan
-
-ci-update-java: clean-lockfiles up-wrapper up up-all-deps
-
-clean-build:
-	- rm -rf $(BUILD_DIRS)
-
-clean-gradle:
-	- rm -rf $(GRADLE_DIR)
-
-clean-lockfiles:
-	find . -name '*gradle.lockfile' -delete
-
-up-wrapper:
-	./gradlew wrapper --write-locks && ./gradlew wrapper
-
-up-all-deps:
-	./gradlew build --write-locks --scan --console=plain | grep -e FAILED -e https
+merge: merge-head push
+	@if gh pr view --json number > /dev/null 2>&1; then \
+		$(MAKE) watch-build create-pr; \
+	else \
+		$(MAKE) create-pr watch-build; \
+	fi
+	@$(MAKE) merge-squash
 
 create-pr:
-	gh pr create --body "" || exit 0
+	@tmp_dir=$$(mktemp -d); \
+	head_before=$$(git rev-parse HEAD); \
+	if gh pr view --json number > /dev/null 2>&1; then \
+		printf '%s\n' "Updating PR message..."; \
+		./.share/bin/pr-message.sh --engine "$(ENGINE)" --title-file "$$tmp_dir/title.txt" --body-file "$$tmp_dir/body.txt" \
+		  $(SKILL_ARG) || exit 1; \
+		head_after=$$(git rev-parse HEAD); \
+		if [ "$$head_before" != "$$head_after" ]; then \
+			./.share/bin/pr-message.sh --engine "$(ENGINE)" --title-file "$$tmp_dir/title.txt" --body-file "$$tmp_dir/body.txt" \
+			  $(SKILL_ARG) || exit 1; \
+		fi; \
+		title=$$(cat "$$tmp_dir/title.txt"); \
+		gh pr edit --title "$$title" --body-file "$$tmp_dir/body.txt" || exit 0; \
+		GH_PAGER=cat gh pr view; \
+	else \
+		./.share/bin/pr-message.sh --engine "$(ENGINE)" --title-file "$$tmp_dir/title.txt" --body-file "$$tmp_dir/body.txt" \
+		  $(SKILL_ARG) || exit 1; \
+		head_after=$$(git rev-parse HEAD); \
+		if [ "$$head_before" != "$$head_after" ]; then \
+			./.share/bin/pr-message.sh --engine "$(ENGINE)" --title-file "$$tmp_dir/title.txt" --body-file "$$tmp_dir/body.txt" \
+			  $(SKILL_ARG) || exit 1; \
+		fi; \
+		title=$$(cat "$$tmp_dir/title.txt"); \
+		gh pr create --title "$$title" --body-file "$$tmp_dir/body.txt" || exit 0; \
+		printf '%s\n' "PR created with generated message."; \
+		GH_PAGER=cat gh pr view; \
+	fi; \
+	rm -rf "$$tmp_dir"
 
 push:
 	git push
@@ -74,15 +64,29 @@ merge-head:
 	git merge origin/HEAD
 
 merge-squash:
-	gh pr merge --squash --delete-branch --auto
+	@if [ -n "$$({ git status --porcelain=1 2>/dev/null; } )" ]; then \
+		printf '%s\n' "WARNING: Uncommitted changes detected. Review before merge." 1>&2; \
+	fi; \
+	printf '%s' "Proceed with squash merge? [Y/n] "; \
+	read -r reply < /dev/tty; \
+	case "$$reply" in \
+		[Nn]|[Nn][Oo]) printf '%s\n' "Merge cancelled."; exit 1 ;; \
+		*) ;; \
+	esac; \
+	gh pr merge --squash --delete-branch
 
-run-url:
-	$(call check_defined, workflow)
-	@$(call gh_head_run_url, $(workflow))
-
-watch:
-	$(call check_defined, workflow)
-	@gh run watch $$($(call gh_head_run_id, $(workflow))) --exit-status
-
-watch-full:
-	@gh run watch $$($(call gh_head_run_id, "full")) --exit-status
+.PHONY: watch-build
+watch-build:
+	@printf "Waiting for workflow 'build' to start on commit $(HEAD)...\n"
+	@run_id=""; \
+	for i in $$(seq 1 12); do \
+		run_id=$$($(call gh_head_run_id, "build")); \
+		if [ -n "$$run_id" ]; then break; fi; \
+		printf "Run not found yet, retrying in 5s... ($$i/12)\n"; \
+		sleep 5; \
+	done; \
+	if [ -z "$$run_id" ]; then \
+		printf "Error: Workflow 'build' did not start within 60 seconds.\n" >&2; \
+		exit 1; \
+	fi; \
+	gh run watch "$$run_id" --exit-status

@@ -1,135 +1,65 @@
 <!--
-SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 
-SPDX-License-Identifier: CC-BY-NC-4.0
+SPDX-License-Identifier: CC-BY-NC-SA-4.0
 -->
 
 # README
 
-This repo hosts 2 plugins, [semver](module/semver/README.md) and [git](module/git/README.md).
+This repo hosts 2 plugins: [semver](module/semver/README.md) and [git](module/git/README.md).
 
-This plugin expects that you will `git tag` in the format of `v0.1.1` and with only one number on prerelease versions,
-e.g. `v0.1.1-rc.1`. It also expects that you will use annotated tags.
+The plugins expect git tags in the format `v0.1.1` (annotated tags) and prerelease versions like `v0.1.1-rc.1`.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, build instructions, and development workflow.
+
+## Goals
+
+Provide semantic versioning for Maven publishing with Gradle.
+
+_Future_: Provide a way to determine what the next version should be using your project's ABI.
 
 ## FAQ
 
-### Gradle Support
-
-Gradle and Java versions are tested as follows. Older versions may work but are unsupported. Version 1.x starts with
-Java 11 but may require 17 without notice.
-
-| Version    | Gradle | Java | License                            |
-| ---------- | ------ | ---- | ---------------------------------- |
-| <= v0.13.x | 8.x    | 11.x | Apache 2.0                         |
-| >= v0.14.x | 9.x    | 17.x | GPLv3 with Classpath Exception 2.0 |
-
 ### Shallow Clones
 
-```
-shallow clone detected! git only has {} commits
+Shallow clones will not work properly for calculating version distance. Instead of a shallow clone, use:
+
+```bash
+git fetch --all --filter blob:none
 ```
 
-Shallow clones will not work properly with calculating the distance and thus you must not use them. The usual reason for
-doing a shallow clone is that repositories can grow quiet large, and it can be quite slow to download a 100Mb
-repository. What most people don't realize is that git is lazy and will fetch blobs as it needs them for a checkout if
-you do things correctly. `git add remote <origin> <https://...>` and then doing `git fetch --all --filter blob:none`
-followed by an operation like `git checkout <branch>` will not retrieve any files until you do the git checkout but it
-will have your full history. This will achieve the correct behavior on github.
+Or in GitHub Actions:
 
-```yml
+```yaml
 - uses: actions/checkout@v4
   with:
-    ref: ${{ github.event.workflow_run.head_branch}}
     filter: "blob:none"
     fetch-depth: 0
 ```
 
 ### Annotated Tags
 
-- [GitHub does not checkout annotated tags properly](https://github.com/actions/checkout/issues/882)
+[GitHub does not checkout annotated tags properly](https://github.com/actions/checkout/issues/882). Use this workaround:
 
-You can use this snippet or another workaround documented on the issue
-
-```yml
+```yaml
 - uses: actions/checkout@v4
   with:
     ref: ${{ github.ref }}
 ```
 
-## Goals
+### Version Support
 
-Provide Semantic versioning for Maven publishing with Gradle.
-
-_Future_: Provide a way to determine what the next version should be using your projects ABI.
-
-## Contributing
-
-### Languages
-
-[asdf](https://asdf-vm.com) is suggested, you can use whatever you'd like to get
-
-- Java 11+
-- NodeJs
-
-add a way to export these to your `PATH` in your `~/.profile`
-
-### Build Tools
-
-- [Gradle](https://docs.gradle.org/current/userguide/command_line_interface.html)
-- [Yarn 4](https://yarnpkg.com/getting-started/install) (via Corepack)
-
-#### Fetching Dependencies
-
-In order to get snapshots of dependencies, you must have a GitHub token in your `~/.gradle/gradle.properties` file. This file should look like:
-
-```properties
-ghUsername=<your username>
-ghPassword=<your token>
-```
-
-You should generate your PAT as [Github Documents here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#authenticating-to-github-packages).
-
-> a personal access token (classic) with at least `read:packages` scope to install packages associated with other private repositories (which `GITHUB_TOKEN` can't access).
-
-Then run.
-
-Yarn setup and manual postinstall:
-
-```sh
-# Enable Corepack, install Node dev tools, run postinstall, then verify Gradle deps
-corepack enable
-yarn install --immutable --inline-builds --check-resolutions
-yarn run -T postinstall
-./gradlew dependencies
-```
-
-If you need to run the postinstall step directly, you can recreate and use the Python lock file via pip-compile (PEP 621):
-
-```sh
-# Regenerate requirements.txt from PEP 621 dependencies in pyproject.toml
-pip-compile -o requirements.txt pyproject.toml
-
-# Then install and set up commit hooks
-pip install -r requirements.txt && git config core.hooksPath .config/git/hooks
-```
-
-### Committing
-
-Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-
-### Releasing
-
-```sh
-git tag -m "v0.12.1" -a v0.12.1 && git push --tags
-```
+| Version    | Gradle | Java | License                            |
+| ---------- | ------ | ---- | ---------------------------------- |
+| <= v0.13.x | 8.x    | 11.x | Apache 2.0                         |
+| >= v0.14.x | 9.x    | 17.x | GPLv3 with Classpath Exception 2.0 |
 
 ## License
 
-All licenses are documented explicitly using SPDX identifiers in their file
-
-- Java: [GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
-  with [Classpath Exception](https://spdx.org/licenses/Classpath-exception-2.0.html)
-- Gradle Kotlin and Config Files: [MIT](https://choosealicense.com/licenses/mit/)
-- Documentation including Javadoc: [CC BY 4.0](https://choosealicense.com/licenses/cc-by-4.0/)
+- **Java**: [GPLv3](https://choosealicense.com/licenses/gpl-3.0/) with [Classpath Exception](https://spdx.org/licenses/Classpath-exception-2.0.html)
+- **Gradle/Kotlin/Config**: [MIT](https://choosealicense.com/licenses/mit/)
+- **Documentation**: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 Copyright © 2024 - 2026 Caleb Cushing
