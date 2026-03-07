@@ -4,7 +4,7 @@
   "private": true,
   "license": "GPL-3.0-or-later WITH Classpath-exception-2.0",
   "devDependencies": {
-    "@github/copilot": "^0.0.390",
+    "@github/copilot": "^0.0.400",
     "@prettier/plugin-xml": "^3.4.2",
     "git-conventional-commits": "^2.8.0",
     "lint-staged": "^16.2.1",
@@ -12,11 +12,20 @@
     "prettier-plugin-java": "^2.7.5",
     "prettier-plugin-properties": "^0.3.0",
     "prettier-plugin-sh": "^0.18.0",
-    "prettier-plugin-toml": "^2.0.6"
+    "prettier-plugin-toml": "^2.0.6",
+    "rimraf": "^6.1.2"
   },
   "scripts": {
+    "cleaner": "rimraf ./build */build ./module/*/build ./.gradle",
+    "contributor": "pip install -r requirements.txt --require-hashes && git config core.hooksPath .share/git/hooks",
+    "dependencies:for": "./gradlew dependencies --configuration",
+    "merge": "yarn merge:junie",
+    "merge:copilot": "make merge ENGINE=copilot",
+    "merge:junie": "make merge ENGINE=junie",
+    "merge:kimi": "make merge ENGINE=kimi",
     "test": "./gradlew check",
-    "contributor": "pip install -r requirements.txt --require-hashes && git config core.hooksPath .config/git/hooks",
-    "setup": "yarn postinstall"
+    "ug": "./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0",
+    "ug:dogfood": "./gradlew dependencies --refresh-dependencies --write-locks --console=plain | grep -e FAILED || exit 0",
+    "ug:scan": "./gradlew dependencies --write-locks --console=plain --scan | grep -e FAILED -e https || exit 0"
   }
 }

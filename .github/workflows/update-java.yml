@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
@@ -48,8 +48,11 @@ jobs:
         with:
           gradle-version: current
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - run: gradle wrapper --write-locks
-      - run: make ci-update-java
+      - run: |
+          find . -name '*gradle.lockfile' -delete
+          gradle wrapper --write-locks
+          ./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0
+          ./gradlew build --write-locks --scan --console=plain | grep -e FAILED -e https
       - run: |
           echo "stdout<<EOF" >> $GITHUB_OUTPUT
           git status --porcelain=1 | tee --append $GITHUB_OUTPUT
