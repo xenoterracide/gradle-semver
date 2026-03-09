@@ -17,12 +17,12 @@ dependencyLocking {
 }
 
 dependencies {
-  api(libs.jgit)
+  compileOnlyApi(libs.jgit)
   api(libs.vavr)
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang)
-  implementation(libs.guava)
-  implementation(libs.java.tools)
+  compileOnly(libs.guava)
+  compileOnly(libs.java.tools)
   shadow(libs.java.tools)
   shadow(libs.jgit)
   shadow(libs.guava)
