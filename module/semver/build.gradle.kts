@@ -16,10 +16,10 @@ dependencyLocking {
 
 dependencies {
   api(libs.semver)
-  api(projects.git)
   compileOnlyApi(libs.jspecify)
-  implementation(libs.java.tools)
   implementation(libs.guava)
+  implementation(libs.java.tools)
+  implementation(projects.git)
   shadow(libs.java.tools)
   shadow(libs.guava)
 
