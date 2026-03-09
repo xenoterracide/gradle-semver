@@ -15,7 +15,7 @@ import org.gradle.api.provider.Provider;
 /**
  * Extension for the {@link GitPlugin} mainly providing {@link Provider}'s for {@link GitMetadata}.
  */
-public class GitExtension implements Provides<GitMetadata> {
+public class GitExtension {
 
   private static final String HEAD_REF = "HEAD";
 
@@ -52,7 +52,6 @@ public class GitExtension implements Provides<GitMetadata> {
     );
   }
 
-  @Override
   public Provider<GitMetadata> getProvider() {
     return this.provider;
   }

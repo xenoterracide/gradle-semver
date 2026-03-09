@@ -9,7 +9,6 @@ import com.xenoterracide.gradle.git.GitMetadata;
 import com.xenoterracide.gradle.git.GitRemote;
 import com.xenoterracide.gradle.git.GitStatus;
 import com.xenoterracide.gradle.git.ProvidedFactory;
-import com.xenoterracide.gradle.git.Provides;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,7 +29,7 @@ import org.semver4j.Semver;
  * </ul>
  */
 // CHECKSTYLE.OFF: FinalClass
-public class SemverExtension implements Provides<Semver> {
+public class SemverExtension {
 
   // CHECKSTYLE.ON: FinalClass
 
@@ -226,7 +225,6 @@ public class SemverExtension implements Provides<Semver> {
    * @implNote The value will not be recalculated more than once per project per build. It is suggested to only use on
    *   the root project.
    */
-  @Override
   public Provider<Semver> getProvider() {
     return this.provider;
   }

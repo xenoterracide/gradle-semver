@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright © 2024 - 2026 Caleb Cushing
+// SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
  * Build Service for Git. Primary goal is to allow for lazy initialization of the Git object and keeping it open for
  * later usage. This Service should not be considered a published API, and may change or be removed in future versions.
  */
-public abstract class GitService implements BuildService<GitService.Params>, AutoCloseable, Provides<Git> {
+public abstract class GitService implements BuildService<GitService.Params>, AutoCloseable {
 
   private @Nullable Git git;
 
@@ -29,7 +29,6 @@ public abstract class GitService implements BuildService<GitService.Params>, Aut
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
   public GitService() {}
 
-  @Override
   public Provider<Git> getProvider() {
     return this.getParameters()
       .getGitDirectory()
