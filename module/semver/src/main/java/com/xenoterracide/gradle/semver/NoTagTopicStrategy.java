@@ -4,7 +4,7 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.google.common.base.MoreObjects;
+import org.apache.commons.lang3.ObjectUtils;
 import org.semver4j.Semver;
 
 /**
@@ -33,8 +33,8 @@ final class NoTagTopicStrategy implements VersionStrategy {
     // Start from 0.0.0
     // Prerelease uses distance from tag (total commits, like HEAD branch)
     // Metadata uses distance from merge base (commits on topic branch only)
-    var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
-    var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
+    var branchName = ObjectUtils.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
+    var shortSha = ObjectUtils.firstNonNull(this.ctx.shortSha(), UNKNOWN);
     var prerelease = String.format("alpha.0.%d", this.ctx.distanceFromTag());
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",

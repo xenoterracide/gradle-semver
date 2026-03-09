@@ -2,12 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.spotbugs.snom.SpotBugsTask
 
 buildscript { dependencyLocking { lockAllConfigurations() } }
 
 plugins {
   our.convention
+  alias(libs.plugins.shadow)
 }
 
 dependencyLocking {
@@ -16,9 +18,11 @@ dependencyLocking {
 
 dependencies {
   api(libs.semver)
-  api(projects.git)
   compileOnlyApi(libs.jspecify)
+  implementation(libs.commons.lang) { version { require("[3.8,4)") } }
   implementation(libs.java.tools)
+  implementation(projects.git)
+  shadow(libs.java.tools)
 
   annotationProcessor(platform(libs.immutables.bom))
   annotationProcessor(libs.immutables.core)
@@ -26,12 +30,25 @@ dependencies {
   compileOnly(libs.bundles.immutables)
 
   spotbugs(libs.spotbugs)
+
+  testImplementation(libs.jgit)
 }
 
 // Ensure SpotBugs has access to annotation classes for proper null analysis
 tasks.withType<SpotBugsTask>().configureEach {
   auxClassPaths.from(configurations.compileClasspath)
   auxClassPaths.from(configurations.runtimeClasspath)
+}
+
+tasks.withType<ShadowJar>().configureEach {
+  archiveClassifier.set("")
+  relocate("com.xenoterracide.tools", "com.xenoterracide.gradle.semver.tools")
+  relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
+  dependencies {
+    include { it.moduleGroup == "com.xenoterracide" && it.moduleName == "tools" }
+    include { it.moduleGroup == "com.google.guava" }
+  }
+  minimize()
 }
 
 testing {
