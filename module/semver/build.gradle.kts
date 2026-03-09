@@ -17,18 +17,16 @@ dependencyLocking {
 }
 
 dependencies {
+  api(libs.semver)
   annotationProcessor(libs.immutables.core)
   annotationProcessor(platform(libs.immutables.bom))
   compileOnly(libs.bundles.immutables)
-  compileOnly(libs.commons.lang)
-  compileOnly(libs.java.tools)
   compileOnly(platform(libs.immutables.bom))
-  compileOnlyApi(libs.semver)
-  compileOnlyApi(projects.git)
   compileOnlyApi(libs.jspecify)
-  shadow(libs.commons.lang)
-  shadow(libs.semver)
-  shadow(projects.git)
+  implementation(libs.commons.lang)
+  implementation(libs.java.tools)
+  implementation(projects.git)
+  shadow(libs.java.tools)
   spotbugs(libs.spotbugs)
   testImplementation(libs.jgit)
 }
