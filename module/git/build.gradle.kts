@@ -45,7 +45,7 @@ tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
   relocate("org.eclipse.jgit", "com.xenoterracide.gradle.git.jgit")
   relocate("com.google.common", "com.xenoterracide.gradle.git.guava")
-  relocate("com.xenoterracide.tools.java", "com.xenoterracide.tools.java")
+  relocate("com.xenoterracide.tools.java", "com.xenoterracide.git.tools")
   dependencies {
     exclude { it.moduleGroup == "io.vavr" }
     exclude { it.moduleGroup == "org.slf4j" }
