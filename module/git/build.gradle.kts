@@ -12,20 +12,22 @@ plugins {
   alias(libs.plugins.shadow)
 }
 
+val relocated by configurations.creating
+
 dependencyLocking {
   lockAllConfigurations()
 }
 
 dependencies {
-  compileOnlyApi(libs.jgit)
+  compileOnly(libs.jgit)
   api(libs.vavr)
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang)
   compileOnly(libs.guava)
   compileOnly(libs.java.tools)
-  shadow(libs.java.tools)
-  shadow(libs.jgit)
-  shadow(libs.guava)
+  relocated(libs.java.tools)
+  relocated(libs.jgit)
+  relocated(libs.guava)
   testFixturesApi(libs.jgit)
   testFixturesApi(libs.jspecify)
 }
@@ -38,13 +40,26 @@ testing {
         implementation(libs.junit.api)
         implementation(libs.junit.parameters)
         implementation(testFixtures(project()))
+        runtimeOnly(libs.guava)
+        runtimeOnly(libs.java.tools)
+        runtimeOnly(libs.jgit)
+      }
+    }
+    val test by getting(JvmTestSuite::class) {
+      dependencies {
+        implementation(libs.guava)
       }
     }
   }
 }
 
+shadow {
+  addShadowVariantIntoJavaComponent = false
+}
+
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
+  configurations = listOf(relocated)
   relocate("org.eclipse.jgit", "com.xenoterracide.gradle.git.jgit")
   relocate("com.google.common", "com.xenoterracide.gradle.git.guava")
   relocate("com.xenoterracide.tools.java", "com.xenoterracide.git.tools")
@@ -54,6 +69,13 @@ tasks.withType<ShadowJar>().configureEach {
     exclude { it.moduleName == "semver4j" }
   }
   minimize()
+}
+
+tasks.named<PluginUnderTestMetadata>("pluginUnderTestMetadata") {
+  val shadowJarTask = tasks.named<ShadowJar>("shadowJar")
+  val shadowJarFile = shadowJarTask.flatMap { it.archiveFile }
+  dependsOn(shadowJarTask)
+  pluginClasspath.setFrom(shadowJarFile, configurations.runtimeClasspath)
 }
 
 gradlePlugin {

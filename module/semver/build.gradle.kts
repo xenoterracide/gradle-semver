@@ -12,6 +12,8 @@ plugins {
   alias(libs.plugins.shadow)
 }
 
+val relocated by configurations.creating
+
 dependencyLocking {
   lockAllConfigurations()
 }
@@ -24,9 +26,9 @@ dependencies {
   compileOnly(platform(libs.immutables.bom))
   compileOnlyApi(libs.jspecify)
   implementation(libs.commons.lang)
-  implementation(libs.java.tools)
+  compileOnly(libs.java.tools)
   implementation(projects.git)
-  shadow(libs.java.tools)
+  relocated(libs.java.tools)
   spotbugs(libs.spotbugs)
   testImplementation(libs.jgit)
 }
@@ -37,13 +39,36 @@ tasks.withType<SpotBugsTask>().configureEach {
   auxClassPaths.from(configurations.runtimeClasspath)
 }
 
+shadow {
+  addShadowVariantIntoJavaComponent = false
+}
+
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
+  configurations = listOf(relocated)
   relocate("com.xenoterracide.tools", "com.xenoterracide.gradle.semver.tools")
   dependencies {
     include { it.moduleGroup == "com.xenoterracide" && it.moduleName == "tools" }
   }
   minimize()
+}
+
+tasks.named<PluginUnderTestMetadata>("pluginUnderTestMetadata") {
+  val shadowJarTask = tasks.named<ShadowJar>("shadowJar")
+  val shadowJarFile = shadowJarTask.flatMap { it.archiveFile }
+  val gitShadowJarTask = rootProject.project(":git").tasks.named<ShadowJar>("shadowJar")
+  val gitShadowJarFile = gitShadowJarTask.flatMap { it.archiveFile }
+  dependsOn(shadowJarTask, gitShadowJarTask)
+  pluginClasspath.setFrom(
+    shadowJarFile,
+    gitShadowJarFile,
+    providers.provider {
+      configurations.runtimeClasspath
+        .get()
+        .files
+        .filterNot { it.absolutePath.contains("/module/git/build/") }
+    },
+  )
 }
 
 testing {
@@ -54,6 +79,9 @@ testing {
         implementation(libs.junit.api)
         implementation(libs.junit.parameters)
         implementation(testFixtures(projects.git))
+        runtimeOnly(libs.guava)
+        runtimeOnly(libs.java.tools)
+        runtimeOnly(libs.jgit)
       }
     }
     val test by getting(JvmTestSuite::class) {
