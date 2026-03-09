@@ -52,6 +52,11 @@ public class GitExtension {
     );
   }
 
+  /**
+   * Gets the GitMetadata provider.
+   *
+   * @return the GitMetadata provider
+   */
   public Provider<GitMetadata> getProvider() {
     return this.provider;
   }

@@ -29,6 +29,13 @@ public abstract class GitService implements BuildService<GitService.Params>, Aut
   @SuppressWarnings({ "this-escape", "InjectOnConstructorOfAbstractClass" })
   public GitService() {}
 
+  /**
+   * Provides a Provider for the Git object, lazily initialized and kept open for later usage. The Provider will be
+   * memoized, so the Git object will only be initialized once per build. The Git object will be closed when the build
+   * finishes, as this Service implements AutoCloseable.
+   *
+   * @return Provider of Git
+   */
   public Provider<Git> getProvider() {
     return this.getParameters()
       .getGitDirectory()

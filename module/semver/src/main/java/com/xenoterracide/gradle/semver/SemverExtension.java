@@ -83,7 +83,6 @@ public class SemverExtension {
    * @param origin the origin remote
    * @return the HEAD branch name, or null if not available
    */
-  // CHECKSTYLE.OFF: ReturnCount
   static @Nullable String getHeadBranchName(GitRemote origin) {
     var headBranchRef = origin.headBranchRefName();
     if (headBranchRef == null) {
@@ -96,8 +95,6 @@ public class SemverExtension {
     }
     return null;
   }
-
-  // CHECKSTYLE.ON: ReturnCount
 
   /**
    * Creates a provider that builds GitContext from GitExtension providers.
