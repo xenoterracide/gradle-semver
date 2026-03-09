@@ -5,6 +5,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.spotbugs.snom.SpotBugsTask
 
+buildscript { dependencyLocking { lockAllConfigurations() } }
+
 plugins {
   our.convention
   alias(libs.plugins.shadow)
