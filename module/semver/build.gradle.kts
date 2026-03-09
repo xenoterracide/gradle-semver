@@ -19,13 +19,16 @@ dependencyLocking {
 dependencies {
   annotationProcessor(libs.immutables.core)
   annotationProcessor(platform(libs.immutables.bom))
-  api(libs.semver)
   compileOnly(libs.bundles.immutables)
+  compileOnly(libs.commons.lang)
+  compileOnly(libs.java.tools)
   compileOnly(platform(libs.immutables.bom))
+  compileOnlyApi(libs.semver)
+  compileOnlyApi(projects.git)
   compileOnlyApi(libs.jspecify)
-  implementation(libs.commons.lang) { version { require("[3.8,4)") } }
-  implementation(libs.java.tools)
-  implementation(projects.git)
+  shadow(libs.commons.lang)
+  shadow(libs.semver)
+  shadow(projects.git)
   spotbugs(libs.spotbugs)
   testImplementation(libs.jgit)
 }
