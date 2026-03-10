@@ -43,6 +43,17 @@ Each module has three test source sets:
 2. `src/testFixtures` - Shared test utilities
 3. `src/testIntegration` - Gradle TestKit integration tests
 
+### CI Build Times
+
+**Full CI builds can take 4-10 minutes.** The `full` job runs with `--no-build-cache --no-configuration-cache --rerun-tasks` which is intentionally thorough but slow.
+
+**Optimization tips for development:**
+
+- The `build` job (without `full`) is faster but still comprehensive
+- Integration tests (`testIntegration`) bootstrap a full MavenLocal repo - this adds significant time
+- Pre-commit checks (`license`, `format`, `format-kotlin`) run in ~30-40 seconds
+- If iterating on tests, consider running specific test tasks locally rather than via CI
+
 ### License Compliance (REUSE 3.0)
 
 - **Java**: GPL-3.0-or-later WITH Classpath-exception-2.0

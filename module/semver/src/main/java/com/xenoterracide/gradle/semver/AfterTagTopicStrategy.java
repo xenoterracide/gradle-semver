@@ -4,10 +4,10 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.google.common.base.MoreObjects;
 import com.xenoterracide.tools.java.util.ObjectTools;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.ObjectUtils;
 import org.semver4j.Semver;
 
 /**
@@ -58,8 +58,8 @@ final class AfterTagTopicStrategy implements VersionStrategy {
   }
 
   private String buildMetadata() {
-    var branchName = MoreObjects.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
-    var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
+    var branchName = ObjectUtils.firstNonNull(this.ctx.currentBranch(), UNKNOWN);
+    var shortSha = ObjectUtils.firstNonNull(this.ctx.shortSha(), UNKNOWN);
     // Metadata shows distance from merge base (commits on topic branch only)
     var baseMetadata = String.format(
       "branch.%s.git.%d.%s",

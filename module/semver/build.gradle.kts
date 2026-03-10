@@ -5,10 +5,14 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.spotbugs.snom.SpotBugsTask
 
+buildscript { dependencyLocking { lockAllConfigurations() } }
+
 plugins {
   our.convention
   alias(libs.plugins.shadow)
 }
+
+val relocated by configurations.creating
 
 dependencyLocking {
   lockAllConfigurations()
@@ -16,20 +20,19 @@ dependencyLocking {
 
 dependencies {
   api(libs.semver)
-  api(projects.git)
-  compileOnlyApi(libs.jspecify)
-  implementation(libs.java.tools)
-  implementation(libs.guava)
-  shadow(libs.java.tools)
-  shadow(libs.guava)
-
-  annotationProcessor(platform(libs.immutables.bom))
   annotationProcessor(libs.immutables.core)
-  compileOnly(platform(libs.immutables.bom))
+  annotationProcessor(platform(libs.immutables.bom))
   compileOnly(libs.bundles.immutables)
-
+  compileOnly(platform(libs.immutables.bom))
+  compileOnlyApi(libs.jspecify)
+  implementation(libs.commons.lang)
+  compileOnly(libs.java.tools)
+  implementation(projects.git)
+  add("shadow", libs.semver)
+  add("shadow", libs.commons.lang)
+  add("shadow", projects.git)
+  relocated(libs.java.tools)
   spotbugs(libs.spotbugs)
-
   testImplementation(libs.jgit)
 }
 
@@ -39,15 +42,36 @@ tasks.withType<SpotBugsTask>().configureEach {
   auxClassPaths.from(configurations.runtimeClasspath)
 }
 
+shadow {
+  addShadowVariantIntoJavaComponent = false
+}
+
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
+  configurations = listOf(relocated)
   relocate("com.xenoterracide.tools", "com.xenoterracide.gradle.semver.tools")
-  relocate("com.google.common", "com.xenoterracide.gradle.semver.guava")
   dependencies {
     include { it.moduleGroup == "com.xenoterracide" && it.moduleName == "tools" }
-    include { it.moduleGroup == "com.google.guava" }
   }
   minimize()
+}
+
+tasks.named<PluginUnderTestMetadata>("pluginUnderTestMetadata") {
+  val shadowJarTask = tasks.named<ShadowJar>("shadowJar")
+  val shadowJarFile = shadowJarTask.flatMap { it.archiveFile }
+  val gitShadowJarTask = rootProject.project(":git").tasks.named<ShadowJar>("shadowJar")
+  val gitShadowJarFile = gitShadowJarTask.flatMap { it.archiveFile }
+  dependsOn(shadowJarTask, gitShadowJarTask)
+  pluginClasspath.setFrom(
+    shadowJarFile,
+    gitShadowJarFile,
+    providers.provider {
+      configurations.runtimeClasspath
+        .get()
+        .files
+        .filterNot { it.absolutePath.contains("/module/git/build/") }
+    },
+  )
 }
 
 testing {
@@ -58,6 +82,9 @@ testing {
         implementation(libs.junit.api)
         implementation(libs.junit.parameters)
         implementation(testFixtures(projects.git))
+        runtimeOnly(libs.guava)
+        runtimeOnly(libs.java.tools)
+        runtimeOnly(libs.jgit)
       }
     }
     val test by getting(JvmTestSuite::class) {

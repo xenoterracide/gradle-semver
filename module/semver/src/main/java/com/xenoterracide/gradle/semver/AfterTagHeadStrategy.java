@@ -4,10 +4,10 @@
 
 package com.xenoterracide.gradle.semver;
 
-import com.google.common.base.MoreObjects;
 import com.xenoterracide.tools.java.util.ObjectTools;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.ObjectUtils;
 import org.semver4j.Semver;
 
 /**
@@ -46,10 +46,9 @@ final class AfterTagHeadStrategy implements VersionStrategy {
     );
 
     var distance = this.ctx.distanceFromTag();
-    var shortSha = MoreObjects.firstNonNull(this.ctx.shortSha(), UNKNOWN);
+    var shortSha = ObjectUtils.firstNonNull(this.ctx.shortSha(), UNKNOWN);
     var metadata = String.format("git.%d.%s", distance, shortSha);
     var metadataWithDirty = appendDirtyMarker(metadata, this.ctx);
-
     return calculateVersion(semver, distance).withBuild(metadataWithDirty);
   }
 
