@@ -14,6 +14,9 @@
 "*.{xml,yml,yaml,properties,toml,json5,js}":
   - &cc0 "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --fallback-dot-license"
   - *prettier
+"*.properties":
+  - "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --merge-copyrights"
+  - *prettier
 ".{editorconfig,gitattributes,mailmap,*ignore}":
   - *cc0
   - *prettier
