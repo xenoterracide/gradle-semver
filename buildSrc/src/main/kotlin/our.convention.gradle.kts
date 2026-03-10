@@ -116,7 +116,7 @@ testing {
 }
 
 tasks.withType<Test>().configureEach {
-  jvmArgs("-XX:MaxRAM=2g", "-XX:MaxRAMPercentage=80", "-XX:+UseStringDeduplication")
+  jvmArgs("-XX:MaxRAMPercentage=80", "-XX:+UseStringDeduplication")
 }
 
 tasks.check {
