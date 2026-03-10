@@ -98,8 +98,11 @@ class PublishedSemverPluginIntegrationTest {
   private static void patchBootstrapBuild(Path sourceCopy) throws IOException {
     var buildFile = sourceCopy.resolve("build.gradle.kts");
     var buildScript = Files.readString(buildFile).replace(
-      "version = if (providers.environmentVariable(\"IS_PUBLISHING\").isPresent) " +
-        "calculateProjectVersion() else \"0.0.0\"",
+      "version =\n" +
+        "  providers\n" +
+        "    .environmentVariable(\"IS_PUBLISHING\")\n" +
+        "    .flatMap { semver.provider }\n" +
+        "    .getOrElse(Semver.ZERO)",
       "version = \"" + VERSION + "\""
     );
     Files.writeString(buildFile, buildScript);
