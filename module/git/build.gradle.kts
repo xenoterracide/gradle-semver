@@ -25,6 +25,8 @@ dependencies {
   implementation(libs.commons.lang)
   compileOnly(libs.guava)
   compileOnly(libs.java.tools)
+  add("shadow", libs.vavr)
+  add("shadow", libs.commons.lang)
   relocated(libs.java.tools)
   relocated(libs.jgit)
   relocated(libs.guava)
