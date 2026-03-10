@@ -115,10 +115,6 @@ testing {
   }
 }
 
-tasks.withType<Test>().configureEach {
-  jvmArgs("-XX:MaxRAMPercentage=80", "-XX:+UseStringDeduplication")
-}
-
 tasks.check {
   dependsOn(testing.suites.named("testIntegration"))
 }
