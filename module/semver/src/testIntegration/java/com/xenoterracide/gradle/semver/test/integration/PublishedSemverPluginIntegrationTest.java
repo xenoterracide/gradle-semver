@@ -32,11 +32,11 @@ class PublishedSemverPluginIntegrationTest {
   void publishedPluginCanApplyGitPlugin() throws Exception {
     var repoRoot = findRepoRoot();
     var sourceCopy = workingDirectory.toPath().resolve("source");
-    var consumerProject = workingDirectory.toPath().resolve("consumer");
 
     copyRepo(repoRoot, sourceCopy);
     patchBootstrapBuild(sourceCopy);
     publishPlugins(sourceCopy);
+    var consumerProject = workingDirectory.toPath().resolve("consumer");
     createConsumerProject(consumerProject);
 
     var build = GradleRunner.create()
