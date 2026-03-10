@@ -32,16 +32,17 @@ class PublishedSemverPluginIntegrationTest {
   void publishedPluginCanApplyGitPlugin() throws Exception {
     var repoRoot = findRepoRoot();
     var sourceCopy = workingDirectory.toPath().resolve("source");
+    var mavenRepo = workingDirectory.toPath().resolve("m2");
 
     copyRepo(repoRoot, sourceCopy);
     patchBootstrapBuild(sourceCopy);
-    publishPlugins(sourceCopy);
+    publishPlugins(sourceCopy, mavenRepo);
     var consumerProject = workingDirectory.toPath().resolve("consumer");
     createConsumerProject(consumerProject);
 
     var build = GradleRunner.create()
       .withProjectDir(consumerProject.toFile())
-      .withArguments("semverVersion", "--stacktrace", "--quiet")
+      .withArguments("-Dmaven.repo.local=" + mavenRepo, "semverVersion", "--stacktrace", "--quiet")
       .build();
 
     assertThat(build.getOutput()).doesNotContain("NoClassDefFoundError").doesNotContain("GitPlugin").isNotBlank();
@@ -96,19 +97,10 @@ class PublishedSemverPluginIntegrationTest {
 
   private static void patchBootstrapBuild(Path sourceCopy) throws IOException {
     var buildFile = sourceCopy.resolve("build.gradle.kts");
-    var buildScript = Files.readString(buildFile)
-      .replace("import org.semver4j.Semver\n", "")
-      .replace("  alias(libs.plugins.semver)\n", "")
-      .replace(
-        """
-        version =
-          providers
-            .environmentVariable(\"IS_PUBLISHING\")
-            .flatMap { semver.provider }
-            .getOrElse(Semver.ZERO)
-        """,
-        "version = \"" + VERSION + "\"\n"
-      );
+    var buildScript = Files.readString(buildFile).replace(
+      "version = if (providers.environmentVariable(\"IS_PUBLISHING\").isPresent) calculateProjectVersion() else \"0.0.0\"",
+      "version = \"" + VERSION + "\""
+    );
     Files.writeString(buildFile, buildScript);
 
     Files.writeString(
@@ -122,13 +114,14 @@ class PublishedSemverPluginIntegrationTest {
     );
   }
 
-  private static void publishPlugins(Path sourceCopy) {
+  private static void publishPlugins(Path sourceCopy, Path mavenRepo) {
     var gradleUserHome = Path.of(System.getProperty("user.home"), ".gradle").toString();
     var ghUsername = System.getenv().getOrDefault("ORG_GRADLE_PROJECT_ghUsername", "test");
     var ghPassword = System.getenv().getOrDefault("ORG_GRADLE_PROJECT_ghPassword", "test");
     GradleRunner.create()
       .withProjectDir(sourceCopy.toFile())
       .withArguments(
+        "-Dmaven.repo.local=" + mavenRepo,
         ":git:publishToMavenLocal",
         ":semver:publishToMavenLocal",
         "-g",
