@@ -20,7 +20,7 @@ immutables-annotations = { module = "org.immutables:value-annotations" }
 immutables-bom = { module = "org.immutables:bom", version.ref = "immutables" }
 immutables-builder = { module = "org.immutables:builder" }
 immutables-core = { module = "org.immutables:value" }
-java-tools = "com.xenoterracide:tools:0.+"
+java-tools = "com.xenoterracide:tools:0.1.0-beta.1.38+git.38.5c1600a"
 jgit = "org.eclipse.jgit:org.eclipse.jgit:7.+"
 jspecify = "org.jspecify:jspecify:1.+"
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api" }

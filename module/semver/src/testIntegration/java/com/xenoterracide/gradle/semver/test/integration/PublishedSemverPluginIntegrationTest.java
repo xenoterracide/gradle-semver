@@ -124,6 +124,8 @@ class PublishedSemverPluginIntegrationTest {
 
   private static void publishPlugins(Path sourceCopy) {
     var gradleUserHome = Path.of(System.getProperty("user.home"), ".gradle").toString();
+    var ghUsername = System.getenv().getOrDefault("ORG_GRADLE_PROJECT_ghUsername", "test");
+    var ghPassword = System.getenv().getOrDefault("ORG_GRADLE_PROJECT_ghPassword", "test");
     GradleRunner.create()
       .withProjectDir(sourceCopy.toFile())
       .withArguments(
@@ -131,8 +133,8 @@ class PublishedSemverPluginIntegrationTest {
         ":semver:publishToMavenLocal",
         "-g",
         gradleUserHome,
-        "-PghUsername=test",
-        "-PghPassword=test",
+        "-PghUsername=" + ghUsername,
+        "-PghPassword=" + ghPassword,
         "--write-locks",
         "--no-configuration-cache"
       )
