@@ -1,13 +1,9 @@
 ---
+name: use-case-creator
+description: Create and maintain use case specifications following Cockburn format with semantic anchors and ubiquitous language. Use when writing use cases, specifying requirements, or documenting system behavior.
 # SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
 #
 # SPDX-License-Identifier: CC-BY-NC-SA-4.0
-
-name: use-case-creator
-license: CC-BY-NC-SA-4.0
-metadata:
-  author: Caleb Cushing
-description: Create and maintain use case specifications following Cockburn format with semantic anchors and ubiquitous language. Use when writing use cases, specifying requirements, or documenting system behavior.
 ---
 
 # Use Case Creator
