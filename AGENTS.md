@@ -19,14 +19,14 @@ The plugins expect git tags in the format `v0.1.1` (annotated tags) and prerelea
 
 ## Technology Stack
 
-| Component | Version/Tool |
-|-----------|--------------|
-| **Language** | Java 17+ (source/target), Java 21 (toolchain) |
-| **Build System** | Gradle 9.3+ with Kotlin DSL |
-| **Task Runner** | Yarn 4.x (package manager for Node tooling) |
-| **Version Management** | asdf (`.tool-versions`) |
-| **Git Hooks** | lint-staged, git-conventional-commits |
-| **Python** | 3.14+ (for REUSE compliance) |
+| Component              | Version/Tool                                  |
+| ---------------------- | --------------------------------------------- |
+| **Language**           | Java 17+ (source/target), Java 21 (toolchain) |
+| **Build System**       | Gradle 9.3+ with Kotlin DSL                   |
+| **Task Runner**        | Yarn 4.x (package manager for Node tooling)   |
+| **Version Management** | asdf (`.tool-versions`)                       |
+| **Git Hooks**          | lint-staged, git-conventional-commits         |
+| **Python**             | 3.14+ (for REUSE compliance)                  |
 
 ### Key Dependencies
 
@@ -73,6 +73,7 @@ Provides git metadata through the `GitExtension`:
 - `status`: Repository status (clean/dirty)
 
 Key classes:
+
 - `GitPlugin`: Plugin entry point
 - `GitMetadata`: Interface for git metadata
 - `GitService`: Service for git operations using JGit
@@ -82,14 +83,15 @@ Key classes:
 
 Calculates semantic versions using strategy pattern:
 
-| Scenario | HEAD Branch Output | Topic Branch Output |
-|----------|-------------------|---------------------|
-| On exact tag | `1.0.0` | `1.0.0+branch.feature.git.0.abc123` |
-| After stable tag | `1.0.1-alpha.0.5+git.5.abc123` | `1.0.1-alpha.0.5+branch.feature.git.3.abc123` |
-| After pre-release tag | `1.0.0-rc.1.5+git.5.abc123` | `1.0.0-rc.1.5+branch.feature.git.3.abc123` |
-| No tags | `0.0.1-alpha.0.5+git.5.abc123` | `0.0.1-alpha.0.5+branch.feature.git.3.abc123` |
+| Scenario              | HEAD Branch Output             | Topic Branch Output                           |
+| --------------------- | ------------------------------ | --------------------------------------------- |
+| On exact tag          | `1.0.0`                        | `1.0.0+branch.feature.git.0.abc123`           |
+| After stable tag      | `1.0.1-alpha.0.5+git.5.abc123` | `1.0.1-alpha.0.5+branch.feature.git.3.abc123` |
+| After pre-release tag | `1.0.0-rc.1.5+git.5.abc123`    | `1.0.0-rc.1.5+branch.feature.git.3.abc123`    |
+| No tags               | `0.0.1-alpha.0.5+git.5.abc123` | `0.0.1-alpha.0.5+branch.feature.git.3.abc123` |
 
 Key classes:
+
 - `SemverPlugin`: Plugin entry point
 - `VersionStrategy`: Strategy interface for version calculation
 - `SemverExtension`: Extension for configuring the plugin
@@ -131,10 +133,10 @@ Key classes:
 ./gradlew publishToMavenLocal        # Publish to local Maven cache
 
 # Yarn scripts
-yarn test          # Run all checks (./gradlew check)
-yarn cleaner       # Clean build directories
-yarn ug            # Update dependency locks
-yarn merge         # Run full merge workflow (Makefile)
+yarn test    # Run all checks (./gradlew check)
+yarn cleaner # Clean build directories
+yarn ug      # Update dependency locks
+yarn merge   # Run full merge workflow (Makefile)
 ```
 
 ## Testing Strategy
@@ -158,9 +160,9 @@ Each module has three test source sets:
 ### Running Tests
 
 ```bash
-./gradlew test                       # Unit tests only
-./gradlew testIntegration            # Integration tests only
-./gradlew check                      # All tests + quality checks
+./gradlew test            # Unit tests only
+./gradlew testIntegration # Integration tests only
+./gradlew check           # All tests + quality checks
 ```
 
 ## Code Style and Quality
@@ -201,6 +203,7 @@ Hooks are in `.share/git/hooks/` and configured via `yarn contributor`:
 Format: `type(scope): subject`
 
 Allowed types (from `git-conventional-commits.yaml`):
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -216,12 +219,13 @@ Allowed types (from `git-conventional-commits.yaml`):
 ### Merge Workflow (Makefile)
 
 ```bash
-yarn merge          # Default (junie engine)
-yarn merge:kimi     # Using kimi engine
-yarn merge:copilot  # Using copilot engine
+yarn merge         # Default (junie engine)
+yarn merge:kimi    # Using kimi engine
+yarn merge:copilot # Using copilot engine
 ```
 
 The merge workflow:
+
 1. Fetches and merges origin/HEAD
 2. Pushes current branch
 3. Creates/updates PR with AI-generated message
@@ -232,18 +236,18 @@ The merge workflow:
 
 All files must have SPDX license identifiers. Licenses per file type:
 
-| File Type | License |
-|-----------|---------|
-| Java source | GPL-3.0-or-later WITH Classpath-exception-2.0 |
-| Gradle/Kotlin build scripts | MIT |
-| Documentation | CC-BY-NC-SA-4.0 |
-| Config/Data files | CC0-1.0 |
+| File Type                   | License                                       |
+| --------------------------- | --------------------------------------------- |
+| Java source                 | GPL-3.0-or-later WITH Classpath-exception-2.0 |
+| Gradle/Kotlin build scripts | MIT                                           |
+| Documentation               | CC-BY-NC-SA-4.0                               |
+| Config/Data files           | CC0-1.0                                       |
 
 ### REUSE Commands
 
 ```bash
-reuse lint                           # Check compliance
-reuse annotate --license ...         # Add license header
+reuse lint                   # Check compliance
+reuse annotate --license ... # Add license header
 ```
 
 Lint-staged automatically adds license headers based on file type (see `.lintstagedrc.yml`).
@@ -285,6 +289,7 @@ git tag -m "v0.12.1" -a v0.12.1 && git push --tags
 ```
 
 Release workflow:
+
 1. Builds and tests
 2. Publishes to staging repository
 3. Creates GitHub release with archives
@@ -299,6 +304,7 @@ Release workflow:
 ### Authentication for GitHub Packages
 
 Create `~/.gradle/gradle.properties`:
+
 ```properties
 ghUsername=<your username>
 ghPassword=<your token>
@@ -320,6 +326,7 @@ Token needs `read:packages` scope minimum.
 ### Shallow Clones
 
 Shallow clones break version distance calculation. Use instead:
+
 ```bash
 git fetch --all --filter blob:none
 ```
@@ -327,6 +334,7 @@ git fetch --all --filter blob:none
 ### GitHub Actions Annotated Tags
 
 GitHub doesn't checkout annotated tags properly. Workaround in workflow:
+
 ```yaml
 - uses: actions/checkout@v4
   with:
