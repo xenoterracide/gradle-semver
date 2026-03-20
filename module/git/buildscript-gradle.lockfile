@@ -2,8 +2,8 @@
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
 com.fasterxml.woodstox:woodstox-core:7.1.1=classpath
-com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.3.2=classpath
-com.gradleup.shadow:shadow-gradle-plugin:9.3.2=classpath
+com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.4.0=classpath
+com.gradleup.shadow:shadow-gradle-plugin:9.4.0=classpath
 commons-codec:commons-codec:1.21.0=classpath
 commons-io:commons-io:2.21.0=classpath
 org.apache.ant:ant-launcher:1.10.15=classpath
@@ -17,8 +17,8 @@ org.codehaus.plexus:plexus-utils:4.0.2=classpath
 org.codehaus.plexus:plexus-xml:4.1.1=classpath
 org.codehaus.woodstox:stax2-api:4.2.2=classpath
 org.jdom:jdom2:2.0.6.1=classpath
-org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.20-RC=classpath
-org.jetbrains.kotlin:kotlin-stdlib:2.2.21=classpath
+org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.20-RC3=classpath
+org.jetbrains.kotlin:kotlin-stdlib:2.3.0=classpath
 org.jetbrains:annotations:13.0=classpath
 org.vafer:jdependency:2.15=classpath
 empty=
