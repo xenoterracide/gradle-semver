@@ -16,8 +16,8 @@
     "rimraf": "^6.1.2"
   },
   "scripts": {
+    "contribute": "uv sync --frozen && git config core.hooksPath .share/git/hooks",
     "cleaner": "rimraf ./build */build ./module/*/build ./.gradle",
-    "contributor": "pip install -r requirements.txt --require-hashes && git config core.hooksPath .share/git/hooks",
     "dependencies:for": "./gradlew dependencies --configuration",
     "merge": "yarn merge:junie",
     "merge:copilot": "make merge ENGINE=copilot",

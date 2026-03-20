@@ -7,32 +7,20 @@
   extends: ["config:recommended"],
   dependencyDashboard: true,
   timezone: "UTC",
+  platformAutomerge: true,
   automergeStrategy: "rebase",
-  // NOTE: This config is designed to work with the GitHub Actions workflow in
-  // .github/workflows/renovate.yml. The workflow passes ORG_GRADLE_PROJECT_*
-  // environment variables that Gradle needs to authenticate with GitHub Packages.
   hostRules: [
     {
       hostType: "maven",
       matchHost: "https://maven.pkg.github.com",
-      // These credentials are used by Renovate's Maven datasource for lookups,
-      // but NOT passed to the Gradle executable for lockfile updates.
-      username: "{{ secrets.GITHUB_ACTOR }}",
-      password: "{{ secrets.GITHUB_TOKEN }}",
     },
   ],
   packageRules: [
     {
-      // Runs during the 03:00 UTC hour daily (scheduled after update-java at 03:00)
+      // Python deps via uv: Run daily at 03:00 UTC (after update-java)
       schedule: ["* 3 * * *"],
-      // Use pip-compile with PEP 621 pyproject at repo root
-      matchManagers: ["pip-compile"],
-      matchFileNames: ["^pyproject\\.toml$"],
-    },
-    {
-      // Disable legacy requirements manager; we use pip-compile with PEP 621
-      matchManagers: ["pip_requirements"],
-      enabled: false,
+      matchManagers: ["pep621"],
+      automerge: true,
     },
     // 1. Baseline: Disable ALL Gradle updates (minor/patch/pin/digest)
     // This effectively ignores libs.versions.toml and build.gradle.kts for non-major updates.
@@ -67,6 +55,14 @@
     {
       matchManagers: ["github-actions"],
       automerge: true,
+    },
+    {
+      // Pin xenoterracide org actions to commit SHAs for build reproducibility
+      // Only these get digest pins; other actions get normal version tag updates
+      matchManagers: ["github-actions"],
+      matchDepNames: ["xenoterracide/**"],
+      automerge: true,
+      pinDigests: true,
     },
     {
       // Run every Wednesday

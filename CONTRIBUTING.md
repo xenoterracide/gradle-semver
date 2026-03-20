@@ -13,7 +13,7 @@ This is a **Gradle plugin project** that provides semantic versioning based on g
 
 ## Prerequisites
 
-- Java 21+ (Temurin recommended)
+- Java 25+ (Temurin recommended)
 - Node.js 24+ (via asdf or other version manager)
 - Python 3.14+ (for REUSE compliance)
 
@@ -101,7 +101,7 @@ yarn merge:copilot # Run merge workflow with copilot
 
 ## Git Hooks
 
-Hooks are in `.share/git/hooks/` and are configured automatically by `yarn contributor`.
+Hooks are in `.share/git/hooks/` and are configured automatically by `yarn contribute`.
 
 - **pre-commit**: Runs `lint-staged` (formatting + license annotation)
 - **commit-msg**: Validates conventional commit format
@@ -124,6 +124,9 @@ Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/): `typ
 - `ci`: CI/CD changes
 - `chore`: Maintenance
 - `deps`: Dependencies
+- `ops`: Operations
+- `merge`: Merge commits
+- `revert`: Reverts
 
 ## Testing
 

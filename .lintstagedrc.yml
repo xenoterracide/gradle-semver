@@ -3,16 +3,16 @@
 # SPDX-License-Identifier: CC0-1.0
 
 # common
-"Makefile":
-  - &mit "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --fallback-dot-license"
 "{.config/git/hooks/*,*.sh}":
-  - "reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --style python"
+  - "uv run reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --style python"
   - &prettier "prettier --cache --ignore-unknown --write"
-"*.{md,adoc}":
-  - "reuse annotate --license 'CC-BY-NC-SA-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+"!(SKILL).{md,adoc}":
+  - "uv run reuse annotate --license 'CC-BY-NC-SA-4.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - *prettier
+"SKILL.md":
   - *prettier
 "*.{xml,yml,yaml,properties,toml,json5,js}":
-  - &cc0 "reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --fallback-dot-license"
+  - &cc0 "uv run reuse annotate --license 'CC0-1.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --fallback-dot-license"
   - *prettier
 ".{editorconfig,gitattributes,mailmap,*ignore}":
   - *cc0
@@ -21,12 +21,15 @@
   - *cc0
   - *prettier
 "package.json":
-  - *mit
+  - &mit "uv run reuse annotate --license 'MIT' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights --fallback-dot-license"
   - *prettier
 "*.gradle.kts":
   - *mit
   - ktlint --format
 # unique
 "*.java":
-  - "reuse annotate --license 'GPL-3.0-or-later WITH Classpath-exception-2.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - "uv run reuse annotate --license 'GPL-3.0-or-later WITH Classpath-exception-2.0' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
+  - *prettier
+"*.ts":
+  - "uv run reuse annotate --license 'GPL-3.0-or-later' --copyright 'Caleb Cushing' --copyright-prefix spdx-string-symbol --merge-copyrights"
   - *prettier
