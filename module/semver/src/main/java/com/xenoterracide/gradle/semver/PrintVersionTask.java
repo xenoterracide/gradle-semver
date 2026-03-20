@@ -7,9 +7,9 @@ package com.xenoterracide.gradle.semver;
 import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.UntrackedTask;
 
 /**
  * Prints a version string.
@@ -17,7 +17,7 @@ import org.gradle.api.tasks.TaskAction;
  * <p>Task is designed to be configuration-cache friendly by only reading declared inputs at execution
  * time.</p>
  */
-@CacheableTask
+@UntrackedTask(because = "Prints version text to standard out")
 public abstract class PrintVersionTask extends DefaultTask {
 
   /** Creates a new task instance. */
