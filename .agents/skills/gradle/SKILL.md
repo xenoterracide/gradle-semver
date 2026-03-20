@@ -13,69 +13,52 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 Guidance for working with Gradle build system.
 
-## Dependency Locking
+## Dependency Management
 
-If this project uses Gradle dependency locking (check for `*.lockfile` files):
+### Checking for Lockfiles
 
-**Lockfile locations:**
+Look for these files to determine if dependency locking is enabled:
 
-- `buildscript-gradle.lockfile` (root buildscript classpath)
-- `gradle.lockfile` (root project dependencies)
+- `gradle.lockfile` (project dependencies)
+- `buildscript-gradle.lockfile` (buildscript classpath)
+- `*/gradle.lockfile` (module-specific)
 - `*/buildscript-gradle.lockfile` (module-specific buildscript)
-- `*/gradle.lockfile` (module-specific dependencies)
 
-### When Analyzing Dependencies
+### Updating Dependencies
 
-When investigating dependency issues or version conflicts:
-
-1. **Check lockfile changes** - Compare `*.lockfile` changes in git to see what
-   versions changed
-2. **Look for configuration changes** - Dependency updates may add/remove
-   configurations
-3. **Verify lockfiles are in sync** - After dependency changes, run:
-   ```bash
-   ./gradlew dependencies --write-locks
-   ```
-
-### Troubleshooting Shadow Plugin Issues
-
-If this project uses the Shadow plugin, the `minimize()` feature can cause
-issues with certain dependencies:
-
-- **Error**: `Cannot read field "forJava" because "parsedFileName" is null`
-- **Cause**: jdependency (used by minimize()) fails to parse certain JAR
-  filenames
-- **Fix**: Remove `minimize()` from the `ShadowJar` configuration if it causes
-  issues
-
-Example shadow configuration without minimize:
-
-```kotlin
-tasks.withType<ShadowJar>().configureEach {
-  archiveClassifier.set("")
-  relocate("com.example.lib", "my.shaded.lib")
-  dependencies {
-    include { it.moduleGroup == "com.example" }
-  }
-  // minimize() // Remove if causing NPE
-}
-```
-
-## Dependency Updates
-
-Standard workflow for updating dependencies (adjust commands based on project
-setup):
+If dependency locking is enabled, update lockfiles after changing dependencies:
 
 ```bash
-# Update locks
 ./gradlew dependencies --write-locks
+```
 
-# Force refresh and update
+To force refresh before updating:
+
+```bash
 ./gradlew dependencies --refresh-dependencies --write-locks
 ```
 
-After updates, verify build passes:
+### Analyzing Dependencies
+
+When investigating dependency issues:
+
+1. **Check lockfile diffs** - Review git changes to `*.lockfile` files
+2. **Look for configuration changes** - Dependency updates may add/remove
+   configurations
+3. **Verify consistency** - Ensure all lockfiles are updated together
+
+### Viewing Dependency Trees
 
 ```bash
-./gradlew check
+./gradlew dependencies
+./gradlew dependencies --configuration runtimeClasspath
+```
+
+## Common Build Tasks
+
+```bash
+./gradlew build          # Build and test
+./gradlew check          # Run all checks (tests, linting)
+./gradlew test           # Run unit tests
+./gradlew clean          # Clean build outputs
 ```
