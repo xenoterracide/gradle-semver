@@ -1,6 +1,14 @@
+<!--
+SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
+
+SPDX-License-Identifier: CC-BY-NC-SA-4.0
+-->
+
 ---
+
 name: gradle
 description: Working with Gradle build system and Kotlin DSL. Use when editing build.gradle.kts, settings.gradle.kts, gradle.properties, or any Gradle configuration files. Also use when analyzing dependencies, updating versions, or troubleshooting Gradle build issues.
+
 ---
 
 # Gradle Skill
@@ -10,6 +18,7 @@ Guidance for working with Gradle build system in this project.
 ## Lockfiles
 
 This project uses Gradle dependency locking. Lockfiles are located at:
+
 - `buildscript-gradle.lockfile` (root buildscript classpath)
 - `gradle.lockfile` (root project dependencies)
 - `*/buildscript-gradle.lockfile` (module-specific buildscript)
@@ -37,6 +46,7 @@ The shadow plugin's `minimize()` feature can cause issues with certain dependenc
 - **Fix**: Remove `minimize()` from the `ShadowJar` configuration if it causes issues
 
 Example shadow configuration without minimize:
+
 ```kotlin
 tasks.withType<ShadowJar>().configureEach {
   archiveClassifier.set("")
@@ -61,6 +71,7 @@ yarn ug:dogfood
 ```
 
 After updates, verify build passes:
+
 ```bash
 ./gradlew check
 ```

@@ -1,6 +1,14 @@
+<!--
+SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
+
+SPDX-License-Identifier: CC-BY-NC-SA-4.0
+-->
+
 ---
+
 name: gradle-shadow
 description: Working with Gradle Shadow plugin for creating fat JARs with dependency shading. Use when configuring ShadowJar tasks, relocate packages, include/exclude dependencies, minimize JARs, or troubleshooting shadow plugin issues.
+
 ---
 
 # Gradle Shadow Plugin Skill
@@ -16,6 +24,7 @@ Guidance for using the Gradle Shadow plugin to create fat JARs with relocated de
 **Cause:** The shadow plugin's `minimize()` feature uses jdependency library to analyze class usage. When certain JAR files have unusual filenames or metadata, jdependency fails to parse them, resulting in a NPE.
 
 **When it happens:**
+
 - After dependency updates that bring in new JAR files
 - With certain dependencies that have non-standard packaging
 - When the `shadowMinimizeApi` configuration contains problematic artifacts
@@ -82,10 +91,10 @@ tasks.withType<ShadowJar>().configureEach {
 
 Common relocation patterns for popular libraries:
 
-| Original Package | Relocated Package |
-|-----------------|-------------------|
-| `org.eclipse.jgit` | `com.mycompany.shaded.jgit` |
-| `com.google.common` | `com.mycompany.shaded.guava` |
+| Original Package          | Relocated Package            |
+| ------------------------- | ---------------------------- |
+| `org.eclipse.jgit`        | `com.mycompany.shaded.jgit`  |
+| `com.google.common`       | `com.mycompany.shaded.guava` |
 | `com.xenoterracide.tools` | `com.mycompany.shaded.tools` |
 
 ## Gradle Plugin Portal Publishing
@@ -109,10 +118,12 @@ gradlePlugin {
 ## Dependency Locking with Shadow
 
 When using dependency locking, shadow plugin creates additional configurations:
+
 - `shadow` - Shadow-specific dependencies
 - `shadowMinimizeApi` - Used by minimize() for API analysis
 
 After updating dependencies, verify lockfiles include these configurations:
+
 ```bash
 ./gradlew dependencies --write-locks
 ```
