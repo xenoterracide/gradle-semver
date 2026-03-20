@@ -44,7 +44,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v5.0.1
+      - uses: gradle/actions/setup-gradle@v5.0.2
         with:
           gradle-version: current
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
