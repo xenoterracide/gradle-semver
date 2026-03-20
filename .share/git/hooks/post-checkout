@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
+
+# Skip in CI environments
+[ -n "$CI" ] && exit 0
+
+# post-checkout receives: $1 = previous HEAD, $2 = new HEAD, $3 = flag (1=branch, 0=file)
+PREV_HEAD="$1"
+CHECKOUT_TYPE="$3"
+
+# Only run on branch checkouts (not file checkouts)
+[ "$CHECKOUT_TYPE" = "1" ] || exit 0
+
+# Check if lockfiles changed between previous and current HEAD
+YARN_LOCK_CHANGED=0
+UV_LOCK_CHANGED=0
+
+if ! git diff --quiet "$PREV_HEAD" HEAD -- yarn.lock 2>/dev/null; then
+	YARN_LOCK_CHANGED=1
+fi
+
+if ! git diff --quiet "$PREV_HEAD" HEAD -- uv.lock 2>/dev/null; then
+	UV_LOCK_CHANGED=1
+fi
+
+if [ "$YARN_LOCK_CHANGED" -eq 1 ]; then
+	echo "yarn.lock changed, running yarn install --immutable..."
+	yarn install --immutable
+fi
+
+if [ "$UV_LOCK_CHANGED" -eq 1 ]; then
+	echo "uv.lock changed, running uv sync --frozen..."
+	uv sync --frozen
+fi

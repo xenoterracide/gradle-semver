@@ -1,0 +1,15 @@
+{
+  "name": "merge",
+  "license": "GPL-3.0-or-later",
+  "packageManager": "yarn@4.12.0",
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "merge:copilot": "ENGINE=copilot tsx merge.ts",
+    "merge:junie": "ENGINE=junie tsx merge.ts",
+    "merge:kimi": "ENGINE=kimi tsx merge.ts"
+  }
+}

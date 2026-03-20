@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
+#
+# SPDX-License-Identifier: MIT
+
+# Skip in CI environments
+[ -n "$CI" ] && exit 0
+
+# Check if lockfiles changed in this merge (HEAD@{1} is the state before the merge)
+YARN_LOCK_CHANGED=0
+UV_LOCK_CHANGED=0
+
+if ! git diff --quiet HEAD@{1} HEAD -- yarn.lock 2>/dev/null; then
+	YARN_LOCK_CHANGED=1
+fi
+
+if ! git diff --quiet HEAD@{1} HEAD -- uv.lock 2>/dev/null; then
+	UV_LOCK_CHANGED=1
+fi
+
+if [ "$YARN_LOCK_CHANGED" -eq 1 ]; then
+	echo "yarn.lock changed, running yarn install --immutable..."
+	yarn install --immutable
+fi
+
+if [ "$UV_LOCK_CHANGED" -eq 1 ]; then
+	echo "uv.lock changed, running uv sync --frozen..."
+	uv sync --frozen
+fi
