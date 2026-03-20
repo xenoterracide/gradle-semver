@@ -1,6 +1,6 @@
 {
   "name": "share",
-  "packageManager": "yarn@4.12.0",
+  "packageManager": "yarn@4.13.0",
   "private": true,
   "license": "MIT",
   "devDependencies": {
