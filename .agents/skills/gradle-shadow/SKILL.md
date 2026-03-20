@@ -28,7 +28,7 @@ jdependency fails to parse them, resulting in a NPE.
 
 - After dependency updates that bring in new JAR files
 - With certain dependencies that have non-standard packaging
-- When the `shadowMinimizeApi` configuration contains problematic artifacts
+- When minimize-related configurations contain problematic artifacts
 
 **Fix:** Remove `minimize()` from your ShadowJar configuration:
 
@@ -68,7 +68,7 @@ Only include specific dependencies in the shadow JAR:
 ```kotlin
 tasks.withType<ShadowJar>().configureEach {
   dependencies {
-    include { it.moduleGroup == "com.xenoterracide" && it.moduleName == "tools" }
+    include { it.moduleGroup == "com.example" && it.moduleName == "library" }
     include { it.moduleGroup == "com.google.guava" }
   }
 }
@@ -83,7 +83,7 @@ tasks.withType<ShadowJar>().configureEach {
   dependencies {
     exclude { it.moduleGroup == "io.vavr" }
     exclude { it.moduleGroup == "org.slf4j" }
-    exclude { it.moduleName == "semver4j" }
+    exclude { it.moduleName == "some-library" }
   }
 }
 ```
@@ -92,11 +92,11 @@ tasks.withType<ShadowJar>().configureEach {
 
 Common relocation patterns for popular libraries:
 
-| Original Package          | Relocated Package            |
-| ------------------------- | ---------------------------- |
-| `org.eclipse.jgit`        | `com.mycompany.shaded.jgit`  |
-| `com.google.common`       | `com.mycompany.shaded.guava` |
-| `com.xenoterracide.tools` | `com.mycompany.shaded.tools` |
+| Original Package     | Relocated Package              |
+| -------------------- | ------------------------------ |
+| `org.eclipse.jgit`   | `com.mycompany.shaded.jgit`    |
+| `com.google.common`  | `com.mycompany.shaded.guava`   |
+| `org.apache.commons` | `com.mycompany.shaded.commons` |
 
 ## Gradle Plugin Portal Publishing
 
@@ -118,12 +118,9 @@ gradlePlugin {
 
 ## Dependency Locking with Shadow
 
-When using dependency locking, shadow plugin creates additional configurations:
-
-- `shadow` - Shadow-specific dependencies
-- `shadowMinimizeApi` - Used by minimize() for API analysis
-
-After updating dependencies, verify lockfiles include these configurations:
+If using dependency locking with the shadow plugin, note that it may create
+additional configurations (e.g., `shadow`, `shadowMinimizeApi`). After updating
+dependencies, verify lockfiles include these configurations:
 
 ```bash
 ./gradlew dependencies --write-locks
@@ -135,5 +132,5 @@ After updating dependencies, verify lockfiles include these configurations:
 2. **Use include over minimize** - If minimize() causes issues, use explicit
    include filters
 3. **Check lockfile diffs** - After dependency updates, review lockfile changes
-   for shadow configurations
+   for shadow-related configurations
 4. **Test the shadow JAR** - Verify the fat JAR works in integration tests

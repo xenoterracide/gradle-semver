@@ -11,11 +11,13 @@ SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 # Gradle Skill
 
-Guidance for working with Gradle build system in this project.
+Guidance for working with Gradle build system.
 
-## Lockfiles
+## Dependency Locking
 
-This project uses Gradle dependency locking. Lockfiles are located at:
+If this project uses Gradle dependency locking (check for `*.lockfile` files):
+
+**Lockfile locations:**
 
 - `buildscript-gradle.lockfile` (root buildscript classpath)
 - `gradle.lockfile` (root project dependencies)
@@ -28,19 +30,17 @@ When investigating dependency issues or version conflicts:
 
 1. **Check lockfile changes** - Compare `*.lockfile` changes in git to see what
    versions changed
-2. **Look for configuration changes** - Dependency updates often add/remove
-   configurations (e.g., `shadowMinimizeApi`)
+2. **Look for configuration changes** - Dependency updates may add/remove
+   configurations
 3. **Verify lockfiles are in sync** - After dependency changes, run:
    ```bash
    ./gradlew dependencies --write-locks
-   # or
-   yarn ug
    ```
 
 ### Troubleshooting Shadow Plugin Issues
 
-The shadow plugin's `minimize()` feature can cause issues with certain
-dependencies:
+If this project uses the Shadow plugin, the `minimize()` feature can cause
+issues with certain dependencies:
 
 - **Error**: `Cannot read field "forJava" because "parsedFileName" is null`
 - **Cause**: jdependency (used by minimize()) fails to parse certain JAR
@@ -63,14 +63,15 @@ tasks.withType<ShadowJar>().configureEach {
 
 ## Dependency Updates
 
-Standard workflow for updating dependencies:
+Standard workflow for updating dependencies (adjust commands based on project
+setup):
 
 ```bash
-# Update locks normally
-yarn ug
+# Update locks
+./gradlew dependencies --write-locks
 
-# Force refresh and update (dogfood mode)
-yarn ug:dogfood
+# Force refresh and update
+./gradlew dependencies --refresh-dependencies --write-locks
 ```
 
 After updates, verify build passes:
