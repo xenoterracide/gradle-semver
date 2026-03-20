@@ -12,21 +12,32 @@ This file contains AI-specific context. For general contribution guidelines, see
 
 This is a **Gradle plugin project** providing semantic versioning derived from git history. It contains two plugins:
 
-1. **`com.xenoterracide.gradle.semver`** (module: `semver`): Semantic versioning plugin that calculates versions from git tags and commits
-2. **`com.xenoterracide.gradle.git`** (module: `git`): Git metadata provider plugin exposing branch, commit, tags, and distance information
+1. **`com.xenoterracide.gradle.git`** (module: `git`): Git metadata provider plugin exposing branch, commit, tags, and distance information
+2. **`com.xenoterracide.gradle.semver`** (module: `semver`): Semantic versioning plugin that calculates versions from git tags and commits
 
-The plugins expect git tags in the format `v0.1.1` (annotated tags) and prerelease versions like `v0.1.1-rc.1`.
+The plugins expect git tags in the format `v0.1.1` (annotated tags) and prerelease versions like `v1.0.0-rc.1`.
+
+### Version Calculation
+
+The semver plugin uses a strategy pattern to calculate versions based on git context:
+
+| Scenario              | HEAD Branch Output             | Topic Branch Output                           |
+| --------------------- | ------------------------------ | --------------------------------------------- |
+| On exact tag          | `1.0.0`                        | `1.0.0+branch.feature.git.0.abc123`           |
+| After stable tag      | `1.0.1-alpha.0.5+git.5.abc123` | `1.0.1-alpha.0.5+branch.feature.git.3.abc123` |
+| After pre-release tag | `1.0.0-rc.1.5+git.5.abc123`    | `1.0.0-rc.1.5+branch.feature.git.3.abc123`    |
+| No tags               | `0.0.1-alpha.0.5+git.5.abc123` | `0.0.1-alpha.0.5+branch.feature.git.3.abc123` |
 
 ## Technology Stack
 
-| Component              | Version/Tool                                  |
-| ---------------------- | --------------------------------------------- |
-| **Language**           | Java 17+ (source/target), Java 21 (toolchain) |
-| **Build System**       | Gradle 9.3+ with Kotlin DSL                   |
-| **Task Runner**        | Yarn 4.x (package manager for Node tooling)   |
-| **Version Management** | asdf (`.tool-versions`)                       |
-| **Git Hooks**          | lint-staged, git-conventional-commits         |
-| **Python**             | 3.14+ (for REUSE compliance)                  |
+| Component           | Version/Tool                                  |
+| ------------------- | --------------------------------------------- |
+| **Language**        | Java 17+ (source/target), Java 25 (toolchain) |
+| **Build System**    | Gradle 9.x with Kotlin DSL                    |
+| **Task Runner**     | Yarn 4.x (package manager for Node tooling)   |
+| **Version Manager** | asdf (`.tool-versions`)                       |
+| **Git Hooks**       | lint-staged, git-conventional-commits         |
+| **Python**          | 3.14+ (for REUSE compliance)                  |
 
 ### Key Dependencies
 
@@ -36,6 +47,9 @@ The plugins expect git tags in the format `v0.1.1` (annotated tags) and prerelea
 - **Guava**: Google's core libraries
 - **Immutables**: Annotation processor for immutable value objects
 - **JUnit 5 + AssertJ**: Testing framework
+- **ErrorProne**: Compile-time bug detection
+- **SpotBugs**: Bytecode security analysis
+- **Checkstyle**: Code style enforcement
 
 ## Project Structure
 
@@ -58,10 +72,12 @@ gradle-semver/
 ├── .share/git/hooks/           # Git hooks
 ├── .github/workflows/          # CI/CD workflows
 ├── .config/                    # Tool configurations
-└── gradle/                     # Gradle wrapper
+├── gradle/
+│   └── libs.versions.toml      # Version catalog
+└── package.json                # Node/Yarn configuration
 ```
 
-### Module: `git`
+### Module: `git` (com.xenoterracide.gradle.git)
 
 Provides git metadata through the `GitExtension`:
 
@@ -76,26 +92,32 @@ Key classes:
 
 - `GitPlugin`: Plugin entry point
 - `GitMetadata`: Interface for git metadata
-- `GitService`: Service for git operations using JGit
+- `GitMetadataImpl`: Implementation of git metadata
+- `GitService`: Gradle shared service for git operations using JGit
+- `GitDirectoryValueSource`: Configuration-cache safe git directory discovery
 - `DistanceCalculator`: Calculates commit distance between references
+- `MergeBaseFinder`: Finds merge base between branches
+- `Describer`: Describes git references
 
-### Module: `semver`
+Uses the Shadow plugin to create a fat JAR with relocated dependencies (JGit, Guava).
+
+### Module: `semver` (com.xenoterracide.gradle.semver)
 
 Calculates semantic versions using strategy pattern:
-
-| Scenario              | HEAD Branch Output             | Topic Branch Output                           |
-| --------------------- | ------------------------------ | --------------------------------------------- |
-| On exact tag          | `1.0.0`                        | `1.0.0+branch.feature.git.0.abc123`           |
-| After stable tag      | `1.0.1-alpha.0.5+git.5.abc123` | `1.0.1-alpha.0.5+branch.feature.git.3.abc123` |
-| After pre-release tag | `1.0.0-rc.1.5+git.5.abc123`    | `1.0.0-rc.1.5+branch.feature.git.3.abc123`    |
-| No tags               | `0.0.1-alpha.0.5+git.5.abc123` | `0.0.1-alpha.0.5+branch.feature.git.3.abc123` |
 
 Key classes:
 
 - `SemverPlugin`: Plugin entry point
-- `VersionStrategy`: Strategy interface for version calculation
 - `SemverExtension`: Extension for configuring the plugin
+- `VersionStrategy`: Strategy interface for version calculation
+- `VersionStrategyFactory`: Factory for creating appropriate strategy
 - `PrintVersionTask`: Task to print computed version
+- Strategy implementations:
+  - `OnExactTagHeadStrategy` / `OnExactTagTopicStrategy`: When HEAD is exactly on a tag
+  - `AfterTagHeadStrategy` / `AfterTagTopicStrategy`: When commits exist after a tag
+  - `NoTagHeadStrategy` / `NoTagTopicStrategy`: When no tags exist in repo
+
+Uses the Shadow plugin to relocate `com.xenoterracide.tools` and Guava dependencies.
 
 ## Build System
 
@@ -107,15 +129,16 @@ Key classes:
 
 ### Convention Plugin Features
 
-- Java toolchain (Java 21)
+- Java toolchain (Java 25)
 - Source/target compatibility (Java 17)
 - ErrorProne static analysis
 - SpotBugs security analysis
 - Checkstyle code style checks
 - JaCoCo code coverage
 - Javadoc generation
-- Gradle TestKit integration testing
+- Gradle TestKit integration testing (`testIntegration` source set)
 - Maven publication to GitHub Packages and Gradle Plugin Portal
+- Shadow JAR creation with dependency relocation
 
 ### Build Commands
 
@@ -133,11 +156,24 @@ Key classes:
 ./gradlew publishToMavenLocal        # Publish to local Maven cache
 
 # Yarn scripts
-yarn test    # Run all checks (./gradlew check)
-yarn cleaner # Clean build directories
-yarn ug      # Update dependency locks
-yarn merge   # Run full merge workflow (Makefile)
+yarn test          # Run all checks (./gradlew check)
+yarn cleaner       # Clean build directories
+yarn ug            # Update dependency locks
+yarn ug:dogfood    # Update locks with --refresh-dependencies
+yarn merge         # Run full merge workflow (Makefile, default: junie)
+yarn merge:kimi    # Run merge workflow with kimi engine
+yarn merge:copilot # Run merge workflow with copilot engine
 ```
+
+### Makefile Workflow
+
+The `merge` target orchestrates the full PR workflow:
+
+1. Fetches and merges origin/HEAD
+2. Pushes current branch
+3. Creates/updates PR with AI-generated message
+4. Waits for build workflow to pass
+5. Interactive prompt for squash merge
 
 ## Testing Strategy
 
@@ -156,6 +192,7 @@ Each module has three test source sets:
    - End-to-end tests using Gradle TestKit
    - Tests plugin application and task execution
    - Located in `src/testIntegration/java`
+   - Registered as a `JvmTestSuite` with `gradlePlugin.testSourceSet(sources)`
 
 ### Running Tests
 
@@ -176,6 +213,7 @@ Each module has three test source sets:
   - ErrorProne (compile-time bug detection)
   - SpotBugs (bytecode analysis)
   - Checkstyle (style enforcement)
+- **Immutable Objects**: Immutables annotation processor
 
 ### Kotlin DSL
 
@@ -185,12 +223,12 @@ Each module has three test source sets:
 ### General Formatting
 
 - **EditorConfig**: 2-space indentation, LF line endings, UTF-8 (see `.editorconfig`)
-- **Prettier**: Handles XML, YAML, JSON, TOML, properties, shell scripts
+- **Prettier**: Handles XML, YAML, JSON, TOML, properties, shell scripts, Java
 - **License Headers**: Managed via `lint-staged` and REUSE
 
 ### Pre-commit Hooks
 
-Hooks are in `.share/git/hooks/` and configured via `yarn contributor`:
+Hooks are in `.share/git/hooks/` and configured via `yarn contribute`:
 
 - **pre-commit**: Runs `lint-staged` (formatting + license annotation)
 - **commit-msg**: Validates conventional commit format
@@ -215,22 +253,9 @@ Allowed types (from `git-conventional-commits.yaml`):
 - `ci`: CI/CD changes
 - `chore`: Maintenance
 - `deps`: Dependencies
-
-### Merge Workflow (Makefile)
-
-```bash
-yarn merge         # Default (junie engine)
-yarn merge:kimi    # Using kimi engine
-yarn merge:copilot # Using copilot engine
-```
-
-The merge workflow:
-
-1. Fetches and merges origin/HEAD
-2. Pushes current branch
-3. Creates/updates PR with AI-generated message
-4. Waits for build workflow to pass
-5. Interactive prompt for squash merge
+- `ops`: Operations
+- `merge`: Merge commits
+- `revert`: Reverts
 
 ## License Compliance (REUSE 3.0)
 
@@ -258,8 +283,11 @@ Lint-staged automatically adds license headers based on file type (see `.lintsta
 
 1. **`build.yml`** - Main build workflow
    - Runs on all pushes and tags
-   - Jobs: build, full (no cache), publish
-   - Publishes to GitHub Packages and Gradle Plugin Portal on tags
+   - Jobs:
+     - `build`: Standard build with cache
+     - `full`: Build without cache (fresh verification)
+     - `publish`: Publishes to GitHub Packages and Gradle Plugin Portal on tags
+   - Creates GitHub releases with archives on tags
 
 2. **`pre-commit.yml`** - Quality checks
    - License compliance (`reuse lint`)
@@ -295,11 +323,16 @@ Release workflow:
 3. Creates GitHub release with archives
 4. Publishes to Gradle Plugin Portal (tags only)
 
+### GroupId Migration
+
+The `semver` module publishes a relocation POM for the old groupId `com.xenoterracide` to the new `com.xenoterracide.gradle`.
+
 ## Dependency Management
 
 - **Lock Files**: All configurations are locked (`*.lockfile`)
 - **Update Command**: `./gradlew dependencies --write-locks` or `yarn ug`
 - **Dogfood Update**: `yarn ug:dogfood` (with `--refresh-dependencies`)
+- **Version Catalog**: `gradle/libs.versions.toml`
 
 ### Authentication for GitHub Packages
 
@@ -320,6 +353,7 @@ Token needs `read:packages` scope minimum.
 4. **Secret Scanning**: Integrated with GitHub secret scanning
 5. **GPG Signing**: All published artifacts are signed
 6. **Configuration Cache**: Gradle configuration cache enabled for faster, reproducible builds
+7. **Shadow Relocation**: Dependencies are relocated to prevent classpath conflicts
 
 ## Troubleshooting
 
@@ -331,6 +365,15 @@ Shallow clones break version distance calculation. Use instead:
 git fetch --all --filter blob:none
 ```
 
+Or in GitHub Actions:
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    filter: "blob:none"
+    fetch-depth: 0
+```
+
 ### GitHub Actions Annotated Tags
 
 GitHub doesn't checkout annotated tags properly. Workaround in workflow:
@@ -339,6 +382,10 @@ GitHub doesn't checkout annotated tags properly. Workaround in workflow:
 - uses: actions/checkout@v4
   with:
     ref: ${{ github.ref }}
+    filter: "blob:none"
+    fetch-depth: 0
+    fetch-tags: true
+- run: git remote set-head --auto origin
 ```
 
 ### Version Shows 0.0.0
@@ -354,6 +401,8 @@ GitHub doesn't checkout annotated tags properly. Workaround in workflow:
 3. **Group ID**: `com.xenoterracide.gradle`
 4. **Version Tags**: Always annotated tags with `v` prefix (e.g., `v0.15.0`)
 5. **Branch Naming**: Uses `HEAD` branch concept from `git remote set-head`
+6. **Configuration Cache Safety**: All git operations use `ValueSource` for configuration cache compatibility
+7. **Shared Services**: Git operations use Gradle shared services (`GitService`) for efficiency
 
 ## Available Tools
 
@@ -362,3 +411,5 @@ GitHub doesn't checkout annotated tags properly. Workaround in workflow:
 - `ktlint` - Kotlin formatter
 - `prettier` - Multi-language formatter
 - `git-conventional-commits` - Commit message validation
+- `asdf` - Version manager (Java, Node.js, Python, ktlint)
+- `uv` - Python package manager (for REUSE)
