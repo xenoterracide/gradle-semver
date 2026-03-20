@@ -47,7 +47,6 @@ tasks.withType<ShadowJar>().configureEach {
     include { it.moduleGroup == "com.xenoterracide" && it.moduleName == "tools" }
     include { it.moduleGroup == "com.google.guava" }
   }
-  minimize()
 }
 
 testing {
