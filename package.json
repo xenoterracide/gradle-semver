@@ -3,8 +3,10 @@
   "packageManager": "yarn@4.13.0",
   "private": true,
   "license": "GPL-3.0-or-later WITH Classpath-exception-2.0",
+  "workspaces": [
+    ".share/node/*"
+  ],
   "devDependencies": {
-    "@github/copilot": "^0.0.400",
     "@prettier/plugin-xml": "^3.4.2",
     "git-conventional-commits": "^2.8.0",
     "lint-staged": "^16.2.1",
@@ -16,12 +18,12 @@
   },
   "scripts": {
     "contribute": "uv sync --frozen && git config core.hooksPath .share/git/hooks",
+    "merge:copilot": "yarn workspace merge run merge:copilot",
+    "merge:junie": "yarn workspace merge run merge:junie",
+    "merge:kimi": "yarn workspace merge run merge:kimi",
     "cleaner": "rimraf ./build */build ./module/*/build ./.gradle",
     "dependencies:for": "./gradlew dependencies --configuration",
     "merge": "yarn merge:junie",
-    "merge:copilot": "make merge ENGINE=copilot",
-    "merge:junie": "make merge ENGINE=junie",
-    "merge:kimi": "make merge ENGINE=kimi",
     "test": "./gradlew check",
     "ug": "./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0",
     "ug:dogfood": "./gradlew dependencies --refresh-dependencies --write-locks --console=plain | grep -e FAILED || exit 0",
