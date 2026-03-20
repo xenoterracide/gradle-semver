@@ -6,66 +6,7 @@ name: update-java
 on:
   schedule:
     - cron: "0 3 * * *"
-  push:
-    branches:
-      - ci/auto-update-java
-      - ci/auto-update
-    paths-ignore:
-      - "**/*.md"
-      - "LICENSES/**"
-      - "REUSE.toml"
-      - ".editorconfig"
-      - ".gitattributes"
-      - ".gitignore"
-      - ".mailmap"
-      - ".lintstagedrc*"
-      - ".prettier*"
-      - "git-conventional-commits.yaml"
-      - ".idea/**"
-      - ".vscode/**"
 
 jobs:
   update-java:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      packages: read
-    env:
-      ORG_GRADLE_PROJECT_ghUsername: ${{ secrets.GITHUB_ACTOR }}
-      ORG_GRADLE_PROJECT_ghPassword: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v6.0.2
-        with:
-          ref: ${{ github.ref }}
-          filter: "blob:none"
-          fetch-depth: 0
-      - uses: actions/setup-java@v5.2.0
-        with:
-          distribution: temurin
-          java-version: 21
-      - uses: gradle/actions/setup-gradle@v5.0.1
-        with:
-          gradle-version: current
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - run: |
-          find . -name '*gradle.lockfile' -delete
-          gradle wrapper --write-locks
-          ./gradlew dependencies --write-locks --console=plain | grep -e FAILED || exit 0
-          ./gradlew build --write-locks --scan --console=plain | grep -e FAILED -e https
-      - run: |
-          echo "stdout<<EOF" >> $GITHUB_OUTPUT
-          git status --porcelain=1 | tee --append $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        name: git status
-        id: git_status
-      - uses: peter-evans/create-pull-request@v8.1.0
-        id: create_pr
-        with:
-          title: "chore(deps): java"
-          branch: deps/update-java
-          token: ${{ secrets.GH_MERGE_PAT }}
-      - run: gh pr merge --auto --squash ${{ steps.create_pr.outputs.pull-request-number }}
-        if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
-        env:
-          GH_TOKEN: ${{ secrets.GH_MERGE_PAT }}
+    uses: xenoterracide/github/.github/workflows/update-java.yml@develop
