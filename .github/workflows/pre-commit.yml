@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © 2024 - 2025 Caleb Cushing
+# SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 #
 # SPDX-License-Identifier: CC0-1.0
 
@@ -6,44 +6,8 @@ name: precommit
 on: [push, workflow_call]
 jobs:
   license:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - &checkout-step
-        uses: actions/checkout@v6.0.2
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          filter: "blob:none"
-          fetch-depth: 0
-      - uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3"
-      - run: pip install -r requirements.txt
-      - run: reuse lint
-  format:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - *checkout-step
-      - uses: actions/setup-node@v6.2.0
-        with:
-          node-version: 24
-          package-manager-cache: false
-      - run: corepack enable
-      - uses: actions/setup-node@v6.2.0
-        with:
-          node-version: 24
-          cache: "yarn"
-      - run: yarn install --immutable --inline-builds --check-resolutions
-      - run: yarn exec prettier --ignore-unknown --check '**'
-  format-kotlin:
-    runs-on: ubuntu-24.04
-    steps:
-      - *checkout-step
-      - uses: actions/setup-java@v5.2.0
-        with:
-          distribution: temurin
-          java-version: 21
-      - uses: asdf-vm/actions/plugins-add@v4.0.1
-      - run: asdf install ktlint
-      - run: ktlint '*.gradle.kts' '**/*.gradle.kts'
+    uses: xenoterracide/github/.github/workflows/license.yml@develop
+  prettier:
+    uses: xenoterracide/github/.github/workflows/prettier.yml@develop
+  kotlin:
+    uses: xenoterracide/github/.github/workflows/ktlint.yml@develop
