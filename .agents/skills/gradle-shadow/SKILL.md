@@ -1,19 +1,18 @@
+---
+name: gradle-shadow
+description: Working with Gradle Shadow plugin for creating fat JARs with dependency shading. Use when configuring ShadowJar tasks, relocate packages, include/exclude dependencies, minimize JARs, or troubleshooting shadow plugin issues.
+---
+
 <!--
-SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
+SPDX-FileCopyrightText: Copyright © 2026 Caleb Cushing
 
 SPDX-License-Identifier: CC-BY-NC-SA-4.0
 -->
 
----
-
-name: gradle-shadow
-description: Working with Gradle Shadow plugin for creating fat JARs with dependency shading. Use when configuring ShadowJar tasks, relocate packages, include/exclude dependencies, minimize JARs, or troubleshooting shadow plugin issues.
-
----
-
 # Gradle Shadow Plugin Skill
 
-Guidance for using the Gradle Shadow plugin to create fat JARs with relocated dependencies.
+Guidance for using the Gradle Shadow plugin to create fat JARs with relocated
+dependencies.
 
 ## Common Issues
 
@@ -21,7 +20,9 @@ Guidance for using the Gradle Shadow plugin to create fat JARs with relocated de
 
 **Error:** `Cannot read field "forJava" because "parsedFileName" is null`
 
-**Cause:** The shadow plugin's `minimize()` feature uses jdependency library to analyze class usage. When certain JAR files have unusual filenames or metadata, jdependency fails to parse them, resulting in a NPE.
+**Cause:** The shadow plugin's `minimize()` feature uses jdependency library to
+analyze class usage. When certain JAR files have unusual filenames or metadata,
+jdependency fails to parse them, resulting in a NPE.
 
 **When it happens:**
 
@@ -131,6 +132,8 @@ After updating dependencies, verify lockfiles include these configurations:
 ## Best Practices
 
 1. **Always relocate** - Prevent classpath conflicts by relocating shaded packages
-2. **Use include over minimize** - If minimize() causes issues, use explicit include filters
-3. **Check lockfile diffs** - After dependency updates, review lockfile changes for shadow configurations
+2. **Use include over minimize** - If minimize() causes issues, use explicit
+   include filters
+3. **Check lockfile diffs** - After dependency updates, review lockfile changes
+   for shadow configurations
 4. **Test the shadow JAR** - Verify the fat JAR works in integration tests
