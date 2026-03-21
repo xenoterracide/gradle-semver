@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: Copyright © 2024-2026 Caleb Cushing
 //
-// SPDX-License-Identifier: CC-BY-NC-4.0
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 = UC-001: User Registration via Identity Provider
