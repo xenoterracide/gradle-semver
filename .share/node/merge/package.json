@@ -5,7 +5,7 @@
   "devDependencies": {
     "@types/node": "^24.12.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.0"
   },
   "scripts": {
     "merge:copilot": "ENGINE=copilot tsx merge.ts",
