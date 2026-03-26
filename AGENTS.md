@@ -119,6 +119,22 @@ Key classes:
 
 Uses the Shadow plugin to relocate `com.xenoterracide.tools` and Guava dependencies.
 
+## Git Subtrees
+
+The following directories are managed as **git subtrees** and shared across
+multiple projects:
+
+| Directory         | Purpose                          |
+| ----------------- | -------------------------------- |
+| `.agents/skills/` | AI agent skills for common tasks |
+| `.share/`         | Shared git hooks and scripts     |
+
+**Important:** Skills in `.agents/skills/` may contain project-specific
+assumptions (e.g., "this project uses lockfiles"). When porting these skills
+to other projects via git subtree, verify that assumptions still hold. Skills
+should be treated as templates that may need adjustment for different project
+contexts.
+
 ## Build System
 
 ### Gradle Configuration
